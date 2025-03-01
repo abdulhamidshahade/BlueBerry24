@@ -374,3 +374,6 @@ src/BlueBerry24.Services/BlueBerry24.Services.AuthAPI/Properties/launchSettings.
 
 # Ignore BlueBerry24.Services.AuthAPI.http in AuthAPI
 src/BlueBerry24.Services/BlueBerry24.Services.AuthAPI/BlueBerry24.Services.AuthAPI.http
+
+#Ignore Migrations folder in AuthAPI
+src/BlueBerry24.Services/BlueBerry24.Services.AuthAPI/Migrations
