@@ -1,6 +1,5 @@
 ﻿using BlueBerry24.Services.AuthAPI.Models.DTOs;
 using BlueBerry24.Services.AuthAPI.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlueBerry24.Services.AuthAPI.Controllers
