@@ -361,3 +361,16 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+
+# Ignore appsettings.json in AuthAPI
+src/BlueBerry24.Services/BlueBerry24.Services.AuthAPI/appsettings.json
+
+# Ignore appsettings.Development.json in AuthAPI
+src/BlueBerry24.Services/BlueBerry24.Services.AuthAPI/appsettings.Development.json
+
+# Ignore launchSettings.json in AuthAPI
+src/BlueBerry24.Services/BlueBerry24.Services.AuthAPI/Properties/launchSettings.json
+
+# Ignore BlueBerry24.Services.AuthAPI.http in AuthAPI
+src/BlueBerry24.Services/BlueBerry24.Services.AuthAPI/BlueBerry24.Services.AuthAPI.http
