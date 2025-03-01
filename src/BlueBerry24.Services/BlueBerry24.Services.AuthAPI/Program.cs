@@ -1,5 +1,7 @@
 using BlueBerry24.Services.AuthAPI.Data;
 using BlueBerry24.Services.AuthAPI.Models;
+using BlueBerry24.Services.AuthAPI.Services;
+using BlueBerry24.Services.AuthAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +27,9 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
 
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("ApiSettings:JwtOptions"));
+
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
