@@ -68,5 +68,55 @@ namespace BlueBerry24.Services.AuthAPI.Controllers
                 });
             }
         }
+
+        [HttpPost]
+        [Route("login")]
+        public async Task<IActionResult> Login(LoginRequestDto requestDto)
+        {
+            if (requestDto == null || !ModelState.IsValid)
+            {
+                return StatusCode(400, new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 400,
+                    StatusMessage = "Invalid request data.",
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList()
+                });
+            }
+
+            try
+            {
+                var loginResult = await _authService.Login(requestDto);
+
+                if (loginResult.Token != string.Empty)
+                {
+                    return StatusCode(200, new ResponseDto
+                    {
+                        IsSuccess = true,
+                        StatusCode = 200,
+                        StatusMessage = "User logged in successfully.",
+                        Data = loginResult
+                    });
+                }
+
+                return Unauthorized(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 401,
+                    StatusMessage = "Invalid email or password",
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred during user login.");
+
+                return StatusCode(500, new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "An unexpected error occurred."
+                });
+            }
+        }
     }
 }
