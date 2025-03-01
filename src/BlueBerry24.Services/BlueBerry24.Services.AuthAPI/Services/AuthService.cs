@@ -104,7 +104,42 @@ namespace BlueBerry24.Services.AuthAPI.Services
             }
         }
 
+        public async Task<LoginResponseDto> Login(LoginRequestDto requestDto)
+        {
+            var normalizedEmail = requestDto.Email.Trim().ToLower();
+            var user = await _context.ApplicationUsers.FirstOrDefaultAsync(e => e.Email.Trim().ToLower() == normalizedEmail);
 
-        
+            if (user == null)
+            {
+                _logger.LogWarning("User not found for email: {Email}", normalizedEmail);
+                return new LoginResponseDto { User = null, Token = "" };
+            }
+
+            var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, requestDto.Password);
+
+            if (!isPasswordCorrect)
+            {
+                _logger.LogWarning("Invalid password for email: {Email}", normalizedEmail);
+                return new LoginResponseDto { User = null, Token = "" };
+            }
+
+            ApplicationUserDto userDto = new()
+            {
+                Email = requestDto.Email,
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserName = user.UserName
+            };
+
+            var token = await _tokenService.GenerateToken(user);
+
+            return new LoginResponseDto()
+            {
+                User = userDto,
+                Token = token
+            };
+        }
+
     }
 }
