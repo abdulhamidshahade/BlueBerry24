@@ -29,6 +29,7 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("ApiSettings:JwtOptions"));
 
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
