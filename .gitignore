@@ -377,3 +377,17 @@ src/BlueBerry24.Services/BlueBerry24.Services.AuthAPI/BlueBerry24.Services.AuthA
 
 #Ignore Migrations folder in AuthAPI
 src/BlueBerry24.Services/BlueBerry24.Services.AuthAPI/Migrations
+
+
+
+# Ignore appsettings.json in CouponAPI
+src/BlueBerry24.Services/BlueBerry24.Services.CouponAPI/appsettings.json
+
+# Ignore appsettings.Development.json in CouponAPI
+src/BlueBerry24.Services/BlueBerry24.Services.CouponAPI/appsettings.Development.json
+
+# Ignore launchSettings.json in CouponAPI
+src/BlueBerry24.Services/BlueBerry24.Services.CouponAPI/Properties/launchSettings.json
+
+# Ignore BlueBerry24.Services.AuthAPI.http in CouponAPI
+src/BlueBerry24.Services/BlueBerry24.Services.CouponAPI/BlueBerry24.Services.CouponAPI.http
