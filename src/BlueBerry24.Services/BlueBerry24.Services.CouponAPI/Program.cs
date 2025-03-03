@@ -1,4 +1,7 @@
 using BlueBerry24.Services.CouponAPI.Data;
+using BlueBerry24.Services.CouponAPI.Services;
+using BlueBerry24.Services.CouponAPI.Services.Generic;
+using BlueBerry24.Services.CouponAPI.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime;
 
@@ -18,6 +21,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<ICouponService, CouponService>();
 
 var app = builder.Build();
 
