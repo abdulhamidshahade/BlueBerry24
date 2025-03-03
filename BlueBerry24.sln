@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35825.156 d17.13
+VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BlueBerry24.Services", "BlueBerry24.Services", "{9D9DD06E-A0C6-41D6-9617-D0934C003764}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBerry24.Services.AuthAPI", "src\BlueBerry24.Services\BlueBerry24.Services.AuthAPI\BlueBerry24.Services.AuthAPI.csproj", "{477557F8-F841-41F9-A043-ACC44FBDA9E1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBerry24.Services.CouponAPI", "src\BlueBerry24.Services\BlueBerry24.Services.CouponAPI\BlueBerry24.Services.CouponAPI.csproj", "{EDBFF178-78C7-4E16-95A7-8CA407581360}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,6 +21,10 @@ Global
 		{477557F8-F841-41F9-A043-ACC44FBDA9E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{477557F8-F841-41F9-A043-ACC44FBDA9E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{477557F8-F841-41F9-A043-ACC44FBDA9E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDBFF178-78C7-4E16-95A7-8CA407581360}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDBFF178-78C7-4E16-95A7-8CA407581360}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDBFF178-78C7-4E16-95A7-8CA407581360}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDBFF178-78C7-4E16-95A7-8CA407581360}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -26,6 +32,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{9D9DD06E-A0C6-41D6-9617-D0934C003764} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{477557F8-F841-41F9-A043-ACC44FBDA9E1} = {9D9DD06E-A0C6-41D6-9617-D0934C003764}
+		{EDBFF178-78C7-4E16-95A7-8CA407581360} = {9D9DD06E-A0C6-41D6-9617-D0934C003764}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {48BEC03E-CD8F-4B45-9609-669A10424A7D}
