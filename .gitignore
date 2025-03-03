@@ -391,3 +391,6 @@ src/BlueBerry24.Services/BlueBerry24.Services.CouponAPI/Properties/launchSetting
 
 # Ignore BlueBerry24.Services.AuthAPI.http in CouponAPI
 src/BlueBerry24.Services/BlueBerry24.Services.CouponAPI/BlueBerry24.Services.CouponAPI.http
+
+#Ignore Migrations folder in CouponAPI
+src/BlueBerry24.Services/BlueBerry24.Services.CouponAPI/Migrations
