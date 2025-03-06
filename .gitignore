@@ -407,3 +407,6 @@ src/BlueBerry24.Services/BlueBerry24.Services.ProductAPI/Properties/launchSettin
 
 # Ignore BlueBerry24.Services.AuthAPI.http in ProductAPI
 src/BlueBerry24.Services/BlueBerry24.Services.ProductAPI/BlueBerry24.Services.ProductAPI.http
+
+#Ignore Migrations folder in ProductAPI
+src/BlueBerry24.Services/BlueBerry24.Services.ProductAPI/Migrations
