@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BlueBerry24.Services.ProductAPI.Data;
+using BlueBerry24.Services.ProductAPI.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BlueBerry24.Services.ProductAPI.Controllers
 {
@@ -6,5 +8,11 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
+        private readonly IProductService _productService;
+
+        public ProductsController(IProductService productService)
+        {
+            _productService = productService;
+        }
     }
 }
