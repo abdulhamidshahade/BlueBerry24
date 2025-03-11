@@ -152,6 +152,72 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<ActionResult<ResponseDto>> Create([FromBody] CreateCategoryDto categoryDto)
+        {
+            if (categoryDto == null)
+            {
+                var badRequestResponse = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    StatusMessage = "Invalid request",
+                    Errors = new List<string> { "Category data is required" }
+                };
+                return BadRequest(badRequestResponse);
+            }
+
+            try
+            {
+                _logger.LogInformation($"Creating new category with name: {categoryDto.Name}");
+                var createdCategory = await _categoryService.CreateAsync(categoryDto);
+                var response = new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status201Created,
+                    StatusMessage = "Category created successfully",
+                    Data = createdCategory
+                };
+                return CreatedAtRoute("GetCategoryById", new { id = createdCategory.Id }, response);
+            }
+            catch (ValidateException ex)
+            {
+                _logger.LogWarning(ex, "Validation failed when creating category");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    StatusMessage = "Validation failed",
+                    Errors = new List<string> { ex.Message }
+                };
+                return BadRequest(response);
+            }
+            catch (DuplicateEntityException ex)
+            {
+                _logger.LogWarning(ex, $"Category with name {categoryDto.Name} already exists");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status409Conflict,
+                    StatusMessage = "Category already exists",
+                    Errors = new List<string> { ex.Message }
+                };
+                return Conflict(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating category");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    StatusMessage = "Error creating category",
+                    Errors = new List<string> { "An unexpected error occurred" }
+                };
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+        }
+
         
 
 
