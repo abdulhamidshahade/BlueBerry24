@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BlueBerry24.Services.CouponAPI.Models.DTOs;
 using BlueBerry24.Services.ProductAPI.Exceptions;
+using BlueBerry24.Services.ProductAPI.Models.DTOs.ProductDtos;
 using BlueBerry24.Services.ProductAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -144,6 +145,72 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
                     StatusMessage = "Error retrieving product",
+                    Errors = new List<string> { "An unexpected error occurred" }
+                };
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<ResponseDto>> Create([FromBody] CreateProductDto productDto)
+        {
+            if (productDto == null)
+            {
+                var badRequestResponse = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    StatusMessage = "Invalid request",
+                    Errors = new List<string> { "Product data is required" }
+                };
+                return BadRequest(badRequestResponse);
+            }
+
+            try
+            {
+                _logger.LogInformation($"Creating new product with name: {productDto.Name}");
+                var createdProduct = await _productService.CreateAsync(productDto);
+                var response = new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status201Created,
+                    StatusMessage = "Product created successfully",
+                    Data = createdProduct
+                };
+                return CreatedAtRoute("GetProductById", new { id = createdProduct.Id }, response);
+            }
+            catch (ValidateException ex)
+            {
+                _logger.LogWarning(ex, "Validation failed when creating product");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    StatusMessage = "Validation failed",
+                    Errors = new List<string> { ex.Message }
+                };
+                return BadRequest(response);
+            }
+            catch (DuplicateEntityException ex)
+            {
+                _logger.LogWarning(ex, $"Product with name {productDto.Name} already exists");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status409Conflict,
+                    StatusMessage = "Product already exists",
+                    Errors = new List<string> { ex.Message }
+                };
+                return Conflict(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating product");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    StatusMessage = "Error creating product",
                     Errors = new List<string> { "An unexpected error occurred" }
                 };
                 return StatusCode(StatusCodes.Status500InternalServerError, response);
