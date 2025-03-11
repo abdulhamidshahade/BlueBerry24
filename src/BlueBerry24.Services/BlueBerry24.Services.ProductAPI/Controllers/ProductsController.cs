@@ -386,6 +386,59 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
 
 
 
-        
+        [HttpHead("name/{name}")]
+        [HttpGet("exists/name/{name}")]
+        public async Task<ActionResult<ResponseDto>> ExistsByName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                var badRequestResponse = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    StatusMessage = "Invalid request",
+                    Errors = new List<string> { "Product name cannot be empty" }
+                };
+                return BadRequest(badRequestResponse);
+            }
+
+            try
+            {
+                var exists = await _productService.ExistsByNameAsync(name);
+
+                if (exists)
+                {
+                    var response = new ResponseDto
+                    {
+                        IsSuccess = true,
+                        StatusCode = StatusCodes.Status200OK,
+                        StatusMessage = "Product exists",
+                        Data = true
+                    };
+                    return Ok(response);
+                }
+
+                var notFoundResponse = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    StatusMessage = "Product not found",
+                    Data = false
+                };
+                return NotFound(notFoundResponse);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error checking existence of product with name {name}");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    StatusMessage = "Error checking product existence",
+                    Errors = new List<string> { "An unexpected error occurred" }
+                };
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+        }
     }
 }
