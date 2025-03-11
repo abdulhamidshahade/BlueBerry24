@@ -217,5 +217,83 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
             }
         }
 
+
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult<ResponseDto>> Update(int id, [FromBody] UpdateProductDto productDto)
+        {
+            if (productDto == null)
+            {
+                var badRequestResponse = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    StatusMessage = "Invalid request",
+                    Errors = new List<string> { "Product data is required" }
+                };
+                return BadRequest(badRequestResponse);
+            }
+
+            try
+            {
+                _logger.LogInformation($"Updating product with Id: {id}");
+                var updatedCoupon = await _productService.UpdateAsync(id, productDto);
+                var response = new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    StatusMessage = "Product updated successfully",
+                    Data = updatedCoupon
+                };
+                return Ok(response);
+            }
+            catch (ValidateException ex)
+            {
+                _logger.LogWarning(ex, "Validation failed when updating product");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    StatusMessage = "Validation failed",
+                    Errors = new List<string> { ex.Message }
+                };
+                return BadRequest(response);
+            }
+            catch (NotFoundException ex)
+            {
+                _logger.LogWarning(ex, $"Product with ID {id} not found");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    StatusMessage = "Product not found",
+                    Errors = new List<string> { ex.Message }
+                };
+                return NotFound(response);
+            }
+            catch (DuplicateEntityException ex)
+            {
+                _logger.LogWarning(ex, $"Product with name {productDto.Name} already exists");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status409Conflict,
+                    StatusMessage = "Product already exists",
+                    Errors = new List<string> { ex.Message }
+                };
+                return Conflict(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error updating product with ID {id}");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    StatusMessage = "Error updating product",
+                    Errors = new List<string> { "An unexpected error occurred" }
+                };
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+        }
     }
 }
