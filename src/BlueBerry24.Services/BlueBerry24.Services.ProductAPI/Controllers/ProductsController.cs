@@ -95,5 +95,60 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
             }
         }
 
+
+        [HttpGet("name/{name}", Name = "GetProductByName")]
+        public async Task<ActionResult<ResponseDto>> GetByName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                var badRequestResponse = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    StatusMessage = "Invalid request",
+                    Errors = new List<string> { "Product name cannot be empty" }
+                };
+                return BadRequest(badRequestResponse);
+            }
+
+            try
+            {
+                _logger.LogInformation($"Getting product with name: {name}");
+                var product = await _productService.GetByNameAsync(name);
+                var response = new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    StatusMessage = "Product retrieved successfully",
+                    Data = product
+                };
+                return Ok(response);
+            }
+            catch (NotFoundException ex)
+            {
+                _logger.LogWarning(ex, $"Product with name {name} not found");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    StatusMessage = "Product not found",
+                    Errors = new List<string> { ex.Message }
+                };
+                return NotFound(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving product with name {name}");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    StatusMessage = "Error retrieving product",
+                    Errors = new List<string> { "An unexpected error occurred" }
+                };
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+        }
+
     }
 }
