@@ -340,6 +340,51 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
             }
         }
 
+        [HttpHead("{id:int}")]
+        [HttpGet("exists/{id:int}")]
+        public async Task<ActionResult<ResponseDto>> ExistsById(int id)
+        {
+            try
+            {
+                var exists = await _categoryService.ExistsAsync(id);
+
+                if (exists)
+                {
+                    var response = new ResponseDto
+                    {
+                        IsSuccess = true,
+                        StatusCode = StatusCodes.Status200OK,
+                        StatusMessage = "Category exists",
+                        Data = true
+                    };
+                    return Ok(response);
+                }
+
+                var notFoundResponse = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    StatusMessage = "Category not found",
+                    Data = false
+                };
+                return NotFound(notFoundResponse);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error checking existence of category with ID {id}");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    StatusMessage = "Error checking category existence",
+                    Errors = new List<string> { "An unexpected error occurred" }
+                };
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+        }
+
+
+
         
 
 
