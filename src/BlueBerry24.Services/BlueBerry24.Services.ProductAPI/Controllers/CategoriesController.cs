@@ -385,7 +385,60 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
 
 
 
-        
+        [HttpHead("name/{name}")]
+        [HttpGet("exists/name/{name}")]
+        public async Task<ActionResult<ResponseDto>> ExistsByName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                var badRequestResponse = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    StatusMessage = "Invalid request",
+                    Errors = new List<string> { "Category name cannot be empty" }
+                };
+                return BadRequest(badRequestResponse);
+            }
+
+            try
+            {
+                var exists = await _categoryService.ExistsByNameAsync(name);
+
+                if (exists)
+                {
+                    var response = new ResponseDto
+                    {
+                        IsSuccess = true,
+                        StatusCode = StatusCodes.Status200OK,
+                        StatusMessage = "Category exists",
+                        Data = true
+                    };
+                    return Ok(response);
+                }
+
+                var notFoundResponse = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    StatusMessage = "Category not found",
+                    Data = false
+                };
+                return NotFound(notFoundResponse);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error checking existence of category with name {name}");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    StatusMessage = "Error checking category existence",
+                    Errors = new List<string> { "An unexpected error occurred" }
+                };
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+        }
 
 
     }
