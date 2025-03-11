@@ -218,6 +218,85 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
             }
         }
 
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult<ResponseDto>> Update(int id, [FromBody] UpdateCategoryDto categoryDto)
+        {
+            if (categoryDto == null)
+            {
+                var badRequestResponse = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    StatusMessage = "Invalid request",
+                    Errors = new List<string> { "Category data is required" }
+                };
+                return BadRequest(badRequestResponse);
+            }
+
+            try
+            {
+                _logger.LogInformation($"Updating category with Id: {id}");
+                var updatedCategory = await _categoryService.UpdateAsync(id, categoryDto);
+                var response = new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    StatusMessage = "Category updated successfully",
+                    Data = updatedCategory
+                };
+                return Ok(response);
+            }
+            catch (ValidateException ex)
+            {
+                _logger.LogWarning(ex, "Validation failed when updating category");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    StatusMessage = "Validation failed",
+                    Errors = new List<string> { ex.Message }
+                };
+                return BadRequest(response);
+            }
+            catch (NotFoundException ex)
+            {
+                _logger.LogWarning(ex, $"Category with ID {id} not found");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    StatusMessage = "Category not found",
+                    Errors = new List<string> { ex.Message }
+                };
+                return NotFound(response);
+            }
+            catch (DuplicateEntityException ex)
+            {
+                _logger.LogWarning(ex, $"Category with name {categoryDto.Name} already exists");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status409Conflict,
+                    StatusMessage = "Category already exists",
+                    Errors = new List<string> { ex.Message }
+                };
+                return Conflict(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error updating category with ID {id}");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    StatusMessage = "Error updating category",
+                    Errors = new List<string> { "An unexpected error occurred" }
+                };
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+        }
+
+
         
 
 
