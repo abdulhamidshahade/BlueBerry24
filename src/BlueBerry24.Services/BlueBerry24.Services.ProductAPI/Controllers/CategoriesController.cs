@@ -297,6 +297,49 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
         }
 
 
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult<ResponseDto>> Delete(int id)
+        {
+            try
+            {
+                _logger.LogInformation($"Deleting category with ID: {id}");
+                var deleted = await _categoryService.DeleteAsync(id);
+
+                if (!deleted)
+                {
+                    _logger.LogWarning($"Category with ID {id} not found for deletion");
+                    var notFoundResponse = new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        StatusMessage = "Category not found",
+                        Errors = new List<string> { $"Category with ID {id} not found" }
+                    };
+                    return NotFound(notFoundResponse);
+                }
+
+                var response = new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    StatusMessage = "Category deleted successfully"
+                };
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting category with ID {id}");
+                var response = new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    StatusMessage = "Error deleting category",
+                    Errors = new List<string> { "An unexpected error occurred" }
+                };
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+        }
+
         
 
 
