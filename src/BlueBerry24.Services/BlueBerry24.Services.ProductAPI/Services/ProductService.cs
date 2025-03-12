@@ -12,13 +12,16 @@ namespace BlueBerry24.Services.ProductAPI.Services
         private readonly IRepository<Product> _productRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly ApplicationDbConte
+        private readonly IProductCategoryService _productCategoryService;
 
-        public ProductService(IRepository<Product> productRepository, IUnitOfWork unitOfWork, IMapper mapper)
+        public ProductService(IRepository<Product> productRepository, IUnitOfWork unitOfWork, 
+            IMapper mapper,
+            IProductCategoryService productCategoryService)
         {
             _productRepository = productRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _productCategoryService = productCategoryService;
         }
 
         public async Task<ProductDto> GetByIdAsync(int id)
@@ -71,6 +74,9 @@ namespace BlueBerry24.Services.ProductAPI.Services
             var product = _mapper.Map<Product>(productDto);
 
             await _productRepository.AddAsync(product);
+
+            await _productCategoryService.AddProductCategoryAsync(product, categories);
+
             await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<ProductDto>(product);
@@ -104,6 +110,9 @@ namespace BlueBerry24.Services.ProductAPI.Services
             existingProduct.ImageUrl = productDto.ImageUrl;
 
             _productRepository.Update(existingProduct);
+
+            await _productCategoryService.UpdateProductCategoryAsync(existingProduct, categories);
+
             await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<ProductDto>(existingProduct);
