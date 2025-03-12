@@ -152,7 +152,8 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ResponseDto>> Create([FromBody] CreateProductDto productDto)
+        public async Task<ActionResult<ResponseDto>> Create([FromBody] CreateProductDto productDto,
+            [FromQuery] List<int> categories)
         {
             if (productDto == null)
             {
@@ -169,7 +170,7 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
             try
             {
                 _logger.LogInformation($"Creating new product with name: {productDto.Name}");
-                var createdProduct = await _productService.CreateAsync(productDto);
+                var createdProduct = await _productService.CreateAsync(productDto, categories);
                 var response = new ResponseDto
                 {
                     IsSuccess = true,
@@ -219,7 +220,8 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
 
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<ResponseDto>> Update(int id, [FromBody] UpdateProductDto productDto)
+        public async Task<ActionResult<ResponseDto>> Update(int id, [FromBody] UpdateProductDto productDto,
+            [FromQuery] List<int> categories)
         {
             if (productDto == null)
             {
@@ -236,13 +238,13 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
             try
             {
                 _logger.LogInformation($"Updating product with Id: {id}");
-                var updatedCoupon = await _productService.UpdateAsync(id, productDto);
+                var updatedProduct = await _productService.UpdateAsync(id, productDto, categories);
                 var response = new ResponseDto
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
                     StatusMessage = "Product updated successfully",
-                    Data = updatedCoupon
+                    Data = updatedProduct
                 };
                 return Ok(response);
             }
