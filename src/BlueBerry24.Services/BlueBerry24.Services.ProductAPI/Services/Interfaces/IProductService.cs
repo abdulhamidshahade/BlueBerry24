@@ -8,8 +8,8 @@ namespace BlueBerry24.Services.ProductAPI.Services.Interfaces
         Task<ProductDto> GetByIdAsync(int id);
         Task<ProductDto> GetByNameAsync(string name);
         Task<IEnumerable<ProductDto>> GetAllAsync();
-        Task<ProductDto> CreateAsync(CreateProductDto productDto);
-        Task<ProductDto> UpdateAsync(int id, UpdateProductDto productDto);
+        Task<ProductDto> CreateAsync(CreateProductDto productDto, List<int> categories);
+        Task<ProductDto> UpdateAsync(int id, UpdateProductDto productDto, List<int> categories);
         Task<bool> DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);
         Task<bool> ExistsByNameAsync(string name);

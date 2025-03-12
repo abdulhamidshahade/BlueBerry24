@@ -36,7 +36,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "BlueBerry24 CouponAPI v1");
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "BlueBerry24 ProductAPI v1");
         options.RoutePrefix = string.Empty;
     });
 }

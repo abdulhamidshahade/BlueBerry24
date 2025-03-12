@@ -12,6 +12,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
         private readonly IRepository<Product> _productRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ApplicationDbConte
 
         public ProductService(IRepository<Product> productRepository, IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -55,7 +56,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
             return _mapper.Map<IEnumerable<ProductDto>>(products);
         }
 
-        public async Task<ProductDto> CreateAsync(CreateProductDto productDto)
+        public async Task<ProductDto> CreateAsync(CreateProductDto productDto, List<int> categories)
         {
             if (productDto == null)
             {
@@ -76,7 +77,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
         }
 
 
-        public async Task<ProductDto> UpdateAsync(int id, UpdateProductDto productDto)
+        public async Task<ProductDto> UpdateAsync(int id, UpdateProductDto productDto, List<int> categories)
         {
             if (productDto == null)
             {
