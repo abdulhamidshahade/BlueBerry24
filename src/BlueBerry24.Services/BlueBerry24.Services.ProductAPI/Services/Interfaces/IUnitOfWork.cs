@@ -3,6 +3,6 @@
     public interface IUnitOfWork
     {
         void Dispose();
-        Task SaveChangesAsync();
+        Task<int> SaveChangesAsync();
     }
 }
