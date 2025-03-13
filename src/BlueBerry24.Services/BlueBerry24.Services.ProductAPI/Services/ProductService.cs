@@ -4,6 +4,8 @@ using BlueBerry24.Services.ProductAPI.Models;
 using BlueBerry24.Services.ProductAPI.Services.Generic;
 using BlueBerry24.Services.ProductAPI.Models.DTOs.ProductDtos;
 using BlueBerry24.Services.ProductAPI.Exceptions;
+using Microsoft.EntityFrameworkCore.Storage;
+using BlueBerry24.Services.ProductAPI.Data;
 
 namespace BlueBerry24.Services.ProductAPI.Services
 {
@@ -13,15 +15,18 @@ namespace BlueBerry24.Services.ProductAPI.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IProductCategoryService _productCategoryService;
+        private readonly ApplicationDbContext _context;
 
         public ProductService(IRepository<Product> productRepository, IUnitOfWork unitOfWork, 
             IMapper mapper,
-            IProductCategoryService productCategoryService)
+            IProductCategoryService productCategoryService,
+            ApplicationDbContext context)
         {
             _productRepository = productRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _productCategoryService = productCategoryService;
+            _context = context;
         }
 
         public async Task<ProductDto> GetByIdAsync(int id)
@@ -71,15 +76,25 @@ namespace BlueBerry24.Services.ProductAPI.Services
                 throw new DuplicateEntityException($"Product with name {productDto.Name} already exists");
             }
 
-            var product = _mapper.Map<Product>(productDto);
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                var product = _mapper.Map<Product>(productDto);
 
-            await _productRepository.AddAsync(product);
+                await _productRepository.AddAsync(product);
 
-            await _productCategoryService.AddProductCategoryAsync(product, categories);
+                await _unitOfWork.SaveChangesAsync();
 
-            await _unitOfWork.SaveChangesAsync();
+                if(!await _productCategoryService.AddProductCategoryAsync(product, categories))
+                {
+                    await transaction.RollbackAsync();
+                    throw new Exception("Failed to add product categories.");
+                }
 
-            return _mapper.Map<ProductDto>(product);
+                await _unitOfWork.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return _mapper.Map<ProductDto>(product);
+            }
         }
 
 
