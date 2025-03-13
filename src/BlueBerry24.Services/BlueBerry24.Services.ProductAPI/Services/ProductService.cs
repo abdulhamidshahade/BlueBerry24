@@ -29,7 +29,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
             _context = context;
         }
 
-        public async Task<ProductDto> GetByIdAsync(int id)
+        public async Task<ProductDto> GetByIdAsync(string id)
         {
             var product = await _productRepository.GetByIdAsync(id);
 
@@ -64,7 +64,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
             return _mapper.Map<IEnumerable<ProductDto>>(products);
         }
 
-        public async Task<ProductDto> CreateAsync(CreateProductDto productDto, List<int> categories)
+        public async Task<ProductDto> CreateAsync(CreateProductDto productDto, List<string> categories)
         {
             if (productDto == null)
             {
@@ -98,7 +98,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
         }
 
 
-        public async Task<ProductDto> UpdateAsync(int id, UpdateProductDto productDto, List<int> categories)
+        public async Task<ProductDto> UpdateAsync(string id, UpdateProductDto productDto, List<string> categories)
         {
             if (productDto == null)
             {
@@ -133,7 +133,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
             return _mapper.Map<ProductDto>(existingProduct);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(string id)
         {
             var product = await _productRepository.GetByIdAsync(id);
             if (product == null)
@@ -147,7 +147,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
             return true;
         }
 
-        public async Task<bool> ExistsAsync(int id)
+        public async Task<bool> ExistsAsync(string id)
         {
             return await _productRepository.ExistsAsync(i => i.Id == id);
         }

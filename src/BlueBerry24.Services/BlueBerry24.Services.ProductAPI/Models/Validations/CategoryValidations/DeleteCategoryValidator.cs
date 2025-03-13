@@ -7,7 +7,7 @@ namespace BlueBerry24.Services.ProductAPI.Models.Validations.CategoryValidations
     {
         public DeleteCategoryValidator()
         {
-            RuleFor(p => p.Id).GreaterThan(0).WithMessage("ID is required!");
+            
         }
     }
 }

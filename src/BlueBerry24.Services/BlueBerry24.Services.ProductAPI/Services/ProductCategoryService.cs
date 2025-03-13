@@ -21,14 +21,14 @@ namespace BlueBerry24.Services.ProductAPI.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<bool> AddProductCategoryAsync(Product product, List<int> categories)
+        public async Task<bool> AddProductCategoryAsync(Product product, List<string> categories)
         {
             if(categories.Count == 0 || !await _productService.ExistsAsync(x => x.Id == product.Id))
             {
                 return false;
             }
 
-            foreach(int categoryId in categories)
+            foreach(string categoryId in categories)
             {
                 await _context.Products_Categories.AddAsync(new ProductCategory
                 {
@@ -40,7 +40,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
             return await _unitOfWork.SaveChangesAsync() > 1;
         }
 
-        public async Task<bool> UpdateProductCategoryAsync(Product product, List<int> categories)
+        public async Task<bool> UpdateProductCategoryAsync(Product product, List<string> categories)
         {
             if (categories.Count == 0 || !await _productService.ExistsAsync(x => x.Id == product.Id))
             {

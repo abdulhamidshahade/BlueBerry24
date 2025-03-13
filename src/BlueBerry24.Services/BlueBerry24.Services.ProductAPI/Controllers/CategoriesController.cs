@@ -55,8 +55,8 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
             }
         }
 
-        [HttpGet("{id:int}", Name = "GetCategoryById")]
-        public async Task<ActionResult<ResponseDto>> GetById(int id)
+        [HttpGet("{id:guid}", Name = "GetCategoryById")]
+        public async Task<ActionResult<ResponseDto>> GetById(string id)
         {
             try
             {
@@ -218,8 +218,8 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
             }
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<ActionResult<ResponseDto>> Update(int id, [FromBody] UpdateCategoryDto categoryDto)
+        [HttpPut("{id:guid}")]
+        public async Task<ActionResult<ResponseDto>> Update(string id, [FromBody] UpdateCategoryDto categoryDto)
         {
             if (categoryDto == null)
             {
@@ -297,8 +297,8 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
         }
 
 
-        [HttpDelete("{id:int}")]
-        public async Task<ActionResult<ResponseDto>> Delete(int id)
+        [HttpDelete("{id:guid}")]
+        public async Task<ActionResult<ResponseDto>> Delete(string id)
         {
             try
             {
@@ -340,9 +340,9 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
             }
         }
 
-        [HttpHead("{id:int}")]
-        [HttpGet("exists/{id:int}")]
-        public async Task<ActionResult<ResponseDto>> ExistsById(int id)
+        [HttpHead("{id:guid}")]
+        [HttpGet("exists/{id:guid}")]
+        public async Task<ActionResult<ResponseDto>> ExistsById(string id)
         {
             try
             {

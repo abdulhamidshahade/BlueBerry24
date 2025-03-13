@@ -54,8 +54,8 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
             }
         }
 
-        [HttpGet("{id:int}", Name = "GetProductById")]
-        public async Task<ActionResult<ResponseDto>> GetById(int id)
+        [HttpGet("{id:guid}", Name = "GetProductById")]
+        public async Task<ActionResult<ResponseDto>> GetById(string id)
         {
             try
             {
@@ -153,7 +153,7 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
 
         [HttpPost]
         public async Task<ActionResult<ResponseDto>> Create([FromBody] CreateProductDto productDto,
-            [FromQuery] List<int> categories)
+            [FromQuery] List<string> categories)
         {
             if (productDto == null)
             {
@@ -219,9 +219,9 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
         }
 
 
-        [HttpPut("{id:int}")]
-        public async Task<ActionResult<ResponseDto>> Update(int id, [FromBody] UpdateProductDto productDto,
-            [FromQuery] List<int> categories)
+        [HttpPut("{id:guid}")]
+        public async Task<ActionResult<ResponseDto>> Update(string id, [FromBody] UpdateProductDto productDto,
+            [FromQuery] List<string> categories)
         {
             if (productDto == null)
             {
@@ -299,8 +299,8 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
         }
 
 
-        [HttpDelete("{id:int}")]
-        public async Task<ActionResult<ResponseDto>> Delete(int id)
+        [HttpDelete("{id:guid}")]
+        public async Task<ActionResult<ResponseDto>> Delete(string id)
         {
             try
             {
@@ -343,9 +343,9 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
         }
 
 
-        [HttpHead("{id:int}")]
-        [HttpGet("exists/{id:int}")]
-        public async Task<ActionResult<ResponseDto>> ExistsById(int id)
+        [HttpHead("{id:guid}")]
+        [HttpGet("exists/{id:guid}")]
+        public async Task<ActionResult<ResponseDto>> ExistsById(string id)
         {
             try
             {

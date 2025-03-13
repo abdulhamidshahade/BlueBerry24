@@ -20,7 +20,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
             _mapper = mapper;
         }
 
-        public async Task<CategoryDto> GetByIdAsync(int id)
+        public async Task<CategoryDto> GetByIdAsync(string id)
         {
             var category = await _categoryRepository.GetByIdAsync(id);
 
@@ -76,7 +76,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
         }
 
 
-        public async Task<CategoryDto> UpdateAsync(int id, UpdateCategoryDto categoryDto)
+        public async Task<CategoryDto> UpdateAsync(string id, UpdateCategoryDto categoryDto)
         {
             if (categoryDto == null)
             {
@@ -106,7 +106,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
             return _mapper.Map<CategoryDto>(existingCategory);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(string id)
         {
             var category = await _categoryRepository.GetByIdAsync(id);
             if (category == null)
@@ -120,7 +120,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
             return true;
         }
 
-        public async Task<bool> ExistsAsync(int id)
+        public async Task<bool> ExistsAsync(string id)
         {
             return await _categoryRepository.ExistsAsync(i => i.Id == id);
         }

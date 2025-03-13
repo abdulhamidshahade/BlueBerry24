@@ -2,6 +2,6 @@
 {
     public class DeleteCategoryDto : CategoryBase
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
     }
 }
