@@ -50,8 +50,8 @@ namespace BlueBerry24.Services.CouponAPI.Controllers
         }
 
 
-        [HttpGet("{id:int}", Name = "GetCouponById")]
-        public async Task<ActionResult<ResponseDto>> GetById(int id)
+        [HttpGet("{id:guid}", Name = "GetCouponById")]
+        public async Task<ActionResult<ResponseDto>> GetById(string id)
         {
             try
             {
@@ -213,8 +213,8 @@ namespace BlueBerry24.Services.CouponAPI.Controllers
             }
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<ActionResult<ResponseDto>> Update(int id, [FromBody] CouponDto couponDto)
+        [HttpPut("{id:guid}")]
+        public async Task<ActionResult<ResponseDto>> Update(string id, [FromBody] CouponDto couponDto)
         {
             if (couponDto == null)
             {
@@ -291,8 +291,8 @@ namespace BlueBerry24.Services.CouponAPI.Controllers
             }
         }
 
-        [HttpDelete("{id:int}")]
-        public async Task<ActionResult<ResponseDto>> Delete(int id)
+        [HttpDelete("{id:guid}")]
+        public async Task<ActionResult<ResponseDto>> Delete(string id)
         {
             try
             {
@@ -334,9 +334,9 @@ namespace BlueBerry24.Services.CouponAPI.Controllers
             }
         }
 
-        [HttpHead("{id:int}")]
+        [HttpHead("{id:guid}")]
         [HttpGet("exists/{id:int}")]
-        public async Task<ActionResult<ResponseDto>> Exists(int id)
+        public async Task<ActionResult<ResponseDto>> Exists(string id)
         {
             try
             {

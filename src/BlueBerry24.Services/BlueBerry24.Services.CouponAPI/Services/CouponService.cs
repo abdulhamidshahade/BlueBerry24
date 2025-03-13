@@ -21,7 +21,7 @@ namespace BlueBerry24.Services.CouponAPI.Services
             _mapper = mapper;
         }
 
-        public async Task<CouponDto> GetByIdAsync(int id)
+        public async Task<CouponDto> GetByIdAsync(string id)
         {
             var coupon = await _couponRepository.GetByIdAsync(id);
 
@@ -78,7 +78,7 @@ namespace BlueBerry24.Services.CouponAPI.Services
         }
 
 
-        public async Task<CouponDto> UpdateAsync(int id, CouponDto couponDto)
+        public async Task<CouponDto> UpdateAsync(string id, CouponDto couponDto)
         {
             if (couponDto == null)
             {
@@ -110,7 +110,7 @@ namespace BlueBerry24.Services.CouponAPI.Services
             return _mapper.Map<CouponDto>(existingCoupon);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(string id)
         {
             var coupon = await _couponRepository.GetByIdAsync(id);
             if (coupon == null)
@@ -124,7 +124,7 @@ namespace BlueBerry24.Services.CouponAPI.Services
             return true;
         }
 
-        public async Task<bool> ExistsAsync(int id)
+        public async Task<bool> ExistsAsync(string id)
         {
             return await _couponRepository.ExistsAsync(i => i.Id == id);
         }
