@@ -13,6 +13,6 @@ namespace BlueBerry24.Services.ShopAPI.Models
         public string Country { get; set; }
         public string City { get; set; }
         public string LogoUrl { get; set; }
-        public OwnerStatus Status { get; set; } = OwnerStatus.Active;
+        public ShopStatus Status { get; set; } = ShopStatus.Active;
     }
 }
