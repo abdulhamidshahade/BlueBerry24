@@ -1,4 +1,7 @@
 using BlueBerry24.Services.ShopAPI.Data;
+using BlueBerry24.Services.ShopAPI.Services;
+using BlueBerry24.Services.ShopAPI.Services.Generic;
+using BlueBerry24.Services.ShopAPI.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +19,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("MSSQLServerConnectionString"));
 });
+
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IShopService, ShopService>();
+
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 
