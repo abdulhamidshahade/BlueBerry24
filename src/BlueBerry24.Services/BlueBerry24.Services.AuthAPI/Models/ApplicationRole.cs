@@ -2,7 +2,7 @@
 
 namespace BlueBerry24.Services.AuthAPI.Models
 {
-    public class ApplicationRole : IdentityRole<Guid>
+    public class ApplicationRole : IdentityRole
     {
         public ApplicationRole()
         {
