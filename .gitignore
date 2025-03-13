@@ -410,3 +410,17 @@ src/BlueBerry24.Services/BlueBerry24.Services.ProductAPI/BlueBerry24.Services.Pr
 
 #Ignore Migrations folder in ProductAPI
 src/BlueBerry24.Services/BlueBerry24.Services.ProductAPI/Migrations
+
+
+
+# Ignore appsettings.json in ShopAPI
+src/BlueBerry24.Services/BlueBerry24.Services.ShopAPI/appsettings.json
+
+# Ignore appsettings.Development.json in ShopAPI
+src/BlueBerry24.Services/BlueBerry24.Services.ShopAPI/appsettings.Development.json
+
+# Ignore launchSettings.json in ShopAPI
+src/BlueBerry24.Services/BlueBerry24.Services.ShopAPI/Properties/launchSettings.json
+
+# Ignore BlueBerry24.Services.AuthAPI.http in ShopAPI
+src/BlueBerry24.Services/BlueBerry24.Services.ShopAPI/BlueBerry24.Services.ShopAPI.http
