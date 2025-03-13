@@ -8,7 +8,7 @@ namespace BlueBerry24.Services.ShopAPI.Halpers
     {
         public ShopMapperProfile()
         {
-            CreateMap<Shop, ShopDto>().ReverseMap();
+            CreateMap<ShopDto, Shop>().ReverseMap();
             CreateMap<CreateShopDto, Shop>().ReverseMap();
             CreateMap<UpdateShopDto, Shop>().ReverseMap();
             CreateMap<DeleteShopDto, Shop>().ReverseMap();
