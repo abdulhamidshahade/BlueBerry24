@@ -1,5 +1,6 @@
 ﻿using BlueBerry24.Services.ProductAPI.Data;
 using BlueBerry24.Services.ProductAPI.Models;
+using BlueBerry24.Services.ProductAPI.Services.Generic;
 using BlueBerry24.Services.ProductAPI.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,11 +9,11 @@ namespace BlueBerry24.Services.ProductAPI.Services
     public class ProductCategoryService : IProductCategoryService
     {
         private readonly ApplicationDbContext _context;
-        private readonly IProductService _productService;
+        private readonly IRepository<Product> _productService;
         private readonly IUnitOfWork _unitOfWork;
 
         public ProductCategoryService(ApplicationDbContext context, 
-            IProductService productService,
+            IRepository<Product> productService,
             IUnitOfWork unitOfWork)
         {
             _context = context;
@@ -22,7 +23,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
 
         public async Task<bool> AddProductCategoryAsync(Product product, List<int> categories)
         {
-            if(categories.Count == 0 || !await _productService.ExistsAsync(product.Id))
+            if(categories.Count == 0 || !await _productService.ExistsAsync(x => x.Id == product.Id))
             {
                 return false;
             }
@@ -41,7 +42,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
 
         public async Task<bool> UpdateProductCategoryAsync(Product product, List<int> categories)
         {
-            if (categories.Count == 0 || !await _productService.ExistsAsync(product.Id))
+            if (categories.Count == 0 || !await _productService.ExistsAsync(x => x.Id == product.Id))
             {
                 return false;
             } 
