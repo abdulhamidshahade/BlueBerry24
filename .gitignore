@@ -441,3 +441,7 @@ src/BlueBerry24.Services/BlueBerry24.Services.ShoppingCartAPI/Properties/launchS
 
 # Ignore BlueBerry24.Services.AuthAPI.http in ShoppingCartAPI
 src/BlueBerry24.Services/BlueBerry24.Services.ShoppingCartAPI/BlueBerry24.Services.ShoppingCartAPI.http
+
+
+#Ignore Migrations folder in ShoppingCartAPI
+src/BlueBerry24.Services/BlueBerry24.Services.ShoppingCartAPI/Migrations
