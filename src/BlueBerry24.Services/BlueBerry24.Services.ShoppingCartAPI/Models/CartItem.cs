@@ -10,7 +10,7 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Models
         public string CartHeaderId { get; set; }
         public CartHeader CartHeader { get; set; }
 
-        public int ProductId { get; set; }
+        public string ProductId { get; set; }
 
         [NotMapped]
         public ProductDto Product { get; set; }
