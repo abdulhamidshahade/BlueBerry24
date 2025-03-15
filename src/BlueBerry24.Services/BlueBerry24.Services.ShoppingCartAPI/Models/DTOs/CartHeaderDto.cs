@@ -7,5 +7,6 @@
         public decimal Discount { get; set; }
         public string CouponCode { get; set; }
         public decimal CartTotal { get; set; }
+        public bool IsActive { get; set; }
     }
 }

@@ -8,6 +8,8 @@
         public string CouponCode { get; set; }
         public decimal CartTotal { get; set; }
 
+        public bool IsActive { get; set; }
+
         public List<CartItem> CartItems { get; set; } = new List<CartItem>();
     }
 }
