@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using BlueBerry24.Services.ShoppingCartAPI.Data;
 using BlueBerry24.Services.ShoppingCartAPI.Exceptions;
+using BlueBerry24.Services.ShoppingCartAPI.Models;
 using BlueBerry24.Services.ShoppingCartAPI.Models.DTOs;
 using BlueBerry24.Services.ShoppingCartAPI.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace BlueBerry24.Services.ShoppingCartAPI.Services
 {
@@ -11,42 +13,74 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public CartService(ApplicationDbContext context, IMapper mapper)
+        public CartService(ApplicationDbContext context, IMapper mapper, IHttpClientFactory httpClientFactory)
         {
             _context = context;
             _mapper = mapper;
+            _httpClientFactory = httpClientFactory;
         }
-        public Task<CartDto> AddItemAsync(string userId, string headerId, CartItemDto itemDto)
+        public async Task<bool> AddItemAsync(string userId, string headerId, CartItemDto itemDto)
         {
-            throw new NotImplementedException();
-        }
+            var cartHeader = await _context.CartHeaders.FirstOrDefaultAsync(u => u.Id == headerId && u.UserId == userId);
 
-        public Task<CartDto> ApplyCouponAsync(string userId, string headerId, string couponCode)
+            if(cartHeader == null)
+            {
+                cartHeader = await CreateCartAsync(userId);
+
+                headerId = cartHeader.Id;
+            }
+
+            var productExists = await _context.CartItems.FirstOrDefaultAsync(i => i.ProductId == itemDto.ProductId && i.CartHeaderId == headerId);
+
+            if (productExists != null)
+            {
+                productExists.Count++;
+            }
+            else
+            {
+                var item = new CartItem
+                {
+                    CartHeaderId = headerId,
+                    Count = 1,
+                    ProductId = itemDto.ProductId
+                };
+
+                await _context.CartHeaders.AddAsync(cartHeader);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+        public async Task<CartHeader> CreateCartAsync(string userId)
         {
-            throw new NotImplementedException();
-        }
+            var cartHeader = new CartHeader
+            {
+                UserId = userId,
+                IsActive = true
+            };
 
-        public Task<CartDto> CreateCartAsync(string userId)
+            await _context.CartHeaders.AddAsync(cartHeader);
+            await _context.SaveChangesAsync();
+
+            return cartHeader;
+        }
+        public async Task<bool> DeleteShoppingCartAsync(string userId, string headerId)
         {
-            throw new NotImplementedException();
-        }
+            var CartHeader = await _context.CartHeaders.FirstOrDefaultAsync(u => u.UserId == userId && u.Id == headerId && u.IsActive);
 
-        public Task<CartDto> DeleteShoppingCartAsync(string userId, string headerId)
+            _context.CartHeaders.Remove(CartHeader);
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+        public async Task<bool> ExistsByUserIdAsync(string userId, string headerId)
         {
-            throw new NotImplementedException();
+            return await _context.CartHeaders.AnyAsync(u => u.UserId == userId);
         }
-
-        public Task<bool> ExistsByHeaderIdAsync(string userId, string headerId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> ExistsByUserIdAsync(string userId)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<CartDto> GetCartByHeaderIdAsync(string userId, string headerId)
         {
             if(userId == null || headerId == null)
@@ -78,8 +112,7 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
                 throw new NotFoundException("There is no cart header found");
             }
         }
-
-        public async Task<CartDto> GetShoppingCartByUserIdAsync(string userId)
+        public async Task<CartDto> GetCartByUserIdAsync(string userId)
         {
             if (userId == null)
             {
@@ -111,28 +144,105 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
                 throw new NotFoundException("There is no cart header found");
             }
         }
+        public async Task<bool> RemoveItemAsync(string userId, string headerId, string productId)
+        {
+            var cartHeader = await _context.CartHeaders.FirstOrDefaultAsync(u => u.UserId == userId && u.Id == headerId && u.IsActive);
 
-        public Task<bool> RemoveItemAsync(string userId, string headerId, string itemId)
+            if(cartHeader == null)
+            {
+                throw new NotFoundException("The shopping cart not found");
+            }
+
+            var item = await _context.CartItems.FirstOrDefaultAsync(h => h.CartHeaderId == headerId && h.ProductId == productId);
+
+            if(item == null)
+            {
+                throw new NotFoundException("The item was not found.");
+            }
+
+
+            if(item.Count == 1)
+            {
+                _context.CartItems.Remove(item);
+            }
+            else
+            {
+                item.Count--;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+        public async Task<bool> UpdateCartHeaderAsync(string userId, string headerId, CartHeaderDto headerDto)
+        {
+
+            var cartHeader = await _context.CartHeaders.FirstOrDefaultAsync(h => h.Id == headerId
+                                                                            && h.UserId == userId && h.IsActive);
+
+            if(cartHeader == null)
+            {
+                throw new NotFoundException("The cart header not found!");
+            }
+
+            cartHeader.CartTotal = headerDto.CartTotal;
+            cartHeader.Discount = headerDto.Discount;
+            cartHeader.CouponCode = headerDto.CouponCode;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+        public async Task<bool> UpdateItemCountAsync(string userId, string headerId, string itemId, int newCount)
+        {
+            var cartHeader = await _context.CartHeaders.FirstOrDefaultAsync(i =>
+                i.Id == headerId &&
+                i.UserId == userId &&
+                i.IsActive
+            );
+
+            if(cartHeader == null)
+            {
+                throw new Exception("The header not found");
+            }
+
+            var item = await _context.CartItems.FirstOrDefaultAsync(i => i.Id == itemId && i.CartHeaderId == headerId);
+
+            if(item == null)
+            {
+                throw new Exception("The item not found");
+            }
+
+            if(newCount < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(newCount), "Quantity cannot be negative");
+            }
+            else if(newCount == 0)
+            {
+                _context.CartItems.Remove(item);
+            }
+            else
+            {
+                item.Count = newCount;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+        public async Task<bool> ExistsByHeaderIdAsync(string userId, string headerId)
+        {
+            return await _context.CartHeaders.AnyAsync(i => i.Id == headerId);
+        }
+
+
+
+        public async Task<CouponDto> GetCouponByNameAsync(string userId, string couponCode)
         {
             throw new NotImplementedException();
         }
 
-        public Task<CartDto> UpdateCartHeaderAsync(string userId, string headerId, CartHeaderDto headerDto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<CartDto> UpdateItemCountAsync(string userId, string headerId, string itemId, int newCount)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> ValidateCouponAsync(string userId, string couponCode)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> ValidateShopOwner(string userId)
+        public Task<bool> RedeemCouponAsync(string userId, string headerId, string couponCode)
         {
             throw new NotImplementedException();
         }
