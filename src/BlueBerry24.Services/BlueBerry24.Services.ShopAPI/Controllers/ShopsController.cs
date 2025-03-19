@@ -53,7 +53,8 @@ namespace BlueBerry24.Services.ShopAPI.Controllers
         }
 
 
-        [HttpGet("{id:guid}", Name = "GetShopById")]
+        [HttpGet]
+        [Route("{id}")]
         public async Task<ActionResult<ResponseDto>> GetById(string id)
         {
             try
@@ -176,7 +177,7 @@ namespace BlueBerry24.Services.ShopAPI.Controllers
                     StatusMessage = "Coupon created successfully",
                     Data = createdShop
                 };
-                return CreatedAtRoute("GetShopById", new { id = createdShop.Id }, response);
+                return Ok(response);
             }
             catch (ValidateException ex)
             {
@@ -337,8 +338,7 @@ namespace BlueBerry24.Services.ShopAPI.Controllers
             }
         }
 
-        [HttpHead("{id:guid}")]
-        [HttpGet("exists/{id:int}")]
+        [HttpGet("exists/{id}")]
         public async Task<ActionResult<ResponseDto>> Exists(string id)
         {
             try
@@ -352,7 +352,6 @@ namespace BlueBerry24.Services.ShopAPI.Controllers
                         IsSuccess = true,
                         StatusCode = StatusCodes.Status200OK,
                         StatusMessage = "Shop exists",
-                        Data = true
                     };
                     return Ok(response);
                 }
@@ -362,7 +361,6 @@ namespace BlueBerry24.Services.ShopAPI.Controllers
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
                     StatusMessage = "Shop not found",
-                    Data = false
                 };
                 return NotFound(notFoundResponse);
             }
@@ -380,7 +378,6 @@ namespace BlueBerry24.Services.ShopAPI.Controllers
             }
         }
 
-        [HttpHead("name/{name}")]
         [HttpGet("exists/name/{name}")]
         public async Task<ActionResult<ResponseDto>> ExistsByName(string name)
         {
