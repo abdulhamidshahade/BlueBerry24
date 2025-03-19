@@ -7,5 +7,10 @@
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         public List<ProductCategory> ProductCategories { get; set; }
+
+        public Category()
+        {
+            Id = Guid.NewGuid().ToString();
+        }
     }
 }

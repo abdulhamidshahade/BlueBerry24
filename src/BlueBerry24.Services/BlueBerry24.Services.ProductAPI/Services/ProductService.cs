@@ -6,6 +6,7 @@ using BlueBerry24.Services.ProductAPI.Models.DTOs.ProductDtos;
 using BlueBerry24.Services.ProductAPI.Exceptions;
 using Microsoft.EntityFrameworkCore.Storage;
 using BlueBerry24.Services.ProductAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlueBerry24.Services.ProductAPI.Services
 {
@@ -31,7 +32,10 @@ namespace BlueBerry24.Services.ProductAPI.Services
 
         public async Task<ProductDto> GetByIdAsync(string id)
         {
-            var product = await _productRepository.GetByIdAsync(id);
+            var product = await _context.Products.Where(i => i.Id == id)
+                .Include(c => c.ProductCategories)
+                .ThenInclude(c => c.Category)
+                .FirstOrDefaultAsync();
 
             if (product == null)
             {
@@ -48,7 +52,10 @@ namespace BlueBerry24.Services.ProductAPI.Services
                 throw new ArgumentException($"Product with name: {name} cannot be empty", nameof(name));
             }
 
-            var product = await _productRepository.GetAsync(c => c.Name == name);
+            var product = await _context.Products.Where(n => n.Name == name)
+                .Include(c => c.ProductCategories)
+                .ThenInclude(c => c.Category)
+                .FirstOrDefaultAsync();
             
             if (product == null)
             {
@@ -60,7 +67,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
 
         public async Task<IEnumerable<ProductDto>> GetAllAsync()
         {
-            var products = await _productRepository.GetAllAsync();
+            var products = await _context.Products.Include(c => c.ProductCategories).ThenInclude(c => c.Category).ToListAsync();
             return _mapper.Map<IEnumerable<ProductDto>>(products);
         }
 
@@ -93,6 +100,10 @@ namespace BlueBerry24.Services.ProductAPI.Services
                 await _unitOfWork.SaveChangesAsync();
 
                 await transaction.CommitAsync();
+
+                product = await _context.Products.Where(i => i.Id == product.Id).Include(c => c.ProductCategories)
+                    .ThenInclude(c => c.Category).FirstOrDefaultAsync();
+
                 return _mapper.Map<ProductDto>(product);
             }
         }
@@ -129,6 +140,11 @@ namespace BlueBerry24.Services.ProductAPI.Services
             await _productCategoryService.UpdateProductCategoryAsync(existingProduct, categories);
 
             await _unitOfWork.SaveChangesAsync();
+
+            existingProduct = await _context.Products.Where(i => i.Id == existingProduct.Id)
+                .Include(c => c.ProductCategories)
+                .ThenInclude(c => c.Category)
+                .FirstOrDefaultAsync();
 
             return _mapper.Map<ProductDto>(existingProduct);
         }

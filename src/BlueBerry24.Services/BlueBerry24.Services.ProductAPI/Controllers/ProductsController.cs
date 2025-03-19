@@ -219,7 +219,7 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
         }
 
 
-        [HttpPut("{id:guid}")]
+        [HttpPut("{id}")]
         public async Task<ActionResult<ResponseDto>> Update(string id, [FromBody] UpdateProductDto productDto,
             [FromQuery] List<string> categories)
         {
@@ -299,7 +299,7 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
         }
 
 
-        [HttpDelete("{id:guid}")]
+        [HttpDelete("{id}")]
         public async Task<ActionResult<ResponseDto>> Delete(string id)
         {
             try
@@ -342,9 +342,7 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
             }
         }
 
-
-        [HttpHead("{id:guid}")]
-        [HttpGet("exists/{id:guid}")]
+        [HttpGet("exists/{id}")]
         public async Task<ActionResult<ResponseDto>> ExistsById(string id)
         {
             try
@@ -387,8 +385,6 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
         }
 
 
-
-        [HttpHead("name/{name}")]
         [HttpGet("exists/name/{name}")]
         public async Task<ActionResult<ResponseDto>> ExistsByName(string name)
         {

@@ -8,5 +8,10 @@
 
         public string CategoryId { get; set; }
         public Category Category { get; set; }
+
+        public ProductCategory()
+        {
+            Id = Guid.NewGuid().ToString();
+        }
     }
 }

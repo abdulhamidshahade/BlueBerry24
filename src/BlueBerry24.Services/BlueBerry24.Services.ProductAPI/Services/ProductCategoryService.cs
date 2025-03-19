@@ -37,7 +37,9 @@ namespace BlueBerry24.Services.ProductAPI.Services
                 });
             }
 
-            return await _unitOfWork.SaveChangesAsync() > 1;
+            await _unitOfWork.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<bool> UpdateProductCategoryAsync(Product product, List<string> categories)

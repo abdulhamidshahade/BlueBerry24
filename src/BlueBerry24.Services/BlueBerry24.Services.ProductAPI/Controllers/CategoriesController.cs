@@ -340,7 +340,6 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
             }
         }
 
-        [HttpHead("{id:guid}")]
         [HttpGet("exists/{id:guid}")]
         public async Task<ActionResult<ResponseDto>> ExistsById(string id)
         {
@@ -384,8 +383,6 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
         }
 
 
-
-        [HttpHead("name/{name}")]
         [HttpGet("exists/name/{name}")]
         public async Task<ActionResult<ResponseDto>> ExistsByName(string name)
         {

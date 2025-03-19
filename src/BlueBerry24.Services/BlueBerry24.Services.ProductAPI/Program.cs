@@ -3,12 +3,17 @@ using BlueBerry24.Services.ProductAPI.Services;
 using BlueBerry24.Services.ProductAPI.Services.Generic;
 using BlueBerry24.Services.ProductAPI.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
 

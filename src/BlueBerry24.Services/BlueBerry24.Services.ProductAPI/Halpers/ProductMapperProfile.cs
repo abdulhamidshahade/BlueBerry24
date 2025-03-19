@@ -8,7 +8,12 @@ namespace BlueBerry24.Services.ProductAPI.Halpers
     {
         public ProductMapperProfile()
         {
-            CreateMap<Product, ProductDto>().ReverseMap();
+            CreateMap<Product, ProductDto>()
+                .ForMember(dest => dest.Categories,
+                opt => opt.MapFrom(src => src.ProductCategories.Select(pc => pc.Category)));
+
+
+
             CreateMap<Product, UpdateProductDto>().ReverseMap();
             CreateMap<Product, CreateProductDto>().ReverseMap();
             CreateMap<Product, DeleteProductDto>().ReverseMap();
