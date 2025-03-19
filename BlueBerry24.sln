@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBerry24.Services.Shoppi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBerry24.Services.UserCouponAPI", "src\BlueBerry24.Services\BlueBerry24.Services.UserCouponAPI\BlueBerry24.Services.UserCouponAPI.csproj", "{A42DC22A-257D-4C2D-9DA5-88469FD5D220}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBerry24.Services.StockAPI", "src\BlueBerry24.Services\BlueBerry24.Services.StockAPI\BlueBerry24.Services.StockAPI.csproj", "{6A235DDA-C779-4A6A-8195-11301AC482EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{A42DC22A-257D-4C2D-9DA5-88469FD5D220}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A42DC22A-257D-4C2D-9DA5-88469FD5D220}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A42DC22A-257D-4C2D-9DA5-88469FD5D220}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A235DDA-C779-4A6A-8195-11301AC482EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A235DDA-C779-4A6A-8195-11301AC482EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A235DDA-C779-4A6A-8195-11301AC482EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A235DDA-C779-4A6A-8195-11301AC482EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -61,6 +67,7 @@ Global
 		{D6DA8A54-3209-46E7-817B-D370E0D7D2D5} = {9D9DD06E-A0C6-41D6-9617-D0934C003764}
 		{C22FE05D-8595-4640-88FF-49FAB2CDDF44} = {9D9DD06E-A0C6-41D6-9617-D0934C003764}
 		{A42DC22A-257D-4C2D-9DA5-88469FD5D220} = {9D9DD06E-A0C6-41D6-9617-D0934C003764}
+		{6A235DDA-C779-4A6A-8195-11301AC482EA} = {9D9DD06E-A0C6-41D6-9617-D0934C003764}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {48BEC03E-CD8F-4B45-9609-669A10424A7D}
