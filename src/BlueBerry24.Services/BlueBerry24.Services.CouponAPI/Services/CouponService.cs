@@ -55,7 +55,7 @@ namespace BlueBerry24.Services.CouponAPI.Services
             return _mapper.Map<IEnumerable<CouponDto>>(coupons);
         }
 
-        public async Task<CouponDto> CreateAsync(CouponDto couponDto)
+        public async Task<CouponDto> CreateAsync(CreateCouponDto couponDto)
         {
             if (couponDto == null)
             {
@@ -85,7 +85,7 @@ namespace BlueBerry24.Services.CouponAPI.Services
                 throw new ArgumentNullException(nameof(couponDto));
             }
 
-            await ValidateCouponDto(couponDto);
+
 
             var existingCoupon = await _couponRepository.GetByIdAsync(id);
             if (existingCoupon == null)
@@ -124,7 +124,7 @@ namespace BlueBerry24.Services.CouponAPI.Services
             return true;
         }
 
-        public async Task<bool> ExistsAsync(string id)
+        public async Task<bool> ExistsByIdAsync(string id)
         {
             return await _couponRepository.ExistsAsync(i => i.Id == id);
         }
@@ -140,7 +140,7 @@ namespace BlueBerry24.Services.CouponAPI.Services
         }
 
 
-        private async Task ValidateCouponDto(CouponDto couponDto)
+        private async Task ValidateCouponDto(CreateCouponDto couponDto)
         {
             if (string.IsNullOrWhiteSpace(couponDto.Code))
             {

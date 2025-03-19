@@ -9,6 +9,7 @@ namespace BlueBerry24.Services.CouponAPI.Halpers
         public AutoMapperProfile()
         {
             CreateMap<Coupon, CouponDto>().ReverseMap();
+            CreateMap<Coupon, CreateCouponDto>().ReverseMap();
         }
     }
 }

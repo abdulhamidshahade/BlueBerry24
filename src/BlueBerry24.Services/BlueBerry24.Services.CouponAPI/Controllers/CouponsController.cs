@@ -50,7 +50,7 @@ namespace BlueBerry24.Services.CouponAPI.Controllers
         }
 
 
-        [HttpGet("{id:guid}", Name = "GetCouponById")]
+        [HttpGet("{id}", Name = "GetCouponById")]
         public async Task<ActionResult<ResponseDto>> GetById(string id)
         {
             try
@@ -148,7 +148,7 @@ namespace BlueBerry24.Services.CouponAPI.Controllers
 
 
         [HttpPost]
-        public async Task<ActionResult<ResponseDto>> Create([FromBody] CouponDto couponDto)
+        public async Task<ActionResult<ResponseDto>> Create([FromBody] CreateCouponDto couponDto)
         {
             if (couponDto == null)
             {
@@ -213,7 +213,7 @@ namespace BlueBerry24.Services.CouponAPI.Controllers
             }
         }
 
-        [HttpPut("{id:guid}")]
+        [HttpPut("{id}")]
         public async Task<ActionResult<ResponseDto>> Update(string id, [FromBody] CouponDto couponDto)
         {
             if (couponDto == null)
@@ -291,7 +291,7 @@ namespace BlueBerry24.Services.CouponAPI.Controllers
             }
         }
 
-        [HttpDelete("{id:guid}")]
+        [HttpDelete("{id}")]
         public async Task<ActionResult<ResponseDto>> Delete(string id)
         {
             try
@@ -334,13 +334,13 @@ namespace BlueBerry24.Services.CouponAPI.Controllers
             }
         }
 
-        [HttpHead("{id:guid}")]
-        [HttpGet("exists/{id:int}")]
+        [HttpGet]
+        [Route("exists/{id}")]
         public async Task<ActionResult<ResponseDto>> Exists(string id)
         {
             try
             {
-                var exists = await _couponService.ExistsAsync(id);
+                var exists = await _couponService.ExistsByIdAsync(id);
 
                 if (exists)
                 {
@@ -349,7 +349,6 @@ namespace BlueBerry24.Services.CouponAPI.Controllers
                         IsSuccess = true,
                         StatusCode = StatusCodes.Status200OK,
                         StatusMessage = "Coupon exists",
-                        Data = true
                     };
                     return Ok(response);
                 }
@@ -359,7 +358,6 @@ namespace BlueBerry24.Services.CouponAPI.Controllers
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
                     StatusMessage = "Coupon not found",
-                    Data = false
                 };
                 return NotFound(notFoundResponse);
             }
@@ -377,7 +375,15 @@ namespace BlueBerry24.Services.CouponAPI.Controllers
             }
         }
 
-        [HttpHead("code/{code}")]
+        //[HttpHead]
+        //[Route("exists/{id:guid}")]
+        //public async Task<IActionResult> ExistsById(string id)
+        //{
+        //    var exists = await _couponService.ExistsByIdAsync(id);
+
+        //    return (!exists) ? NotFound() : Ok();
+        //}
+
         [HttpGet("exists/code/{code}")]
         public async Task<ActionResult<ResponseDto>> ExistsByCode(string code)
         {
@@ -404,7 +410,6 @@ namespace BlueBerry24.Services.CouponAPI.Controllers
                         IsSuccess = true,
                         StatusCode = StatusCodes.Status200OK,
                         StatusMessage = "Coupon exists",
-                        Data = true
                     };
                     return Ok(response);
                 }
@@ -414,7 +419,6 @@ namespace BlueBerry24.Services.CouponAPI.Controllers
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
                     StatusMessage = "Coupon not found",
-                    Data = false
                 };
                 return NotFound(notFoundResponse);
             }
