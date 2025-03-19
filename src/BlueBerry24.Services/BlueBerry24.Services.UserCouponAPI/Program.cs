@@ -1,4 +1,6 @@
 using BlueBerry24.Services.UserCouponAPI.Data;
+using BlueBerry24.Services.UserCouponAPI.Services;
+using BlueBerry24.Services.UserCouponAPI.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +20,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+
+builder.Services.AddHttpClient("Coupon", c => c.BaseAddress =
+new Uri(builder.Configuration["ApiSettings:CouponAPIUrl"]));
+
+builder.Services.AddHttpClient("User", c => c.BaseAddress =
+new Uri(builder.Configuration["ApiSettings:UserAPIUrl"]));
+
+
+builder.Services.AddScoped<IUserCouponService, UserCouponService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICouponService, CouponService>();
 
 
 var app = builder.Build();
