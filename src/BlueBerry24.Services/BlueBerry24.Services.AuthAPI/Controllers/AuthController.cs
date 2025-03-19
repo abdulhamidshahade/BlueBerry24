@@ -10,11 +10,12 @@ namespace BlueBerry24.Services.AuthAPI.Controllers
     {
         private readonly IAuthService _authService;
         private readonly ILogger<AuthController> _logger;
-
-        public AuthController(IAuthService authService, ILogger<AuthController> logger)
+        private readonly IUserService _userService;
+        public AuthController(IAuthService authService, ILogger<AuthController> logger, IUserService userService)
         {
             _authService = authService;
             _logger = logger;
+            _userService = userService;
         }
 
         [HttpPost]
@@ -116,6 +117,55 @@ namespace BlueBerry24.Services.AuthAPI.Controllers
                     StatusMessage = "An unexpected error occurred."
                 });
             }
+        }
+
+        [HttpGet]
+        [Route("exists/{id}")]
+        public async Task<ActionResult<ResponseDto>> IsUserExistsById(string id)
+        {
+            var exists = await _userService.IsUserExistsByIdAsync(id);
+
+            if (!exists)
+            {
+                return NotFound(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 404,
+                    StatusMessage = "The user is not exists by Id"
+                });
+            }
+
+            return Ok(new ResponseDto
+            {
+                IsSuccess = true,
+                StatusCode = 200,
+                StatusMessage = "The user is exists by Id"
+            });
+        }
+
+
+        [HttpGet]
+        [Route("exists/email-address/{emailAddress}")]
+        public async Task<IActionResult> IsUserExistsByEmail(string emailAddress)
+        {
+            var exists = await _userService.IsUserExistsByEmailAsync(emailAddress);
+
+            if (!exists)
+            {
+                return NotFound(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 404,
+                    StatusMessage = "The user is not exists by Email"
+                });
+            }
+
+            return Ok(new ResponseDto
+            {
+                IsSuccess = true,
+                StatusCode = 200,
+                StatusMessage = "The user is exists by Email"
+            });
         }
     }
 }
