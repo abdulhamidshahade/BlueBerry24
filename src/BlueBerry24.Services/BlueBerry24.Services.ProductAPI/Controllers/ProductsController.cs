@@ -347,7 +347,7 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
         {
             try
             {
-                var exists = await _productService.ExistsAsync(id);
+                var exists = await _productService.ExistsByIdAsync(id);
 
                 if (exists)
                 {
@@ -437,6 +437,40 @@ namespace BlueBerry24.Services.ProductAPI.Controllers
                 };
                 return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
+        }
+
+
+        [HttpGet]
+        [Route("exists/shop/{productId}")]
+        public async Task<ActionResult<ResponseDto>> ExistsByShopId(string productId, [FromQuery] string shopId)
+        {
+            if(string.IsNullOrEmpty(productId) || string.IsNullOrEmpty(shopId))
+            {
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 400,
+                    StatusMessage = "product id or shop id is null"
+                });
+            }
+
+            var exists = await _productService.ExistsByShopIdAsync(productId, shopId);
+
+            if (exists)
+            {
+                return Ok(new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    StatusMessage = "The product exists by shop successfully"
+                });
+            }
+            return NotFound(new ResponseDto
+            {
+                IsSuccess = false,
+                StatusCode = 404,
+                StatusMessage = "The product don't found by shop id"
+            });
         }
     }
 }
