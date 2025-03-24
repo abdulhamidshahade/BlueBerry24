@@ -11,7 +11,8 @@ namespace BlueBerry24.Services.ProductAPI.Services.Interfaces
         Task<ProductDto> CreateAsync(CreateProductDto productDto, List<string> categories);
         Task<ProductDto> UpdateAsync(string id, UpdateProductDto productDto, List<string> categories);
         Task<bool> DeleteAsync(string id);
-        Task<bool> ExistsAsync(string id);
+        Task<bool> ExistsByIdAsync(string id);
         Task<bool> ExistsByNameAsync(string name);
+        Task<bool> ExistsByShopIdAsync(string productId, string shopId);
     }
 }

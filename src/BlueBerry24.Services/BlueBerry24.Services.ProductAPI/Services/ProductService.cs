@@ -163,7 +163,7 @@ namespace BlueBerry24.Services.ProductAPI.Services
             return true;
         }
 
-        public async Task<bool> ExistsAsync(string id)
+        public async Task<bool> ExistsByIdAsync(string id)
         {
             return await _productRepository.ExistsAsync(i => i.Id == id);
         }
@@ -176,6 +176,15 @@ namespace BlueBerry24.Services.ProductAPI.Services
             }
 
             return await _productRepository.ExistsAsync(c => c.Name == name);
+        }
+
+
+
+        public async Task<bool> ExistsByShopIdAsync(string productId, string shopId)
+        {
+            var exists = await _context.Products.Where(i => i.Id == productId && i.ShopId == shopId).AnyAsync();
+
+            return exists;
         }
     }
 }
