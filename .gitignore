@@ -483,3 +483,18 @@ src/BlueBerry24.Services/BlueBerry24.Services.StockAPI/BlueBerry24.Services.Stoc
 #Ignore Migrations folder in StockAPI
 src/BlueBerry24.Services/BlueBerry24.Services.StockAPI/Migrations
 
+
+
+
+
+# Ignore appsettings.json in NotificationAPI
+src/BlueBerry24.Services/BlueBerry24.Services.NotificationAPI/appsettings.json
+
+# Ignore appsettings.Development.json in NotificationAPI
+src/BlueBerry24.Services/BlueBerry24.Services.NotificationAPI/appsettings.Development.json
+
+# Ignore launchSettings.json in NotificationAPI
+src/BlueBerry24.Services/BlueBerry24.Services.NotificationAPI/Properties/launchSettings.json
+
+# Ignore BlueBerry24.Services.StockAPI.http in NotificationAPI
+src/BlueBerry24.Services/BlueBerry24.Services.NotificationAPI/BlueBerry24.Services.NotificationAPI.http
