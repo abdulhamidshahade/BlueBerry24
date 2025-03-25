@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBerry24.Services.UserCo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBerry24.Services.StockAPI", "src\BlueBerry24.Services\BlueBerry24.Services.StockAPI\BlueBerry24.Services.StockAPI.csproj", "{6A235DDA-C779-4A6A-8195-11301AC482EA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBerry24.Services.NotificationAPI", "src\BlueBerry24.Services\BlueBerry24.Services.NotificationAPI\BlueBerry24.Services.NotificationAPI.csproj", "{1B6A5D97-DFC8-4295-97E5-8DF2BDDC04FF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{6A235DDA-C779-4A6A-8195-11301AC482EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A235DDA-C779-4A6A-8195-11301AC482EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A235DDA-C779-4A6A-8195-11301AC482EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B6A5D97-DFC8-4295-97E5-8DF2BDDC04FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B6A5D97-DFC8-4295-97E5-8DF2BDDC04FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B6A5D97-DFC8-4295-97E5-8DF2BDDC04FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B6A5D97-DFC8-4295-97E5-8DF2BDDC04FF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -68,6 +74,7 @@ Global
 		{C22FE05D-8595-4640-88FF-49FAB2CDDF44} = {9D9DD06E-A0C6-41D6-9617-D0934C003764}
 		{A42DC22A-257D-4C2D-9DA5-88469FD5D220} = {9D9DD06E-A0C6-41D6-9617-D0934C003764}
 		{6A235DDA-C779-4A6A-8195-11301AC482EA} = {9D9DD06E-A0C6-41D6-9617-D0934C003764}
+		{1B6A5D97-DFC8-4295-97E5-8DF2BDDC04FF} = {9D9DD06E-A0C6-41D6-9617-D0934C003764}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {48BEC03E-CD8F-4B45-9609-669A10424A7D}
