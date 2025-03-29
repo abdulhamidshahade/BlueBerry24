@@ -8,6 +8,6 @@ namespace BlueBerry24.Services.UserCouponAPI.Services.Interfaces
         Task<bool> DisableUserCouponAsync(string usreId, string couponId);
         Task<IReadOnlyCollection<string>> GetCouponsByUserIdAsync(string userId);
         Task<IReadOnlyCollection<string>> GetUsersByCouponIdAsync(string couponId);
-        Task<bool> HasUserUsedCouponAsync(string userId, string couponId);
+        Task<bool> IsCouponUsedByUser(string userId, string couponId);
     }
 }
