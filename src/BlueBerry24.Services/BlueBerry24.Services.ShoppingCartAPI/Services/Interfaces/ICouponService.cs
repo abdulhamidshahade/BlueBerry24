@@ -2,7 +2,7 @@
 {
     public interface ICouponService
     {
-        Task<bool> IsUsedByUserAsync(string userId);
-        Task<bool> IsAvailableAsync(string userId);
+        Task<bool> IsUsedByUserAsync(string userId, string couponCode);
+        //Task<bool> IsAvailableAsync(string couponCode);
     }
 }
