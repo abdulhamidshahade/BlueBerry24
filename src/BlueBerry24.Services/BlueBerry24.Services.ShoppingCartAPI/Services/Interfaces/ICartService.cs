@@ -19,7 +19,6 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services.Interfaces
         Task<bool> UpdateCartHeaderAsync(string userId, string headerId, CartHeaderDto headerDto);
 
 
-        Task<decimal> RedeemCouponAsync(string userId, string headerId, string couponCode);
-        Task<CouponDto> GetCouponByNameAsync(string userId, string couponCode);
+ 
     }
 }
