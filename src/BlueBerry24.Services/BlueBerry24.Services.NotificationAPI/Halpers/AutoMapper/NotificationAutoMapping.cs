@@ -9,6 +9,7 @@ namespace BlueBerry24.Services.NotificationAPI.Halpers.AutoMapper
         public NotificationAutoMapping()
         {
             CreateMap<Notification, NotificationDto>().ReverseMap();
+            CreateMap<Notification, CreateNotificationDto>().ReverseMap();
         }
     }
 }
