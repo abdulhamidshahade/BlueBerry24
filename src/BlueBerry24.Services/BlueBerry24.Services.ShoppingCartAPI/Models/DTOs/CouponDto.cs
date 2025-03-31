@@ -6,6 +6,5 @@
         public string Code { get; set; }
         public decimal DiscountAmount { get; set; }
         public decimal MinimumAmount { get; set; }
-        public string ShopId { get; set; }
     }
 }
