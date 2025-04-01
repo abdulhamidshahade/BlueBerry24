@@ -97,7 +97,7 @@ namespace BlueBerry24.Services.ShopAPI.Controllers
         }
 
         [HttpGet("name/{name}", Name = "GetShopByName")]
-        public async Task<ActionResult<ResponseDto>> GetByCode(string name)
+        public async Task<ActionResult<ResponseDto>> GetByName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
