@@ -19,6 +19,12 @@ namespace BlueBerry24.Services.NotificationAPI.Models
 
         public DateTime ExpirationDate { get; set; }
 
+        public Notification()
+        {
+            Id = Guid.NewGuid().ToString();
+            CreatedAt = DateTime.UtcNow;
+        }
+
 
     }
 }
