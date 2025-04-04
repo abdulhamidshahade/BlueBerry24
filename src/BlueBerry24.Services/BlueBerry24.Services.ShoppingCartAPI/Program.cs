@@ -69,14 +69,20 @@ builder.Services.AddAuthentication(x =>
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
+builder.Services.AddScoped<ICartService, CartService>();
+
 
 builder.Services.AddHttpClient("Product", u => u.BaseAddress =
 new Uri(builder.Configuration["ServiceUrls:ProductAPIUrl"]));
 
 builder.Services.AddHttpClient("Coupons", c => c.BaseAddress =
 new Uri(builder.Configuration["ServiceUrls:CouponAPIUrl"]));
+
+
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
