@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BlueBerry24.Services.ShoppingCartAPI.Data;
 using BlueBerry24.Services.ShoppingCartAPI.Exceptions;
+using BlueBerry24.Services.ShoppingCartAPI.Messaging.Client;
 using BlueBerry24.Services.ShoppingCartAPI.Models;
 using BlueBerry24.Services.ShoppingCartAPI.Models.DTOs;
 using BlueBerry24.Services.ShoppingCartAPI.Services.Interfaces;
@@ -14,12 +15,15 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _config;
 
-        public CartService(ApplicationDbContext context, IMapper mapper, IHttpClientFactory httpClientFactory)
+        public CartService(ApplicationDbContext context, IMapper mapper, IHttpClientFactory httpClientFactory, IConfiguration config)
         {
             _context = context;
             _mapper = mapper;
             _httpClientFactory = httpClientFactory;
+            _config = config;
+
         }
         public async Task<bool> AddItemAsync(string userId, string headerId, CartItemDto itemDto)
         {
@@ -232,19 +236,11 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
         }
         public async Task<bool> ExistsByHeaderIdAsync(string userId, string headerId)
         {
-            return await _context.CartHeaders.AnyAsync(i => i.Id == headerId);
+            return await _context.CartHeaders.AnyAsync(i => i.Id == headerId && i.UserId == userId);
         }
 
 
 
-        public async Task<CouponDto> GetCouponByNameAsync(string userId, string couponCode)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> RedeemCouponAsync(string userId, string headerId, string couponCode)
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }
