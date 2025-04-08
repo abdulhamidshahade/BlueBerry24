@@ -121,11 +121,11 @@ namespace BlueBerry24.Services.UserCouponAPI.Controllers
 
 
         [HttpGet]
-        [Route("used-coupon/{userId:guid}")]
+        [Route("used-coupon/{userId}")]
         public async Task<ActionResult<ResponseDto>> HasUserUsedCoupon(string userId, [FromQuery] string couponId)
         {
 
-            var hasUsed = await _userCouponService.HasUserUsedCouponAsync(userId, couponId);
+            var hasUsed = await _userCouponService.IsCouponUsedByUser(userId, couponId);
 
             if (hasUsed)
             {
