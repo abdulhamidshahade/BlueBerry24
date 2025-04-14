@@ -16,5 +16,7 @@ namespace BlueBerry24.Services.StockAPI.Services.Interfaces
         Task IncreaseByItemAsync(string productId, string shopId);
         Task DecreaseByItemAsync(string productId, string shopId);
 
+        Task<bool> IsStockAvailableAsync(string productId, string shopId);
+
     }
 }
