@@ -5,6 +5,7 @@ using BlueBerry24.Services.ShoppingCartAPI.Messaging.Client;
 using BlueBerry24.Services.ShoppingCartAPI.Models;
 using BlueBerry24.Services.ShoppingCartAPI.Models.DTOs;
 using BlueBerry24.Services.ShoppingCartAPI.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -16,15 +17,17 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
         private readonly IMapper _mapper;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _config;
+        private readonly ILogger<CartService> _logger;
 
-        public CartService(ApplicationDbContext context, IMapper mapper, IHttpClientFactory httpClientFactory, IConfiguration config)
+        public CartService(ApplicationDbContext context, IMapper mapper, IHttpClientFactory httpClientFactory, IConfiguration config, ILogger<CartService> logger)
         {
             _context = context;
             _mapper = mapper;
             _httpClientFactory = httpClientFactory;
             _config = config;
-
+            _logger = logger;
         }
+
         public async Task<bool> AddItemAsync(string userId, string headerId, CartItemDto itemDto)
         {
             var cartHeader = await _context.CartHeaders.FirstOrDefaultAsync(u => u.Id == headerId && u.UserId == userId);
@@ -32,31 +35,58 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
             if(cartHeader == null)
             {
                 cartHeader = await CreateCartAsync(userId);
-
                 headerId = cartHeader.Id;
             }
 
-            var productExists = await _context.CartItems.FirstOrDefaultAsync(i => i.ProductId == itemDto.ProductId && i.CartHeaderId == headerId);
-
-            if (productExists != null)
+            using var stockClient = new StockRpcClient(_config);
+            if (!await stockClient.IsProductAvailableInStockAsync(itemDto.ProductId, itemDto.ShopId))
             {
-                productExists.Count++;
+                throw new InvalidOperationException("The stock of the product is empty");
             }
-            else
+
+            try
             {
-                var item = new CartItem
+                var productExists = await _context.CartItems.FirstOrDefaultAsync(i => i.ProductId == itemDto.ProductId && i.CartHeaderId == headerId);
+
+                if (productExists != null)
                 {
-                    CartHeaderId = headerId,
-                    Count = 1,
-                    ProductId = itemDto.ProductId
-                };
 
-                await _context.CartHeaders.AddAsync(cartHeader);
+                    productExists.Count++;
+
+
+                }
+                else
+                {
+                    var item = new CartItem
+                    {
+                        CartHeaderId = headerId,
+                        Count = 1,
+                        ProductId = itemDto.ProductId
+                    };
+
+
+
+                    await _context.CartItems.AddAsync(item);
+                }
+
+                
+
+                await _context.SaveChangesAsync();
+
+
+                return true;
             }
 
-            await _context.SaveChangesAsync();
+            
 
-            return true;
+            catch (DbUpdateConcurrencyException ex)
+            {
+
+                _logger.LogError(ex, "Concurrency conflict detected for ProductId {ProductId}", itemDto.ProductId);
+
+
+                throw new InvalidOperationException("The cart was modified by another user. Please refresh and try again.");
+            }
         }
         public async Task<CartHeader> CreateCartAsync(string userId)
         {
@@ -238,9 +268,5 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
         {
             return await _context.CartHeaders.AnyAsync(i => i.Id == headerId && i.UserId == userId);
         }
-
-
-
-        
     }
 }
