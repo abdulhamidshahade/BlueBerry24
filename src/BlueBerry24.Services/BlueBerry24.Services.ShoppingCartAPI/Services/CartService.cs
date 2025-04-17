@@ -18,74 +18,151 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _config;
         private readonly ILogger<CartService> _logger;
+        private readonly ICartCacheService _cacheService;
+        private readonly IDistributedLockService _distributedLockService;
 
-        public CartService(ApplicationDbContext context, IMapper mapper, IHttpClientFactory httpClientFactory, IConfiguration config, ILogger<CartService> logger)
+        public CartService(ApplicationDbContext context, 
+                           IMapper mapper, 
+                           IHttpClientFactory httpClientFactory, 
+                           IConfiguration config, 
+                           ILogger<CartService> logger,
+                           IDistributedLockService distributedLockService,
+                           ICartCacheService cacheService)
         {
             _context = context;
             _mapper = mapper;
             _httpClientFactory = httpClientFactory;
             _config = config;
             _logger = logger;
+            _distributedLockService = distributedLockService;
+            _cacheService = cacheService;
         }
 
         public async Task<bool> AddItemAsync(string userId, string headerId, CartItemDto itemDto)
         {
-            var cartHeader = await _context.CartHeaders.FirstOrDefaultAsync(u => u.Id == headerId && u.UserId == userId);
+            var lockKey = $"lock:cart:{userId}";
+            var lockValue = Guid.NewGuid().ToString();
 
-            if(cartHeader == null)
+            if(!await _distributedLockService.AcquireLockAsync(lockKey, lockValue, TimeSpan.FromSeconds(5)))
             {
-                cartHeader = await CreateCartAsync(userId);
-                headerId = cartHeader.Id;
-            }
-
-            using var stockClient = new StockRpcClient(_config);
-            if (!await stockClient.IsProductAvailableInStockAsync(itemDto.ProductId, itemDto.ShopId))
-            {
-                throw new InvalidOperationException("The stock of the product is empty");
+                throw new Exception("Another process is modifying the cart, please again");
             }
 
             try
             {
-                var productExists = await _context.CartItems.FirstOrDefaultAsync(i => i.ProductId == itemDto.ProductId && i.CartHeaderId == headerId);
+                var cart = await _cacheService.GetCartAsync(userId);
 
-                if (productExists != null)
+                if(cart == null)
                 {
+                    var databaseCart = await _context.CartHeaders
+                        .Where(u => u.UserId == userId && u.Id == headerId)
+                        .Include(c => c.CartItems)
+                        .FirstOrDefaultAsync();
 
-                    productExists.Count++;
-
-
-                }
-                else
-                {
-                    var item = new CartItem
+                    if(databaseCart == null)
                     {
-                        CartHeaderId = headerId,
-                        Count = 1,
-                        ProductId = itemDto.ProductId
-                    };
+                        CartHeader newCartHeader = new CartHeader
+                        {
+                            UserId = userId,
+                            CartTotal = 0m,
+                            Discount = 0m,
+                            CouponCode = string.Empty,
+                            IsActive = true
+                        };
 
+                        await _context.CartHeaders.AddAsync(newCartHeader);
+                        await _context.SaveChangesAsync();
 
+                    }
+                    else
+                    {
+                        cart = new CartDto
+                        {
+                            ShoppingCartHeaderDto = new CartHeaderDto
+                            {
+                                Id = databaseCart.Id,
+                                CartTotal = databaseCart.CartTotal,
+                                CouponCode = databaseCart.CouponCode,
+                                Discount = databaseCart.Discount,
+                                IsActive = databaseCart.IsActive,
+                                UserId = databaseCart.UserId
+                            },
+                            CartItems = databaseCart.CartItems.Select(i => new CartItemDto
+                            {
+                                Id = i.Id,
+                                CartHeaderId = i.CartHeaderId,
+                                Count = i.Count,
+                                ProductId = i.ProductId,
+                                ShopId = i.ShopId
+                            }).ToList()
+                        };
+                    }
 
-                    await _context.CartItems.AddAsync(item);
+                    var existingItem = cart.CartItems.FirstOrDefault(i => i.ProductId == itemDto.ProductId);
+
+                    if(existingItem != null)
+                    {
+                        existingItem.Count++;
+                    }
+                    else
+                    {
+                        existingItem.Count = 1;
+                        cart.CartItems.Add(itemDto);
+                    }
+
+                    await _cacheService.SetCartAsync(userId, cart);
+
+                    var cartHeader = await _context.CartHeaders.FirstOrDefaultAsync(u => u.UserId == userId && u.Id == headerId);
+
+                    if(cartHeader != null)
+                    {
+                        foreach(var item in cart.CartItems)
+                        {
+                            var databaseItem = await _context.CartItems.FirstOrDefaultAsync(i => i.CartHeaderId == cartHeader.Id && i.ProductId == item.ProductId);
+
+                            if(databaseItem != null)
+                            {
+                                databaseItem.Count = item.Count;
+                            }
+
+                            else
+                            {
+                                var newItem = new CartItem
+                                {
+                                    CartHeaderId = cartHeader.Id,
+                                    Count = item.Count,
+                                    ShopId = item.ShopId,
+                                    ProductId = item.ProductId
+                                };
+
+                                await _context.CartItems.AddAsync(newItem);
+                            }
+
+                           
+                        }
+
+                        
+                    }
+                    
+
                 }
-
-                
-
                 await _context.SaveChangesAsync();
-
-
                 return true;
+
+
+
             }
 
-            
-
-            catch (DbUpdateConcurrencyException ex)
+            catch(Exception ex)
             {
+                _logger.LogError(ex, "Error occurred while adding item to cart.");
+                throw;
+            }
 
-                _logger.LogError(ex, "Concurrency conflict detected for ProductId {ProductId}", itemDto.ProductId);
-
-
-                throw new InvalidOperationException("The cart was modified by another user. Please refresh and try again.");
+            finally
+            {
+  
+                await _distributedLockService.ReleaseLockAsync(lockKey, lockValue);
             }
         }
         public async Task<CartHeader> CreateCartAsync(string userId)
