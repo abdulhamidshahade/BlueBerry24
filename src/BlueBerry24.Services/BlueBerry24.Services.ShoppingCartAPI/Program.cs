@@ -1,4 +1,5 @@
 using BlueBerry24.Services.ShoppingCartAPI.Data;
+using BlueBerry24.Services.ShoppingCartAPI.Jobs;
 using BlueBerry24.Services.ShoppingCartAPI.Services;
 using BlueBerry24.Services.ShoppingCartAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -83,6 +84,10 @@ new Uri(builder.Configuration["ServiceUrls:CouponAPIUrl"]));
 
 
 builder.Services.AddHttpContextAccessor();
+
+
+builder.Services.AddHostedService<CartSyncService>();
+
 
 var app = builder.Build();
 
