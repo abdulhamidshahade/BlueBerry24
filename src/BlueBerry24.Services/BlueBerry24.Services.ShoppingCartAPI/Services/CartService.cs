@@ -7,6 +7,7 @@ using BlueBerry24.Services.ShoppingCartAPI.Models.DTOs;
 using BlueBerry24.Services.ShoppingCartAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Index.HPRtree;
 using Newtonsoft.Json;
 
 namespace BlueBerry24.Services.ShoppingCartAPI.Services
@@ -21,10 +22,10 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
         private readonly ICartCacheService _cacheService;
         private readonly IDistributedLockService _distributedLockService;
 
-        public CartService(ApplicationDbContext context, 
-                           IMapper mapper, 
-                           IHttpClientFactory httpClientFactory, 
-                           IConfiguration config, 
+        public CartService(ApplicationDbContext context,
+                           IMapper mapper,
+                           IHttpClientFactory httpClientFactory,
+                           IConfiguration config,
                            ILogger<CartService> logger,
                            IDistributedLockService distributedLockService,
                            ICartCacheService cacheService)
@@ -38,12 +39,15 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
             _cacheService = cacheService;
         }
 
+
+
+
         public async Task<bool> AddItemAsync(string userId, string headerId, CartItemDto itemDto)
         {
             var lockKey = $"lock:cart:{userId}";
             var lockValue = Guid.NewGuid().ToString();
 
-            if(!await _distributedLockService.AcquireLockAsync(lockKey, lockValue, TimeSpan.FromSeconds(5)))
+            if (!await _distributedLockService.AcquireLockAsync(lockKey, lockValue, TimeSpan.FromSeconds(10)))
             {
                 throw new Exception("Another process is modifying the cart, please again");
             }
@@ -52,108 +56,30 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
             {
                 var cart = await _cacheService.GetCartAsync(userId);
 
-                if(cart == null)
+                if (cart == null)
                 {
-                    var databaseCart = await _context.CartHeaders
-                        .Where(u => u.UserId == userId && u.Id == headerId)
-                        .Include(c => c.CartItems)
-                        .FirstOrDefaultAsync();
-
-                    if(databaseCart == null)
-                    {
-                        CartHeader newCartHeader = new CartHeader
-                        {
-                            UserId = userId,
-                            CartTotal = 0m,
-                            Discount = 0m,
-                            CouponCode = string.Empty,
-                            IsActive = true
-                        };
-
-                        await _context.CartHeaders.AddAsync(newCartHeader);
-                        await _context.SaveChangesAsync();
-
-                    }
-                    else
-                    {
-                        cart = new CartDto
-                        {
-                            ShoppingCartHeaderDto = new CartHeaderDto
-                            {
-                                Id = databaseCart.Id,
-                                CartTotal = databaseCart.CartTotal,
-                                CouponCode = databaseCart.CouponCode,
-                                Discount = databaseCart.Discount,
-                                IsActive = databaseCart.IsActive,
-                                UserId = databaseCart.UserId
-                            },
-                            CartItems = databaseCart.CartItems.Select(i => new CartItemDto
-                            {
-                                Id = i.Id,
-                                CartHeaderId = i.CartHeaderId,
-                                Count = i.Count,
-                                ProductId = i.ProductId,
-                                ShopId = i.ShopId
-                            }).ToList()
-                        };
-                    }
-
-                    var existingItem = cart.CartItems.FirstOrDefault(i => i.ProductId == itemDto.ProductId);
-
-                    if(existingItem != null)
-                    {
-                        existingItem.Count++;
-                    }
-                    else
-                    {
-                        existingItem.Count = 1;
-                        cart.CartItems.Add(itemDto);
-                    }
-
-                    await _cacheService.SetCartAsync(userId, cart);
-
-                    var cartHeader = await _context.CartHeaders.FirstOrDefaultAsync(u => u.UserId == userId && u.Id == headerId);
-
-                    if(cartHeader != null)
-                    {
-                        foreach(var item in cart.CartItems)
-                        {
-                            var databaseItem = await _context.CartItems.FirstOrDefaultAsync(i => i.CartHeaderId == cartHeader.Id && i.ProductId == item.ProductId);
-
-                            if(databaseItem != null)
-                            {
-                                databaseItem.Count = item.Count;
-                            }
-
-                            else
-                            {
-                                var newItem = new CartItem
-                                {
-                                    CartHeaderId = cartHeader.Id,
-                                    Count = item.Count,
-                                    ShopId = item.ShopId,
-                                    ProductId = item.ProductId
-                                };
-
-                                await _context.CartItems.AddAsync(newItem);
-                            }
-
-                           
-                        }
-
-                        
-                    }
-                    
-
+                    cart = await LoadCartFromDatabaseAsync(userId, headerId) ?? await CreateNewCartAsync(userId);
                 }
-                await _context.SaveChangesAsync();
+
+                var existingItem = cart.CartItems.FirstOrDefault(i => i.ProductId == itemDto.ProductId);
+
+                if (existingItem != null)
+                {
+                    existingItem.Count++;
+                }
+                else
+                {
+                    itemDto.Count = 1;
+                    cart.CartItems.Add(itemDto);
+                }
+
+                await _cacheService.SetCartAsync(userId, cart, TimeSpan.FromMinutes(60));
+                await SyncCartToDatabaseAsync(cart);
+
                 return true;
-
-
-
             }
 
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while adding item to cart.");
                 throw;
@@ -161,10 +87,110 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
 
             finally
             {
-  
+
                 await _distributedLockService.ReleaseLockAsync(lockKey, lockValue);
             }
         }
+
+
+
+
+        private async Task<CartDto> LoadCartFromDatabaseAsync(string userId, string headerId)
+        {
+            var header = await _context.CartHeaders.Where(i => i.UserId == userId && i.Id == headerId).FirstOrDefaultAsync();
+
+            if (header == null) return null;
+
+            return new CartDto
+            {
+                ShoppingCartHeaderDto = new CartHeaderDto
+                {
+                    Id = header.Id,
+                    CartTotal = header.CartTotal,
+                    CouponCode = header.CouponCode,
+                    Discount = header.Discount,
+                    IsActive = header.IsActive,
+                    UserId = header.UserId
+                },
+                CartItems = header.CartItems.Select(i => new CartItemDto
+                {
+                    Id = i.Id,
+                    CartHeaderId = i.CartHeaderId,
+                    ProductId = i.ProductId,
+                    ShopId = i.ShopId,
+                    Count = i.Count
+                }).ToList()
+            };
+        }
+
+
+        private async Task<CartDto> CreateNewCartAsync(string userId)
+        {
+            var newHeader = new CartHeader
+            {
+                UserId = userId,
+                CartTotal = 0m,
+                Discount = 0m,
+                CouponCode = string.Empty,
+                IsActive = true
+            };
+
+            await _context.CartHeaders.AddAsync(newHeader);
+            await _context.SaveChangesAsync();
+
+            return new CartDto
+            {
+                ShoppingCartHeaderDto = new CartHeaderDto
+                {
+                    Id = newHeader.Id,
+                    UserId = newHeader.UserId,
+                    CartTotal = newHeader.CartTotal,
+                    Discount = newHeader.Discount,
+                    CouponCode = newHeader.CouponCode,
+                    IsActive = newHeader.IsActive
+                },
+
+                CartItems = new List<CartItemDto>()
+            };
+
+
+        }
+
+        private async Task SyncCartToDatabaseAsync(CartDto Cart)
+        {
+            var header = await _context.CartHeaders.FirstOrDefaultAsync(i => i.Id == Cart.ShoppingCartHeaderDto.Id);
+
+            header.CartTotal = Cart.ShoppingCartHeaderDto.CartTotal;
+            header.Discount = Cart.ShoppingCartHeaderDto.Discount;
+            header.CouponCode = Cart.ShoppingCartHeaderDto.CouponCode;
+            header.IsActive = Cart.ShoppingCartHeaderDto.IsActive;
+
+            foreach(var item in Cart.CartItems)
+            {
+                var dbItem = await _context.CartItems.FirstOrDefaultAsync(i => i.CartHeaderId == header.Id && i.ProductId == item.ProductId);
+
+                if(dbItem != null)
+                {
+                    dbItem.Count = item.Count;
+                }
+                else
+                {
+                    var newItem = new CartItem
+                    {
+                        CartHeaderId = header.Id,
+                        ProductId = item.ProductId,
+                        Count = item.Count,
+                        ShopId = item.ShopId
+                    };
+                    await _context.CartItems.AddAsync(newItem);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+
+
         public async Task<CartHeader> CreateCartAsync(string userId)
         {
             var cartHeader = new CartHeader
@@ -194,18 +220,18 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
         }
         public async Task<CartDto> GetCartByHeaderIdAsync(string userId, string headerId)
         {
-            if(userId == null || headerId == null)
+            if (userId == null || headerId == null)
             {
                 throw new Exception("userId or headerId is not");
             }
 
             var existingHeader = await _context.CartHeaders.FirstOrDefaultAsync(i => i.Id == headerId);
 
-            if(existingHeader != null)
+            if (existingHeader != null)
             {
                 var cartItems = await _context.CartItems.Where(h => h.CartHeaderId == headerId).ToListAsync();
 
-                if(cartItems.Count != 0)
+                if (cartItems.Count != 0)
                 {
                     return new CartDto
                     {
@@ -234,7 +260,7 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
 
             if (existingHeader != null)
             {
-                
+
                 var cartItems = await _context.CartItems.Where(h => h.CartHeaderId == existingHeader.Id).ToListAsync();
 
                 if (cartItems.Count != 0)
@@ -259,20 +285,20 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
         {
             var cartHeader = await _context.CartHeaders.FirstOrDefaultAsync(u => u.UserId == userId && u.Id == headerId && u.IsActive);
 
-            if(cartHeader == null)
+            if (cartHeader == null)
             {
                 throw new NotFoundException("The shopping cart not found");
             }
 
             var item = await _context.CartItems.FirstOrDefaultAsync(h => h.CartHeaderId == headerId && h.ProductId == productId);
 
-            if(item == null)
+            if (item == null)
             {
                 throw new NotFoundException("The item was not found.");
             }
 
 
-            if(item.Count == 1)
+            if (item.Count == 1)
             {
                 _context.CartItems.Remove(item);
             }
@@ -291,7 +317,7 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
             var cartHeader = await _context.CartHeaders.FirstOrDefaultAsync(h => h.Id == headerId
                                                                             && h.UserId == userId && h.IsActive);
 
-            if(cartHeader == null)
+            if (cartHeader == null)
             {
                 throw new NotFoundException("The cart header not found!");
             }
@@ -312,23 +338,23 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
                 i.IsActive
             );
 
-            if(cartHeader == null)
+            if (cartHeader == null)
             {
                 throw new Exception("The header not found");
             }
 
             var item = await _context.CartItems.FirstOrDefaultAsync(i => i.Id == itemId && i.CartHeaderId == headerId);
 
-            if(item == null)
+            if (item == null)
             {
                 throw new Exception("The item not found");
             }
 
-            if(newCount < 0)
+            if (newCount < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(newCount), "Quantity cannot be negative");
             }
-            else if(newCount == 0)
+            else if (newCount == 0)
             {
                 _context.CartItems.Remove(item);
             }
