@@ -3,6 +3,6 @@
     public class CartDto
     {
         public CartHeaderDto ShoppingCartHeaderDto { get; set; }
-        public IEnumerable<CartItemDto> CartItems { get; set; }
+        public List<CartItemDto> CartItems { get; set; }
     }
 }
