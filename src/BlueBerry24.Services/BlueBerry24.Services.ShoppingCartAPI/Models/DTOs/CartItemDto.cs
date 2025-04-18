@@ -7,6 +7,7 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Models.DTOs
         public string Id { get; set; }
         public string CartHeaderId { get; set; }
         public string ProductId { get; set; }
+        public string ShopId { get; set; }
         public int Count { get; set; }
     }
 }
