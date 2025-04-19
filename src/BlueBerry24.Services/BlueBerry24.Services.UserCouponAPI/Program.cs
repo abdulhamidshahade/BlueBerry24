@@ -1,4 +1,5 @@
 using BlueBerry24.Services.UserCouponAPI.Data;
+using BlueBerry24.Services.UserCouponAPI.Messaging.Server;
 using BlueBerry24.Services.UserCouponAPI.Services;
 using BlueBerry24.Services.UserCouponAPI.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -29,9 +30,11 @@ builder.Services.AddHttpClient("User", c => c.BaseAddress =
 new Uri(builder.Configuration["ApiSettings:UserAPIUrl"]));
 
 
-builder.Services.AddScoped<IUserCouponService, UserCouponService>();
+//builder.Services.AddScoped<IUserCouponService, UserCouponService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
+
+builder.Services.AddHostedService<UserCouponRpcServer>();
 
 
 var app = builder.Build();
