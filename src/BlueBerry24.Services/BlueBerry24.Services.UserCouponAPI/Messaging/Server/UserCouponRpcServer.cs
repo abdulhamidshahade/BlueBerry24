@@ -3,7 +3,6 @@ using RabbitMQ.Client;
 using System.Text;
 using BlueBerry24.Services.UserCouponAPI.Services.Interfaces;
 using Newtonsoft.Json;
-using Microsoft.IdentityModel.Tokens;
 
 namespace BlueBerry24.Services.UserCouponAPI.Messaging.Server
 {
