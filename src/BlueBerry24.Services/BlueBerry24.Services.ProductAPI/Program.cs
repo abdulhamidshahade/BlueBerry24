@@ -1,4 +1,5 @@
 using BlueBerry24.Services.ProductAPI.Data;
+using BlueBerry24.Services.ProductAPI.Messaging;
 using BlueBerry24.Services.ProductAPI.Services;
 using BlueBerry24.Services.ProductAPI.Services.Generic;
 using BlueBerry24.Services.ProductAPI.Services.Interfaces;
@@ -31,6 +32,8 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
+
+builder.Services.AddHostedService<StockEventConsumer>();
 
 var app = builder.Build();
 
