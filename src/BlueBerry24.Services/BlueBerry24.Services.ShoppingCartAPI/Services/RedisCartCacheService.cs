@@ -46,5 +46,16 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services
 
             await _db.SetAddAsync("active_cart_users", userId);
         }
+
+        public async Task<bool> DeleteItemAsync(string userId, string itemId)
+        {
+            var key = $"cart:{userId}";
+            var cart = await _db.StringGetAsync(key);
+
+            var cartObject = JsonConvert.DeserializeObject<CartDto>(cart);
+            var item = cartObject.CartItems.Where(i => i.Id == itemId).FirstOrDefault();
+
+            
+        }
     }
 }
