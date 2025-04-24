@@ -12,13 +12,16 @@ namespace BlueBerry24.Services.ShoppingCartAPI.Services.Interfaces
 
         Task<CartHeader> CreateCartAsync(string userId);
         Task<bool> AddItemAsync(string userId, string headerId, CartItemDto itemDto);
-        Task<bool> RemoveItemAsync(string userId, string headerId, string productId);
+        Task<bool> RemoveItemAsync(string userId, CartItemDto cartItemDto);
         Task<bool> UpdateItemCountAsync(string userId, string headerId, string itemId, int newCount);
         Task<bool> DeleteShoppingCartAsync(string userId, string headerId);
 
         Task<bool> UpdateCartHeaderAsync(string userId, string headerId, CartHeaderDto headerDto);
 
 
- 
+        Task<bool> IncreaseItemAsync(string userId, CartItemDto cartItemDto);
+        Task<bool> DecreaseItemAsync(string userId, CartItemDto cartItemDto);
+
+        Task<bool> RedeemCouponAsync(string userId, CartHeaderDto cartDto);
     }
 }
