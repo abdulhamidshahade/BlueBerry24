@@ -1,6 +1,6 @@
 ﻿using BlueBerry24.Domain.Entities.Auth;
 
-namespace BlueBerry24.Domain.Repositories.Interfaces.Auth
+namespace BlueBerry24.Domain.Repositories.AuthInterfaces
 {
     public interface IAuthRepository
     {
