@@ -4,14 +4,14 @@ namespace BlueBerry24.Domain.Repositories.ProductInterfaces
 {
     public interface IProductRepository
     {
-        Task<Product> GetByIdAsync(string id);
+        Task<Product> GetByIdAsync(int id);
         Task<Product> GetByNameAsync(string name);
         Task<IEnumerable<Product>> GetAllAsync();
-        Task<Product> CreateAsync(Product product, List<string> categories);
-        Task<Product> UpdateAsync(string id, Product product, List<string> categories);
-        Task<bool> DeleteAsync(string id);
-        Task<bool> ExistsByIdAsync(string id);
+        Task<Product> CreateAsync(Product product);
+        Task<Product> UpdateAsync(int id, Product product);
+        Task<bool> DeleteAsync(Product product);
+        Task<bool> ExistsByIdAsync(int id);
         Task<bool> ExistsByNameAsync(string name);
-        Task<bool> ExistsByShopIdAsync(string productId, string shopId);
+
     }
 }

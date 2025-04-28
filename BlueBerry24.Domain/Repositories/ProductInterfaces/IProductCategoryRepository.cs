@@ -4,7 +4,7 @@ namespace BlueBerry24.Domain.Repositories.ProductInterfaces
 {
     public interface IProductCategoryRepository
     {
-        Task<bool> AddProductCategoryAsync(Product Product, List<string> categories);
-        Task<bool> UpdateProductCategoryAsync(Product product, List<string> categories);
+        Task<bool> AddProductCategoryAsync(Product Product, List<int> categories);
+        Task<bool> UpdateProductCategoryAsync(Product product, List<int> categories);
     }
 }

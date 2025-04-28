@@ -5,17 +5,17 @@ namespace BlueBerry24.Domain.Repositories.StockInterfaces
     public interface IStockRepository
     {
         Task<Stock> CreateStockAsync(Stock stockDto);
-        Task<bool> UpdateStockByIdAsync(string id, Stock stock);
-        Task<bool> DeleteStockByIdAsync(string id);
-        Task<Stock> GetStockByIdAsync(string id);
-        Task<List<Stock>> GetStocksByShopIdAsync(string shopId);
+        Task<bool> UpdateStockByIdAsync(int id, Stock stock);
+        Task<bool> DeleteStockByIdAsync(Stock stock);
+        Task<Stock> GetStockByIdAsync(int id);
+        Task<List<Stock>> GetStocksByShopIdAsync(int shopId);
 
-        Task CheckStock(string productId, string shopId, int quantity);
+        Task CheckStock(int productId, int shopId, int quantity);
 
-        Task IncreaseByItemAsync(string productId, string shopId);
-        Task DecreaseByItemAsync(string productId, string shopId);
+        Task<bool> IncreaseByItemAsync(int productId, int shopId);
+        Task<bool> DecreaseByItemAsync(int productId, int shopId);
 
-        Task<bool> IsStockAvailableAsync(string productId, string shopId);
+        Task<bool> IsStockAvailableAsync(int productId, int shopId);
 
     }
 }

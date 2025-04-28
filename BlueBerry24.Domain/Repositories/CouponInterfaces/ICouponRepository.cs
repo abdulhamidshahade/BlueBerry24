@@ -1,16 +1,16 @@
 ﻿using BlueBerry24.Domain.Entities.Coupon;
+using System.Linq.Expressions;
 
 namespace BlueBerry24.Domain.Repositories.CouponInterfaces
 {
     public interface ICouponRepository
     {
-        Task<Coupon> GetByIdAsync(string id);
+        Task<Coupon> GetByIdAsync(int id);
         Task<Coupon> GetByCodeAsync(string code);
         Task<IEnumerable<Coupon>> GetAllAsync();
         Task<Coupon> CreateAsync(Coupon coupon);
-        Task<Coupon> UpdateAsync(string id, Coupon coupon);
-        Task<bool> DeleteAsync(string id);
-        Task<bool> ExistsByIdAsync(string id);
-        Task<bool> ExistsByCodeAsync(string code);
+        Task<Coupon> UpdateAsync(int id, Coupon coupon);
+        Task<bool> DeleteAsync(Coupon coupon);
+        Task<bool> ExistsAsync(Expression<Func<Coupon, bool>> expression);
     }
 }
