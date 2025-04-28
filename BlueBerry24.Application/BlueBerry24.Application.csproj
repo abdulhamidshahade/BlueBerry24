@@ -6,4 +6,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Mapping\" />
+    <Folder Include="Dtos\" />
+    <Folder Include="Services\Interfaces\" />
+    <Folder Include="Services\Concretes\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BlueBerry24.Domain\BlueBerry24.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
