@@ -2,16 +2,10 @@
 {
     public class Product : ProductBase
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         public List<ProductCategory> ProductCategories { get; set; }
-
-
-        public Product()
-        {
-            Id = Guid.NewGuid().ToString();
-        }
     }
 }
