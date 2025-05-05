@@ -13,6 +13,7 @@ namespace BlueBerry24.Infrastructure.Data
     {
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Coupon> Coupons { get; set; }
+        public DbSet<UserCoupon> UserCoupons { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
