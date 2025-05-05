@@ -10,7 +10,7 @@ namespace BlueBerry24.Domain.Repositories.ShoppingCartInterfaces
     public interface ICartHeaderRepository
     {
         Task<bool> ExistsByIdAsync(int id);
-        Task<CartHeader> CreateCartAsync(CartHeader header);
+        Task<CartHeader> CreateCartAsync(int userId);
         Task<bool> DeleteCartHeaderAsync(int id);
         Task<CartHeader> UpdateCartHeaderAsync(int id, CartHeader header);
     }
