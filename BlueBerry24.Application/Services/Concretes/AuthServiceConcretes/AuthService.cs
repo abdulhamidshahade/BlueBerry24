@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace BlueBerry24.Services.AuthAPI.Services
+namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
 {
     public class AuthService : IAuthService
     {

@@ -2,7 +2,7 @@
 using BlueBerry24.Domain.Entities.Auth;
 using Microsoft.AspNetCore.Identity;
 
-namespace BlueBerry24.Services.AuthAPI.Services
+namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
 {
     public class UserService : IUserService
     {

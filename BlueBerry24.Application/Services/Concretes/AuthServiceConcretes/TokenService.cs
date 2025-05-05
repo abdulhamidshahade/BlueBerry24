@@ -7,7 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace BlueBerry24.Services.AuthAPI.Services
+namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
 {
     public class TokenService : ITokenService
     {
