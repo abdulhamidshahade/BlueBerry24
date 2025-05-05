@@ -41,17 +41,37 @@ namespace BlueBerry24.Infrastructure.Repositories.ProductConcretes
 
         public async Task<IEnumerable<Product>> GetAllAsync()
         {
-            return await _context.Products.ToListAsync();
+            var products = await _context.Products
+                .Include(c => c.ProductCategories)
+                .ThenInclude(c => c.Category)
+                .ToListAsync();
+
+            if (products == null) return null;
+
+            return products;
         }
 
         public async Task<Product> GetByIdAsync(int id)
         {
-            return await _context.Products.FindAsync(id);
+            var product = await _context.Products.Where(i => i.Id == id)
+                .Include(c => c.ProductCategories)
+                .ThenInclude(c => c.Category)
+                .FirstOrDefaultAsync();
+
+            if (product == null) return null;
+
+            return product; 
         }
 
         public async Task<Product> GetByNameAsync(string name)
         {
-            var product = await _context.Products.Where(n => n.Name == name).FirstOrDefaultAsync();
+            var product = await _context.Products.Where(n => n.Name == name)
+                .Include(c => c.ProductCategories)
+                .ThenInclude(c => c.Category)
+                .FirstOrDefaultAsync();
+
+            if (product == null) return null;
+
             return product;
         }
 
