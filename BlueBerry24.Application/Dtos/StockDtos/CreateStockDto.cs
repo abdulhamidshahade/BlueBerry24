@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BlueBerry24.Application.Dtos.StockDtos
 {
-    class CreateStockDto
+    public class CreateStockDto : StockBaseDto
     {
     }
 }
