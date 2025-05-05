@@ -10,7 +10,7 @@ namespace BlueBerry24.Domain.Repositories.ProductInterfaces
         Task<Category> CreateAsync(Category category);
         Task<Category> UpdateAsync(int id, Category category);
         Task<bool> DeleteAsync(Category category);
-        Task<bool> ExistsAsync(int id);
+        Task<bool> ExistsByIdAsync(int id);
         Task<bool> ExistsByNameAsync(string name);
     }
 }
