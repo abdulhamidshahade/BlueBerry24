@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BlueBerry24.Application.Dtos.ShopDtos
 {
-    class UpdateShopDto
+    public class UpdateShopDto
     {
         public int Id { get; set; }
     }
