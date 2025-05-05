@@ -6,7 +6,7 @@ namespace BlueBerry24.Domain.Entities.ShoppingCart
     public class CartItem
     {
         public int Id { get; set; }
-        public string CartHeaderId { get; set; }
+        public int CartHeaderId { get; set; }
         public CartHeader CartHeader { get; set; }
 
         public string ProductId { get; set; }
