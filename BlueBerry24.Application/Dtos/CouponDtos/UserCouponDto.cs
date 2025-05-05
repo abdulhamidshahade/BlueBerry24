@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace BlueBerry24.Application.Dtos.CouponDtos
 {
-    class UserCouponDto
+    public class UserCouponDto
     {
-        public string UserId { get; set; }
-        public string CouponId { get; set; }
+        public int UserId { get; set; }
+        public int CouponId { get; set; }
         public bool IsUsed { get; set; }
     }
 }

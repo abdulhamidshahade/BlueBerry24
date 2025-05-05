@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BlueBerry24.Application.Dtos.CouponDtos
 {
-    class CreateCouponDto : CouponBaseDto
+    public class CreateCouponDto : CouponBaseDto
     {
         public string Code { get; set; }
     }
