@@ -28,7 +28,7 @@ namespace BlueBerry24.Infrastructure.Repositories.ProductConcretes
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> ExistsAsync(int id)
+        public async Task<bool> ExistsByIdAsync(int id)
         {
             return await _context.Categories.AnyAsync(i => i.Id == id);
         }
