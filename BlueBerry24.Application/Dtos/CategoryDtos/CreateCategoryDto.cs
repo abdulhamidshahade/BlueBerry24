@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BlueBerry24.Application.Dtos.CategoryDtos
 {
-    class CreateCategoryDto : CategoryBaseDto
+    public class CreateCategoryDto : CategoryBaseDto
     {
 
     }
