@@ -1,6 +1,8 @@
 ﻿using BlueBerry24.Domain.Entities.ShoppingCart;
+using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.ShoppingCartInterfaces;
 using BlueBerry24.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,58 +14,82 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
     class CartItemRepository : ICartItemRepository
     {
         private readonly ApplicationDbContext _context;
-        public CartItemRepository(ApplicationDbContext context)
+        private readonly ICartHeaderRepository _cartHeaderRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        public CartItemRepository(ApplicationDbContext context, ICartHeaderRepository cartHeaderRepository,
+            IUnitOfWork unitOfWork)
         {
             _context = context;
+            _cartHeaderRepository = cartHeaderRepository;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task<CartItem> AddItemAsync(CartItem item)
+        public async Task<bool> LoadItemsToPersistenceStorage(List<CartItem> items, int headerId)
         {
-            await _context.CartItems.AddAsync(item);
-            await _context.SaveChangesAsync();
+            if (!await _cartHeaderRepository.ExistsByIdAsync(headerId))
+            {
+                return false;
+            }
 
-            return item;
+            await _context.CartItems.AddRangeAsync(items);
+            return await _unitOfWork.SaveDbChangesAsync();
         }
 
-        public async Task<bool> DecreaseItemAsync(CartItem item)
+        public async Task<bool> RemoveItemsFromPersistenceStorage(int headerId)
         {
-            var itemModel = await _context.CartItems.FindAsync(item.Id);
+            var items = await _context.CartItems.Where(i => i.CartHeaderId == headerId).ToListAsync();
 
-            if (itemModel == null) return false;
-
-            itemModel.Count--;
-            return await _context.SaveChangesAsync() > 0;
+            _context.CartItems.RemoveRange(items);
+            return await _unitOfWork.SaveDbChangesAsync();
         }
 
-        public Task<bool> ExistsByUserIdAsync(int userId, int headerId)
-        {
-            throw new NotImplementedException();
-        }
+        //public async Task<CartItem> AddItemAsync(CartItem item)
+        //{
+        //    await _context.CartItems.AddAsync(item);
+        //    await _context.SaveChangesAsync();
 
-        public async Task<bool> IncreaseItemAsync(CartItem item)
-        {
-            var itemModel = await _context.CartItems.FindAsync(item.Id);
+        //    return item;
+        //}
 
-            if (itemModel == null) return false;
+        //public async Task<bool> DecreaseItemAsync(CartItem item)
+        //{
+        //    var itemModel = await _context.CartItems.FindAsync(item.Id);
 
-            itemModel.Count++;
-            return await _context.SaveChangesAsync() > 0;
-        }
+        //    if (itemModel == null) return false;
 
-        public async Task<bool> RemoveItemAsync(CartItem item)
-        {
-            _context.CartItems.Remove(item);
-            return await _context.SaveChangesAsync() > 0;
-        }
+        //    itemModel.Count--;
+        //    return await _context.SaveChangesAsync() > 0;
+        //}
 
-        public async Task<CartItem> UpdateItemCountAsync(CartItem item, int newCount)
-        {
-            var itemModel = await _context.CartItems.FindAsync(item);
+        //public Task<bool> ExistsByUserIdAsync(int userId, int headerId)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-            itemModel.Count = newCount;
-            await _context.SaveChangesAsync();
+        //public async Task<bool> IncreaseItemAsync(CartItem item)
+        //{
+        //    var itemModel = await _context.CartItems.FindAsync(item.Id);
 
-            return itemModel;
-        }
+        //    if (itemModel == null) return false;
+
+        //    itemModel.Count++;
+        //    return await _context.SaveChangesAsync() > 0;
+        //}
+
+        //public async Task<bool> RemoveItemAsync(CartItem item)
+        //{
+        //    _context.CartItems.Remove(item);
+        //    return await _context.SaveChangesAsync() > 0;
+        //}
+
+        //public async Task<CartItem> UpdateItemCountAsync(CartItem item, int newCount)
+        //{
+        //    var itemModel = await _context.CartItems.FindAsync(item);
+
+        //    itemModel.Count = newCount;
+        //    await _context.SaveChangesAsync();
+
+        //    return itemModel;
+        //}
     }
 }
