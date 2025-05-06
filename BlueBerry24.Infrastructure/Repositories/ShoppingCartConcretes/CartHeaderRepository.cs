@@ -1,4 +1,5 @@
 ﻿using BlueBerry24.Domain.Entities.ShoppingCart;
+using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.ShoppingCartInterfaces;
 using BlueBerry24.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -13,15 +14,23 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
     class CartHeaderRepository : ICartHeaderRepository
     {
         private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CartHeaderRepository(ApplicationDbContext context)
+        public CartHeaderRepository(ApplicationDbContext context, IUnitOfWork unitOfWork)
         {
             _context = context;
+            _unitOfWork = unitOfWork;
         }
-        public async Task<CartHeader> CreateCartAsync(CartHeader header)
+        public async Task<CartHeader> CreateCartAsync(int userId)
         {
+            var header = new CartHeader
+            {
+                UserId = userId,
+                IsActive = true
+            };
+
             await _context.CartHeaders.AddAsync(header);
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveDbChangesAsync();
 
             return header;
         }
