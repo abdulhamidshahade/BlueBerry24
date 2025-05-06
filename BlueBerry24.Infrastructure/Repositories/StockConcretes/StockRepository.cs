@@ -1,4 +1,5 @@
 ﻿using BlueBerry24.Domain.Entities.Stock;
+using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.StockInterfaces;
 using BlueBerry24.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -8,9 +9,11 @@ namespace BlueBerry24.Infrastructure.Repositories.StockConcretes
     class StockRepository : IStockRepository
     {
         private readonly ApplicationDbContext _context;
-        public StockRepository(ApplicationDbContext context)
+        private readonly IUnitOfWork _unitOfWork;
+        public StockRepository(ApplicationDbContext context, IUnitOfWork unitOfWork)
         {
             _context = context;
+            _unitOfWork = unitOfWork;
         }
         public Task CheckStock(int productId, int shopId, int quantity)
         {
@@ -48,6 +51,18 @@ namespace BlueBerry24.Infrastructure.Repositories.StockConcretes
             return stock;
         }
 
+        public async Task<Stock> GetStockByProductId(int productId)
+        {
+            var stock = await _context.Stocks.Where(p => p.ProductId == productId).FirstOrDefaultAsync();
+            return stock;
+        }
+
+        public async Task<List<Stock>> GetStocks()
+        {
+            var stocks = await _context.Stocks.ToListAsync();
+            return stocks;
+        }
+
         public async Task<List<Stock>> GetStocksByShopIdAsync(int shopId)
         {
             var stocks = await _context.Stocks.Where(s => s.ShopId == shopId).ToListAsync();
@@ -65,9 +80,9 @@ namespace BlueBerry24.Infrastructure.Repositories.StockConcretes
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> IsStockAvailableAsync(int productId, int shopId)
+        public async Task<bool> IsStockAvailableAsync(int productId)
         {
-            var stock = await _context.Stocks.Where(pk => pk.ProductId == productId && pk.ShopId == shopId)
+            var stock = await _context.Stocks.Where(pk => pk.ProductId == productId)
                 .FirstOrDefaultAsync();
 
             if (stock == null) return false;
@@ -78,6 +93,19 @@ namespace BlueBerry24.Infrastructure.Repositories.StockConcretes
             }
 
             return true;
+        }
+
+        public async Task<bool> UpdateStockAsync(Stock stock)
+        {
+            var stockDb = await _context.Stocks.FindAsync(stock.Id);
+
+            if(stockDb == null)
+            {
+                return false;
+            }
+
+            stockDb.Quantity = stock.Quantity;
+            return await _unitOfWork.SaveDbChangesAsync();
         }
 
         public async Task<bool> UpdateStockByIdAsync(int id, Stock stock)
