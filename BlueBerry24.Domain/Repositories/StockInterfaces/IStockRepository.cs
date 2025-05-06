@@ -12,10 +12,13 @@ namespace BlueBerry24.Domain.Repositories.StockInterfaces
 
         Task CheckStock(int productId, int shopId, int quantity);
 
-        Task<bool> IncreaseByItemAsync(int productId, int shopId);
-        Task<bool> DecreaseByItemAsync(int productId, int shopId);
+        //Task<bool> IncreaseByItemAsync(int productId, int shopId);
+        //Task<bool> DecreaseByItemAsync(int productId, int shopId);
 
-        Task<bool> IsStockAvailableAsync(int productId, int shopId);
+        Task<bool> UpdateStockAsync(Stock stock);
 
+        Task<bool> IsStockAvailableAsync(int productId);
+        Task<Stock> GetStockByProductId(int productId);
+        Task<List<Stock>> GetStocks();
     }
 }
