@@ -1,6 +1,4 @@
-﻿using BlueBerry24.Services.ShopAPI.Halpers.Constants;
-
-namespace BlueBerry24.Domain.Entities.Shop
+﻿namespace BlueBerry24.Domain.Entities.Shop
 {
     public class Shop : ShopBase
     {
