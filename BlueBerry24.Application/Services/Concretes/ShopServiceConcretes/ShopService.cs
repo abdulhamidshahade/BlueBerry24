@@ -85,12 +85,12 @@ namespace BlueBerry24.Application.Services.Concretes.ShopServiceConcretes
             //    throw new NotFoundException($"Shop with id: {id} not found");
             //}
 
-            var shopWithSameName = await _shopRepository.GetAsync(c => c.Name == shopDto.Name && c.Id != id);
+            //var shopWithSameName = await _shopRepository.GetAsync(c => c.Name == shopDto.Name && c.Id != id);
 
-            if (shopWithSameName != null)
-            {
-                throw new DuplicateEntityException($"Shop with name: {shopDto.Name} already exists");
-            }
+            //if (shopWithSameName != null)
+            //{
+            //    throw new DuplicateEntityException($"Shop with name: {shopDto.Name} already exists");
+            //}
 
             //existingShop.Name = shopDto.Name;
             //existingShop.Description = shopDto.Description;
@@ -104,7 +104,7 @@ namespace BlueBerry24.Application.Services.Concretes.ShopServiceConcretes
 
             var mappedShop = _mapper.Map<Shop>(shopDto);
 
-            var updatedShop = await _shopRepository.UpdateAsync(mappedShop);
+            var updatedShop = await _shopRepository.UpdateAsync(id, mappedShop);
             return _mapper.Map<ShopDto>(updatedShop);
         }
 
