@@ -9,5 +9,6 @@ namespace BlueBerry24.Application.Dtos.ShoppingCartDtos
         public string ProductId { get; set; }
         public string ShopId { get; set; }
         public int Count { get; set; }
+        public decimal unitPrice { get; set; }
     }
 }
