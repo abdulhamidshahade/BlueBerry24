@@ -22,8 +22,9 @@ The solution is split into four projects:
 * AutoMapper mapping between entities and DTOs.
 * OpenAPI spec generation for Swagger / CLI clients.
 
-# Project Structure
+---
 
+## 🗂 Project Structure (Simplified)
 ```text
 BlueBerry24/
 ├── BlueBerry24.API/                # HTTP entry-point
@@ -36,7 +37,7 @@ BlueBerry24/
 └── BlueBerry24.Infrastructure/     # Persistence & integrations
     └── Data/
 ```
-```
+---
 
 ## 🛠 Tech Stack
 
