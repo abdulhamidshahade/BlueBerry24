@@ -93,12 +93,12 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
             //    return null;
             //}
 
-            var couponWithSameCode = await _couponRepository.GetAsync(c => c.Code == couponDto.Code && c.Id != id);
+            //var couponWithSameCode = await _couponRepository.GetAsync(c => c.Code == couponDto.Code && c.Id != id);
 
-            if (couponWithSameCode != null)
-            {
-                return null;
-            }
+            //if (couponWithSameCode != null)
+            //{
+            //    return null;
+            //}
 
             //existingCoupon.DiscountAmount = couponDto.DiscountAmount;
             //existingCoupon.MinimumAmount = couponDto.MinimumAmount;

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BlueBerry24.Application.Dtos.AuthDtos;
 using BlueBerry24.Application.Dtos.CouponDtos;
 using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.CouponServiceInterfaces;
@@ -59,14 +60,15 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
 
             //var userCoupon = await _context.Users_Coupons.FirstOrDefaultAsync(u => u.UserId == userId && u.CouponId == couponId && !u.IsUsed);
 
-            List<string> userHasCoupons = await _userCouponRepository.GetCouponsByUserIdAsync(userId);
+            List<CouponDto> userHasCoupons = _mapper.Map<List<CouponDto>>
+                (await _userCouponRepository.GetCouponsByUserIdAsync(userId));
 
-            if (!userHasCoupons.Contains(couponExists.Code))
+            if (!userHasCoupons.Any(i => i.Code == couponExists.Code))
             {
                 return false;
             }
 
-            var disabledCoupon = await _userCouponRepository.DisableCouponToUserAsync(userId, couponId);
+            var disabledCoupon = await _userCouponRepository.DisableCouponForUserAsync(userId, couponId);
 
             return disabledCoupon;
         }
@@ -80,7 +82,8 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
 
             //var coupons = await _context.Users_Coupons.Where(u => u.UserId == userId && !u.IsUsed).ToListAsync();
 
-            List<string> couponCodes = await _userCouponRepository.GetCouponsByUserIdAsync(userId);
+            List<CouponDto> couponCodes = 
+                _mapper.Map<List<CouponDto>>(await _userCouponRepository.GetCouponsByUserIdAsync(userId));
 
             if(couponCodes == null)
             {
@@ -92,7 +95,7 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
             //    couponCodes.Add(userCoupon.CouponId.ToString());
             //}
 
-            return couponCodes;
+            return couponCodes.Select(c => c.Code).ToList();
         }
 
         public async Task<List<string>> GetUsersByCouponIdAsync(int couponId)
@@ -105,14 +108,15 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
 
             //var users = await _context.Users_Coupons.Where(u => u.CouponId == couponId).Select(u => u.UserId).Distinct().ToListAsync();
 
-            List<string> userList = await _userCouponRepository.GetUsersByCouponIdAsync(couponId);
+            List<ApplicationUserDto> userList = 
+                _mapper.Map<List<ApplicationUserDto>>(await _userCouponRepository.GetUsersByCouponIdAsync(couponId));
 
             //foreach (var userCoupon in users)
             //{
             //    userList.Add(userCoupon.ToString());
             //}
 
-            return userList;
+            return userList.Select(n => n.FirstName).ToList();
         }
 
         public async Task<bool> IsCouponUsedByUser(int userId, int couponId)
@@ -146,7 +150,7 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
                 return false;
             }
 
-            var isCouponUsed = await _userCouponRepository.IsCouponUsedByUser(userId, couponId);
+            var isCouponUsed = await _userCouponRepository.IsCouponUsedByUserAsync(userId, couponId);
 
             return isCouponUsed;
         }
