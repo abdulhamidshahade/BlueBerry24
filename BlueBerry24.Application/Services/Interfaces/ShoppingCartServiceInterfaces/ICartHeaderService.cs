@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 
 namespace BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces
 {
-    interface ICartHeaderService
+    public interface ICartHeaderService
     {
-        Task<bool> ExistsByIdAsync(int id);
-        Task<CartHeaderDto> CreateCartAsync(CartHeaderDto header);
-        Task<bool> DeleteCartHeaderAsync(int id);
-        Task<CartHeaderDto> UpdateCartHeaderAsync(int id, CartHeaderDto header);
+        Task<bool> ExistsByIdAsync(int userId);
+        Task<CartHeaderDto> CreateCartHeaderAsync(int userId);
+        Task<bool> DeleteCartHeaderAsync(int userId);
+        Task<CartHeaderDto> UpdateCartHeaderAsync(int userId, CartHeaderDto header);
+        Task<CartHeaderDto> GetCartHeaderAsync(int userId);
     }
 }
