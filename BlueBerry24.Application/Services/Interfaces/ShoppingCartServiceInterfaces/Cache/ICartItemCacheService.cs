@@ -12,11 +12,11 @@ namespace BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfa
     public interface ICartItemCacheService
     {
         Task<bool> AddItemAsync(CartItemDto item, int userId);
-        Task<bool> RemoveItemAsync(CartItem item, int userId);
-        Task<bool> UpdateItemCountAsync(CartItem item, int userId, int newCount);
+        Task<bool> RemoveItemAsync(CartItemDto item, int userId);
+        Task<bool> UpdateItemCountAsync(CartItemDto item, int userId, int newCount);
 
-        Task<bool> IncreaseItemAsync(CartItem item, int userId);
-        Task<bool> DecreaseItemAsync(CartItem item, int userId);
+        Task<bool> IncreaseItemAsync(CartItemDto item, int userId);
+        Task<bool> DecreaseItemAsync(CartItemDto item, int userId);
         Task<List<CartItemDto>> GetAllItems(int userId);
         Task<bool> DeleteAllItems(int userId);
     }

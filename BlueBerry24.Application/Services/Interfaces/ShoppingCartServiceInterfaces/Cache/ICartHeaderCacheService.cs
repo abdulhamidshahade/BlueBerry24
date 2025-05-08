@@ -11,7 +11,7 @@ namespace BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfa
     public interface ICartHeaderCacheService
     {
         Task<bool> ExistsByUserIdAsync(int userId);
-        Task<bool> CreateCartHeaderAsync(int userId, TimeSpan timeSpan);
+        Task<bool> CreateCartHeaderAsync(int userId, CartHeaderDto cartHeader, TimeSpan timeSpan);
         Task<bool> DeleteCartHeaderAsync(int userId);
         Task<bool> UpdateCartHeaderAsync(int userId, CartHeaderDto cartHeader);
         Task<CartHeaderDto> GetCartHeaderAsync(int userId);
