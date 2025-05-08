@@ -14,17 +14,22 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes.Cache
             _db = redis.GetDatabase();
         }
 
-        public async Task<bool> CreateCartHeaderAsync(int userId, string key, TimeSpan timeSpan)
+        public async Task<bool> CreateCartHeaderAsync(string key, 
+                                                      CartHeader cartHeader, 
+                                                      TimeSpan timeSpan,
+                                                      ITransaction? transaction = null)
         {
             //var key = $"cart-header:{userId}";
-            var cartHeader = new CartHeader
-            {
-                IsActive = true
-            };
+            //var cartHeader = new CartHeader
+            //{
+            //    IsActive = true
+            //};
+
+
             var cartToJson = JsonConvert.SerializeObject(cartHeader);
 
-            var setHeaderSuccess = await _db.StringSetAsync(key, cartToJson, timeSpan);
-            var AddUserSuccess = await _db.SetAddAsync("active_cart_users", userId);
+            var setHeaderSuccess = await transaction.StringSetAsync(key, cartToJson, timeSpan);
+            var AddUserSuccess = await transaction.SetAddAsync("active_cart_users", cartHeader.UserId);
 
             return setHeaderSuccess && setHeaderSuccess;
         }

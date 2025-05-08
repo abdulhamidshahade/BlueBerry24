@@ -14,27 +14,44 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes.Cache
             _db = redis.GetDatabase();
         }
 
-        public async Task<bool> AddItemAsync(CartItem item, string key, ITransaction transaction)
+        public async Task<bool> AddItemAsync(CartItem item, string key, ITransaction? transaction = null)
         {
             //var addItems = await _db.HashIncrementAsync(key, item.Id.ToString(), 1);
 
-            var addedItem = await transaction.HashIncrementAsync(key, item.Id.ToString(), 1);
+            if (transaction != null)
+            {
+                await transaction.HashIncrementAsync(key, item.Id.ToString(), 1);
+            }
+            else
+            {
+                await _db.HashIncrementAsync(key, item.Id.ToString(), 1);
+            }
+
 
             int quantity = (int)await _db.HashGetAsync(key, item.Id.ToString());
 
             return quantity > 0;
         }
 
-        public async Task<bool> DecreaseItemAsync(CartItem item, string key)
+        public async Task<bool> DecreaseItemAsync(CartItem item, string key, ITransaction? transaction = null)
         {
             int quantity = (int)await _db.HashGetAsync(key, item.Id.ToString());
 
-            var decreasedItem = await _db.HashIncrementAsync(key, item.Id.ToString(), -1);
+            long decreasedItem = 0;
 
-            return decreasedItem < quantity;
+            if(transaction != null)
+            {
+                decreasedItem = await transaction.HashIncrementAsync(key, item.Id.ToString(), -1);
+            }
+            else
+            {
+                decreasedItem = await _db.HashIncrementAsync(key, item.Id.ToString(), -1);
+            }
+
+                return decreasedItem < quantity;
         }
 
-        public async Task<bool> DeleteAllItems(string key, ITransaction transaction)
+        public async Task<bool> DeleteAllItems(string key, ITransaction? transaction = null)
         {
             var deletedItems = await transaction.KeyDeleteAsync(key);
 
@@ -51,7 +68,7 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes.Cache
             {
                 items.Add(new CartItem
                 {
-                    ProductId = entry.Name,
+                    ProductId = (int)entry.Name,
                     Count = (int)entry.Value
                 });
             }
