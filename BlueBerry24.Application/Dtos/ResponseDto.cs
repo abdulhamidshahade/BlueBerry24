@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BlueBerry24.Application.Dtos
 {
-    class ResponseDto
+    public class ResponseDto
     {
         public bool IsSuccess { get; set; }
         public int StatusCode { get; set; }
