@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlueBerry24.Infrastructure.Data
 {
-    class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
     {
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Coupon> Coupons { get; set; }
@@ -21,6 +21,7 @@ namespace BlueBerry24.Infrastructure.Data
         public DbSet<CartHeader> CartHeaders { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Stock> Stocks { get; set; }
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
 
