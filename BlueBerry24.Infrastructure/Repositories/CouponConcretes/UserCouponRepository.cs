@@ -1,4 +1,5 @@
-﻿using BlueBerry24.Domain.Entities.Coupon;
+﻿using BlueBerry24.Domain.Entities.Auth;
+using BlueBerry24.Domain.Entities.Coupon;
 using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.CouponInterfaces;
 using BlueBerry24.Infrastructure.Data;
@@ -42,7 +43,7 @@ namespace BlueBerry24.Infrastructure.Repositories.CouponConcretes
             return userCoupon;
         }
 
-        public async Task<bool> DisableCouponToUserAsync(int userId, int couponId)
+        public async Task<bool> DisableCouponForUserAsync(int userId, int couponId)
         {
             var userCouponModel = await _context.UserCoupons.Where(i => i.UserId == userId && i.CouponId == couponId)
                 .FirstOrDefaultAsync();
@@ -51,27 +52,27 @@ namespace BlueBerry24.Infrastructure.Repositories.CouponConcretes
             return await _unifOfWork.SaveDbChangesAsync();
         }
 
-        public async Task<List<string>> GetCouponsByUserIdAsync(int userId)
+        public async Task<IReadOnlyList<Coupon>> GetCouponsByUserIdAsync(int userId)
         {
             var coupons = await _context.UserCoupons.Where(i => i.UserId == userId)
                 .Select(c => c.Coupon)
-                .Select(c => c.ToString())
+                //.Select(c => c.ToString())
                 .ToListAsync();
 
             return coupons;
         }
 
-        public async Task<List<string>> GetUsersByCouponIdAsync(int couponId)
+        public async Task<IReadOnlyList<ApplicationUser>> GetUsersByCouponIdAsync(int couponId)
         {
             var users = await _context.UserCoupons.Where(c => c.CouponId == couponId)
                 .Select(u => u.User)
-                .Select(u => u.ToString())
+                //.Select(u => u.ToString())
                 .ToListAsync();
 
             return users;
         }
 
-        public async Task<bool> IsCouponUsedByUser(int userId, int couponId)
+        public async Task<bool> IsCouponUsedByUserAsync(int userId, int couponId)
         {
             var coupon = await _context.UserCoupons.Where(i => i.UserId == userId && couponId == couponId)
                 .FirstOrDefaultAsync();
