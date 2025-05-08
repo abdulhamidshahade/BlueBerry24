@@ -11,7 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\BlueBerry24.Application\BlueBerry24.Application.csproj" />
+    
   </ItemGroup>
 
 </Project>
