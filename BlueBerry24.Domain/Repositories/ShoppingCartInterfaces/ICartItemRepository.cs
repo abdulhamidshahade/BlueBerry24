@@ -21,7 +21,8 @@ namespace BlueBerry24.Domain.Repositories.ShoppingCartInterfaces
         //Task<bool> ExistsByUserIdAsync(int userId, int headerId);
 
 
-        Task<bool> LoadItemsToPersistenceStorage(List<CartItem> items, int headerId);
-        Task<bool> RemoveItemsFromPersistenceStorage(int headerId);
+        Task<bool> LoadItemsToPersistenceStorage(List<CartItem> items, int cartId);
+        Task<List<CartItem>> GetItemsFromPersistenceStorage(int cartId);
+        Task<bool> RemoveItemsFromPersistenceStorage(int cartId);
     }
 }
