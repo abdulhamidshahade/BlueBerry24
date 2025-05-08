@@ -57,10 +57,12 @@ namespace BlueBerry24.Domain.Repositories
 
         
 
-        public async Task CommitTransactionAsync()
+        public async Task<bool> CommitTransactionAsync()
         {
             await _currentTransaction.CommitAsync();
             await _currentTransaction.DisposeAsync();
+
+            return true;
         }
 
         
