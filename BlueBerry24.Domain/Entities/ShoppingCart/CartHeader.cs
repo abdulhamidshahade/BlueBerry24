@@ -7,9 +7,8 @@
         public decimal Discount { get; set; }
         public string CouponCode { get; set; } = string.Empty;
         public decimal CartTotal { get; set; }
-
+        public int ShoppingCartId { get; set; }
+        public ShoppingCart ShoppingCart { get; set; }
         public bool IsActive { get; set; }
-
-        public List<CartItem> CartItems { get; set; } = new List<CartItem>();
     }
 }
