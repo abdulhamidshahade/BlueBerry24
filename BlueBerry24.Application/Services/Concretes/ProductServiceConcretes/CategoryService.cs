@@ -87,12 +87,12 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
             //    return null;
             //}
 
-            var categoryWithName = await _categoryRepository.GetAsync(c => c.Name == categoryDto.Name && c.Id != id);
+            //var categoryWithName = await _categoryRepository.GetAsync(c => c.Name == categoryDto.Name && c.Id != id);
 
-            if (categoryWithName != null)
-            {
-                return null;
-            }
+            //if (categoryWithName != null)
+            //{
+            //    return null;
+            //}
 
             //existingCategory.Name = categoryDto.Name;
             //existingCategory.Description = categoryDto.Description;
