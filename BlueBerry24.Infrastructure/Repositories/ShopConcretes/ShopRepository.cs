@@ -65,7 +65,7 @@ namespace BlueBerry24.Infrastructure.Repositories.ShopConcretes
             shopModel.Country = shop.Country;
             shopModel.LogoUrl = shop.LogoUrl;
             shopModel.Address = shop.Address;
-            shopModel.Status = shop.Status;
+            shopModel.IsActive = shop.IsActive;
             shopModel.Email = shop.Email;
             shopModel.Phone = shop.Phone;
 
