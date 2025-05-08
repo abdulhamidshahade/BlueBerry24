@@ -10,9 +10,9 @@ namespace BlueBerry24.Domain.Repositories.CouponInterfaces
     public interface IUserCouponRepository
     {
         Task<UserCoupon> AddCouponToUserAsync(int userId, int couponId);
-        Task<bool> DisableCouponToUserAsync(int userId, int couponId);
-        Task<List<string>> GetCouponsByUserIdAsync(int userId);
-        Task<List<string>> GetUsersByCouponIdAsync(int couponId);
-        Task<bool> IsCouponUsedByUser(int userId, int couponId);
+        Task<bool> DisableCouponForUserAsync(int userId, int couponId);
+        Task<IReadOnlyList<Coupon>> GetCouponsByUserIdAsync(int userId);
+        Task<IReadOnlyList<User>> GetUsersByCouponIdAsync(int couponId);
+        Task<bool> IsCouponUsedByUserAsync(int userId, int couponId);
     }
 }
