@@ -24,20 +24,24 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<bool> LoadItemsToPersistenceStorage(List<CartItem> items, int headerId)
+        public async Task<List<CartItem>> GetItemsFromPersistenceStorage(int cartId)
         {
-            if (!await _cartHeaderRepository.ExistsByIdAsync(headerId))
-            {
-                return false;
-            }
+            var items = await _context.CartItems.Where(i => i.ShoppingCartId == cartId).ToListAsync();
+
+            return items;
+        }
+
+        public async Task<bool> LoadItemsToPersistenceStorage(List<CartItem> items, int cartId)
+        {
+            
 
             await _context.CartItems.AddRangeAsync(items);
             return await _unitOfWork.SaveDbChangesAsync();
         }
 
-        public async Task<bool> RemoveItemsFromPersistenceStorage(int headerId)
+        public async Task<bool> RemoveItemsFromPersistenceStorage(int cartId)
         {
-            var items = await _context.CartItems.Where(i => i.CartHeaderId == headerId).ToListAsync();
+            var items = await _context.CartItems.Where(i => i.ShoppingCartId == cartId).ToListAsync();
 
             _context.CartItems.RemoveRange(items);
             return await _unitOfWork.SaveDbChangesAsync();

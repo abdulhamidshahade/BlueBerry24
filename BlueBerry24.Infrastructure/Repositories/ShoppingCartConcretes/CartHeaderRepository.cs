@@ -26,7 +26,6 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
             var header = new CartHeader
             {
                 UserId = userId,
-                IsActive = true
             };
 
             await _context.CartHeaders.AddAsync(header);
@@ -35,26 +34,33 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
             return header;
         }
 
-        public async Task<bool> DeleteCartHeaderAsync(int id)
+        public async Task<bool> DeleteCartHeaderAsync(int userId)
         {
-            var cartHeader = await _context.CartHeaders.FindAsync(id);
+            var cartHeader = await _context.CartHeaders.FindAsync(userId);
 
             _context.CartHeaders.Remove(cartHeader);
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> ExistsByIdAsync(int id)
+        public async Task<bool> ExistsByIdAsync(int userId)
         {
-            return await _context.CartHeaders.AnyAsync(i => i.Id == id);
+            return await _context.CartHeaders.AnyAsync(i => i.Id == userId);
         }
 
-        public async Task<CartHeader> UpdateCartHeaderAsync(int id, CartHeader header)
+        public async Task<CartHeader> GetCartHeaderAsync(int userId)
         {
-            var headerModel = await _context.CartHeaders.FindAsync(id);
+            var cartHeader = await _context.CartHeaders.Where(i => i.UserId == userId && i.IsActive)
+                .FirstOrDefaultAsync();
+
+            return cartHeader;
+        }
+
+        public async Task<CartHeader> UpdateCartHeaderAsync(int userId, CartHeader header)
+        {
+            var headerModel = await _context.CartHeaders.FindAsync(userId);
 
             headerModel.CartTotal = header.CartTotal;
             headerModel.Discount = header.Discount;
-            headerModel.IsActive = header.IsActive;
             headerModel.CouponCode = header.CouponCode;
 
             await _context.SaveChangesAsync();
