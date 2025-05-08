@@ -1,4 +1,5 @@
 ﻿using BlueBerry24.Application.Dtos.AuthDtos;
+using BlueBerry24.Application.Halpers;
 using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
 using BlueBerry24.Domain.Entities.Auth;
 using BlueBerry24.Domain.Repositories.AuthInterfaces;
@@ -107,7 +108,7 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
         public async Task<LoginResponseDto> Login(LoginRequestDto requestDto)
         {
             var normalizedEmail = requestDto.Email.Trim().ToLower();
-            var user = await .ApplicationUsers.FirstOrDefaultAsync(e => e.Email.Trim().ToLower() == normalizedEmail);
+            var user = await _userManager.FindByEmailAsync(EmailNormalizer.NormalizeEmail(requestDto.Email));
 
             if (user == null)
             {
