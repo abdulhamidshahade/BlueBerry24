@@ -11,7 +11,7 @@ namespace BlueBerry24.Domain.Repositories.ShoppingCartInterfaces.Cache
     public interface ICartHeaderCacheRepository
     {
         Task<bool> ExistsByUserIdAsync(string key);
-        Task<bool> CreateCartHeaderAsync(int userId, string key, TimeSpan timeSpan);
+        Task<bool> CreateCartHeaderAsync(string key, CartHeader cartHeader, TimeSpan timeSpan, ITransaction? transaction = null);
         Task<bool> DeleteCartHeaderAsync(int userId, string key, ITransaction transaction);
         Task<bool> UpdateCartHeaderAsync(string key, CartHeader cartHeader);
         Task<CartHeader> GetCartHeaderAsync(string key);
