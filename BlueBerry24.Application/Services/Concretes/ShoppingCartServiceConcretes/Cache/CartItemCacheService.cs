@@ -41,33 +41,54 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                 return false;
             }
 
+            var mappedItem = _mapper.Map<CartItem>(item);
             var itemsKey = $"{_cartSettings.CartItems}:{userId}";
             var headerKey = $"{_cartSettings.CartHeader}:{userId}";
 
             if (await _cartHeaderCacheRepository.ExistsByUserIdAsync(headerKey))
             {
-                // add item normally to cart.
+                var addItem  = await _cartItemCacheRepository.AddItemAsync(mappedItem, itemsKey);
+                return addItem;
+            }
+            else
+            {
+                
+
+                _unitOfWork.BeginCacheTransaction();
+
+                await _unitOfWork.ExecuteInTransactionCacheAsync(async x =>
+                {
+                    var createdHeader = await _cartHeaderCacheRepository.CreateCartHeaderAsync(headerKey, new CartHeader(), TimeSpan.FromHours(24), x);
+                    var addedItem = await _cartItemCacheRepository.AddItemAsync(mappedItem, itemsKey, x);
+                });
+
+                var commited = await _unitOfWork.CacheCommitTransactionAsync();
+
+
+
+                return commited;
+            }
+        }
+
+        public async Task<bool> DecreaseItemAsync(CartItemDto item, int userId)
+        {
+            if (!await _userService.IsUserExistsByIdAsync(userId))
+            {
+                return false;
             }
 
             var mappedItem = _mapper.Map<CartItem>(item);
+            var itemsKey = $"{_cartSettings.CartItems}:{userId}";
 
-            _unitOfWork.BeginCacheTransaction();
-
-            await _unitOfWork.ExecuteInTransactionAsync(async x =>
+            if (item.Count != 1)
             {
-                var createdHeader = await _cartHeaderCacheRepository.CreateCartHeaderAsync(userId, key, TimeSpan.FromHours(24));
-                var addedItem = await _cartItemCacheRepository.AddItemAsync(mappedItem, itemsKey, x);
-            });
+                return await _cartItemCacheRepository.DecreaseItemAsync(mappedItem, itemsKey);
+            }
 
-            var commited = await _unitOfWork.CacheCommitTransactionAsync();
-
-            return commited;
-            
-        }
-
-        public Task<bool> DecreaseItemAsync(CartItem item, int userId)
-        {
-            throw new NotImplementedException();
+            else
+            {
+                return await _cartItemCacheRepository.RemoveItemAsync(mappedItem, itemsKey);
+            }
         }
 
         public async Task<bool> DeleteAllItems(int userId)
@@ -99,7 +120,7 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
             return mappedItems;
         }
 
-        public async Task<bool> IncreaseItemAsync(CartItem item, int userId)
+        public async Task<bool> IncreaseItemAsync(CartItemDto item, int userId)
         {
             if (!await _userService.IsUserExistsByIdAsync(userId))
             {
@@ -107,13 +128,14 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
             }
 
             var itemsKey = $"{_cartSettings.CartItems}:{userId}";
+            var mappedItem = _mapper.Map<CartItem>(item);
 
-            var increasedItem = await _cartItemCacheRepository.IncreaseItemAsync(item, itemsKey);
+            var increasedItem = await _cartItemCacheRepository.IncreaseItemAsync(mappedItem, itemsKey);
 
             return increasedItem;
         }
 
-        public async Task<bool> RemoveItemAsync(CartItem item, int userId)
+        public async Task<bool> RemoveItemAsync(CartItemDto item, int userId)
         {
             if (!await _userService.IsUserExistsByIdAsync(userId))
             {
@@ -121,26 +143,33 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
             }
 
             var itemsKey = $"{_cartSettings.CartItems}:{userId}";
+            var mappedItem = _mapper.Map<CartItem>(item);
 
-            var deletedItem = await _cartItemCacheRepository.RemoveItemAsync(item, itemsKey);
+            var deletedItem = await _cartItemCacheRepository.RemoveItemAsync(mappedItem, itemsKey);
             return deletedItem;
         }
 
-        public async Task<bool> UpdateItemCountAsync(CartItem item, int userId, int newCount)
+        public async Task<bool> UpdateItemCountAsync(CartItemDto item, int userId, int newCount)
         {
             if (!await _userService.IsUserExistsByIdAsync(userId))
             {
                 return false;
             }
 
-            if(newCount <= 0)
+            if(newCount < 0)
             {
                 return false;
             }
 
-            var itemsKey = $"{_cartSettings.CartItems}:{userId}";
+            if(newCount == 0)
+            {
+                return await RemoveItemAsync(item, userId);
+            }
 
-            var updatedItem = await _cartItemCacheRepository.UpdateItemCountAsync(item, itemsKey, newCount);
+            var itemsKey = $"{_cartSettings.CartItems}:{userId}";
+            var mappedItem = _mapper.Map<CartItem>(item);
+
+            var updatedItem = await _cartItemCacheRepository.UpdateItemCountAsync(mappedItem, itemsKey, newCount);
             return updatedItem;
         }
     }

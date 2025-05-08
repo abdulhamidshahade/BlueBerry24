@@ -37,7 +37,7 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
             _cartSettings = options.Value;
         }
 
-        public async Task<bool> CreateCartHeaderAsync(int userId, TimeSpan timeSpan)
+        public async Task<bool> CreateCartHeaderAsync(int userId, CartHeaderDto cartHeader, TimeSpan timeSpan)
         {
             if(timeSpan.TotalHours < 24 || timeSpan.TotalHours > 48)
             {
@@ -50,8 +50,9 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
             }
 
             var key = $"{_cartSettings.CartHeader}:{userId}";
+            var mappedCartHeader = _mapper.Map<CartHeader>(cartHeader);
 
-            var createdHeader = await _cartHeaderCacheRepository.CreateCartHeaderAsync(userId, key, timeSpan);
+            var createdHeader = await _cartHeaderCacheRepository.CreateCartHeaderAsync(key, mappedCartHeader, timeSpan);
             return createdHeader;
         }
 
