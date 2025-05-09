@@ -1,4 +1,4 @@
-﻿namespace BlueBerry24.Domain.Entities.Shop
+﻿namespace BlueBerry24.Domain.Entities.ShopEntities
 {
     public abstract class ShopBase
     {

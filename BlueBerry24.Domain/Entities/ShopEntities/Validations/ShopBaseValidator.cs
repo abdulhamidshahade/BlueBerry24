@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace BlueBerry24.Domain.Entities.Shop.Validations
+namespace BlueBerry24.Domain.Entities.ShopEntities.Validations
 {
     public class ShopBaseValidator<T> : AbstractValidator<T> where T : ShopBase
     {
