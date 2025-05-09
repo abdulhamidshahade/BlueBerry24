@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace BlueBerry24.Domain.Entities.Auth
+namespace BlueBerry24.Domain.Entities.AuthEntities
 { 
     public class ApplicationRole : IdentityRole<int>
     {
