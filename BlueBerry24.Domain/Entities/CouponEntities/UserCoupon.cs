@@ -1,13 +1,15 @@
-﻿using BlueBerry24.Domain.Entities.Auth;
+﻿
+using BlueBerry24.Domain.Entities.AuthEntities;
+using BlueBerry24.Domain.Entities.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BlueBerry24.Domain.Entities.Coupon
+namespace BlueBerry24.Domain.Entities.CouponEntities
 {
-    public class UserCoupon
+    public class UserCoupon : IAuditableEntity
     {
         public int Id { get; set; }
         public int UserId { get; set; }
