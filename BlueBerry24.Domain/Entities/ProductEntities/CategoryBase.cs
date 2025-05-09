@@ -1,4 +1,4 @@
-﻿namespace BlueBerry24.Domain.Entities.Product
+﻿namespace BlueBerry24.Domain.Entities.ProductEntities
 {
     public abstract class CategoryBase
     {
