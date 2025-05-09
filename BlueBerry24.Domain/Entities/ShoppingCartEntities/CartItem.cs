@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BlueBerry24.Domain.Entities.Base;
+using System.ComponentModel.DataAnnotations;
 
 
-namespace BlueBerry24.Domain.Entities.ShoppingCart
+namespace BlueBerry24.Domain.Entities.ShoppingCartEntities
 {
-    public class CartItem
+    public class CartItem : IAuditableEntity
     {
         public int Id { get; set; }
         public int ShoppingCartId { get; set; }
@@ -17,6 +18,10 @@ namespace BlueBerry24.Domain.Entities.ShoppingCart
 
         //[Timestamp]
         //public byte[] RowVersion { get; set; }
+
+
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
 
     }
 }

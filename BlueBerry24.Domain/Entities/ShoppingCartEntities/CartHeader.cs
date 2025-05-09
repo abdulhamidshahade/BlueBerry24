@@ -1,6 +1,8 @@
-﻿namespace BlueBerry24.Domain.Entities.ShoppingCart
+﻿using BlueBerry24.Domain.Entities.Base;
+
+namespace BlueBerry24.Domain.Entities.ShoppingCartEntities
 {
-    public class CartHeader
+    public class CartHeader : IAuditableEntity
     {
         public int Id { get; set; }
         public int UserId { get; set; }
@@ -10,5 +12,8 @@
         public int ShoppingCartId { get; set; }
         public ShoppingCart ShoppingCart { get; set; }
         public bool IsActive { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 }
