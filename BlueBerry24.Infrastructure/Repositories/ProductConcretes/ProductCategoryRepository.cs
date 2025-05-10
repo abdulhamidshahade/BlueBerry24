@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Domain.Entities.Product;
+﻿using BlueBerry24.Domain.Entities.ProductEntities;
 using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.ProductInterfaces;
 using BlueBerry24.Infrastructure.Data;
@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlueBerry24.Infrastructure.Repositories.ProductConcretes
 {
-    class ProductCategoryRepository : IProductCategoryRepository
+    public class ProductCategoryRepository : IProductCategoryRepository
     {
         private readonly ApplicationDbContext _context;
         private readonly IUnitOfWork _unitOfWork;

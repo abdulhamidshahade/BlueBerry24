@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcretes.Cache
 {
-    class CartCacheService : ICartCacheService
+    public class CartCacheService : ICartCacheService
     {
         private readonly ICartHeaderCacheService _cartHeaderCacheService;
         private readonly ICartItemCacheService _cartItemCacheService;

@@ -4,20 +4,16 @@ using StackExchange.Redis;
 
 namespace BlueBerry24.Domain.Repositories
 {
-    class UnitOfWork : IUnitOfWork
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _context;
         private IDbContextTransaction _currentTransaction;
         private ITransaction _cacheTransaction;
         private readonly StackExchange.Redis.IDatabase _db;
         public UnitOfWork(ApplicationDbContext context, 
-                          IDbContextTransaction currentTransaction, 
-                          ITransaction cacheTransaction,
                           IConnectionMultiplexer redis)
         {
             _context = context;
-            _currentTransaction = currentTransaction;
-            _cacheTransaction = cacheTransaction;
             _db = redis.GetDatabase();
         }
 

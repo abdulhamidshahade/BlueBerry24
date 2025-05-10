@@ -1,8 +1,7 @@
 ﻿using BlueBerry24.Application.Dtos.AuthDtos;
 using BlueBerry24.Application.Halpers;
 using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
-using BlueBerry24.Domain.Entities.Auth;
-using BlueBerry24.Domain.Repositories.AuthInterfaces;
+using BlueBerry24.Domain.Entities.AuthEntities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -11,19 +10,16 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
 {
     public class AuthService : IAuthService
     {
-        private readonly IAuthRepository _authRepository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IRoleService _roleService;
         private readonly ILogger<AuthService> _logger;
         private readonly ITokenService _tokenService;
 
-        public AuthService(IAuthRepository authRepository,
-            UserManager<ApplicationUser> userManager,
-            IRoleService roleService,
-            ILogger<AuthService> logger,
-            ITokenService tokenService)
+        public AuthService(UserManager<ApplicationUser> userManager,
+                           IRoleService roleService,
+                           ILogger<AuthService> logger,
+                           ITokenService tokenService)
         {
-            _authRepository = authRepository;
             _userManager = userManager;
             _roleService = roleService;
             _logger = logger;

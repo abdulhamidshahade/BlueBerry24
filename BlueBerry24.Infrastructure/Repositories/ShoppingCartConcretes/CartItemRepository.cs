@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Domain.Entities.ShoppingCart;
+﻿using BlueBerry24.Domain.Entities.ShoppingCartEntities;
 using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.ShoppingCartInterfaces;
 using BlueBerry24.Infrastructure.Data;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
 {
-    class CartItemRepository : ICartItemRepository
+    public class CartItemRepository : ICartItemRepository
     {
         private readonly ApplicationDbContext _context;
         private readonly ICartHeaderRepository _cartHeaderRepository;

@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Domain.Entities.Stock;
+﻿using BlueBerry24.Domain.Entities.StockEntities;
 using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.StockInterfaces;
 using BlueBerry24.Infrastructure.Data;
@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlueBerry24.Infrastructure.Repositories.StockConcretes
 {
-    class StockRepository : IStockRepository
+    public class StockRepository : IStockRepository
     {
         private readonly ApplicationDbContext _context;
         private readonly IUnitOfWork _unitOfWork;
@@ -30,7 +30,7 @@ namespace BlueBerry24.Infrastructure.Repositories.StockConcretes
 
         public async Task<bool> DecreaseByItemAsync(int productId, int shopId)
         {
-            var stock = await _context.Stocks.Where(fk => fk.ProductId == productId && fk.ShopId == shopId)
+            var stock = await _context.Stocks.Where(fk => fk.ProductId == productId)
                 .FirstOrDefaultAsync();
 
             if (stock == null) return false;
@@ -63,15 +63,15 @@ namespace BlueBerry24.Infrastructure.Repositories.StockConcretes
             return stocks;
         }
 
-        public async Task<List<Stock>> GetStocksByShopIdAsync(int shopId)
-        {
-            var stocks = await _context.Stocks.Where(s => s.ShopId == shopId).ToListAsync();
-            return stocks;
-        }
+        //public async Task<List<Stock>> GetStocksByShopIdAsync(int shopId)
+        //{
+        //    var stocks = await _context.Stocks.Where(s => s.ShopId == shopId).ToListAsync();
+        //    return stocks;
+        //}
 
         public async Task<bool> IncreaseByItemAsync(int productId, int shopId)
         {
-            var stock = await _context.Stocks.Where(pk => pk.ProductId == productId && pk.ShopId == shopId)
+            var stock = await _context.Stocks.Where(pk => pk.ProductId == productId)
                 .FirstOrDefaultAsync();
 
             if (stock == null) return false;
@@ -113,7 +113,6 @@ namespace BlueBerry24.Infrastructure.Repositories.StockConcretes
             var stockModel = await _context.Stocks.FindAsync(id);
 
             stockModel.Quantity = stock.Quantity;
-            stockModel.ShopId = stock.ShopId;
 
             return await _context.SaveChangesAsync() > 0;
         }

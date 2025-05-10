@@ -1,5 +1,5 @@
-﻿using BlueBerry24.Domain.Entities.Auth;
-using BlueBerry24.Domain.Entities.Coupon;
+﻿using BlueBerry24.Domain.Entities.AuthEntities;
+using BlueBerry24.Domain.Entities.CouponEntities;
 using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.CouponInterfaces;
 using BlueBerry24.Infrastructure.Data;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace BlueBerry24.Infrastructure.Repositories.CouponConcretes
 {
-    class UserCouponRepository : IUserCouponRepository
+    public class UserCouponRepository : IUserCouponRepository
     {
         private readonly ApplicationDbContext _context;
         private readonly IUnitOfWork _unifOfWork;

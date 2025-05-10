@@ -1,11 +1,11 @@
-﻿using BlueBerry24.Domain.Entities.Product;
+﻿using BlueBerry24.Domain.Entities.ProductEntities;
 using BlueBerry24.Domain.Repositories.ProductInterfaces;
 using BlueBerry24.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlueBerry24.Infrastructure.Repositories.ProductConcretes
 {
-    class ProductRepository : IProductRepository
+    public class ProductRepository : IProductRepository
     {
         private readonly ApplicationDbContext _context;
         

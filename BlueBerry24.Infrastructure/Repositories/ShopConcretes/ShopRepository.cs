@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Domain.Entities.Shop;
+﻿using BlueBerry24.Domain.Entities.ShopEntities;
 using BlueBerry24.Domain.Repositories.ShopInterfaces;
 using BlueBerry24.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlueBerry24.Infrastructure.Repositories.ShopConcretes
 {
-    class ShopRepository : IShopRepository
+    public class ShopRepository : IShopRepository
     {
         private readonly ApplicationDbContext _context;
         
