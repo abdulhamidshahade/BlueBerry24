@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using BlueBerry24.Application.Dtos.ShopDtos;
 using BlueBerry24.Application.Services.Interfaces.ShopServiceInterfaces;
-using BlueBerry24.Domain.Entities.Shop;
+using BlueBerry24.Domain.Entities.ShopEntities;
 using BlueBerry24.Domain.Repositories.ShopInterfaces;
 
 namespace BlueBerry24.Application.Services.Concretes.ShopServiceConcretes

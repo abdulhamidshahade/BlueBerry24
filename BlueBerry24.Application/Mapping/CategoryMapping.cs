@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using BlueBerry24.Application.Dtos.CategoryDtos;
-using BlueBerry24.Domain.Entities.Product;
+using BlueBerry24.Domain.Entities.ProductEntities;
 
 namespace BlueBerry24.Application.Mapping
 {

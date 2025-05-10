@@ -1,5 +1,5 @@
 ﻿using BlueBerry24.Application.Dtos.StockDtos;
-using BlueBerry24.Domain.Entities.Stock;
+using BlueBerry24.Domain.Entities.StockEntities;
 
 namespace BlueBerry24.Application.Services.Interfaces.StockServiceInterfaces
 {

@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Domain.Entities.ShoppingCart;
+﻿using BlueBerry24.Domain.Entities.ShoppingCartEntities;
 using BlueBerry24.Domain.Repositories.ShoppingCartInterfaces.Cache;
 using StackExchange.Redis;
 
@@ -9,7 +9,7 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes.Cache
         private IDatabase _db;
 
 
-        public RedisCartItemCache(ConnectionMultiplexer redis)
+        public RedisCartItemCache(IConnectionMultiplexer redis)
         {
             _db = redis.GetDatabase();
         }

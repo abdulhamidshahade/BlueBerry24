@@ -1,5 +1,5 @@
-﻿using BlueBerry24.Domain.Entities.Auth;
-using BlueBerry24.Domain.Entities.Coupon;
+﻿using BlueBerry24.Domain.Entities.AuthEntities;
+using BlueBerry24.Domain.Entities.CouponEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

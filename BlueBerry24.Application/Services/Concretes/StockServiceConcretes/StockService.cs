@@ -3,7 +3,7 @@
 using AutoMapper;
 using BlueBerry24.Application.Dtos.StockDtos;
 using BlueBerry24.Application.Services.Interfaces.StockServiceInterfaces;
-using BlueBerry24.Domain.Entities.Stock;
+using BlueBerry24.Domain.Entities.StockEntities;
 using BlueBerry24.Domain.Repositories.StockInterfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.InteropServices;

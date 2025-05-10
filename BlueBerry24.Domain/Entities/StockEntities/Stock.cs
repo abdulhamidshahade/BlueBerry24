@@ -1,4 +1,5 @@
 ﻿using BlueBerry24.Domain.Entities.Base;
+using BlueBerry24.Domain.Entities.ProductEntities;
 
 namespace BlueBerry24.Domain.Entities.StockEntities
 {
@@ -6,6 +7,7 @@ namespace BlueBerry24.Domain.Entities.StockEntities
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
+        public Product Product { get; set; }
         public int Quantity { get; set; }
 
 

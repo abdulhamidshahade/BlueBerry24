@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using BlueBerry24.Application.Dtos.CouponDtos;
-using BlueBerry24.Domain.Entities.Coupon;
+using BlueBerry24.Domain.Entities.CouponEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

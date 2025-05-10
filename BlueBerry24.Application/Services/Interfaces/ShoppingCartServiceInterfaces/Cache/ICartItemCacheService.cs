@@ -1,5 +1,5 @@
 ﻿using BlueBerry24.Application.Dtos.ShoppingCartDtos;
-using BlueBerry24.Domain.Entities.ShoppingCart;
+using BlueBerry24.Domain.Entities.ShoppingCartEntities;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;

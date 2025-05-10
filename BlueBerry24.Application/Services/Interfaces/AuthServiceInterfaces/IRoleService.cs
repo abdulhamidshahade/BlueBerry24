@@ -1,6 +1,6 @@
 ﻿
 
-using BlueBerry24.Domain.Entities.Auth;
+using BlueBerry24.Domain.Entities.AuthEntities;
 
 namespace BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces
 {

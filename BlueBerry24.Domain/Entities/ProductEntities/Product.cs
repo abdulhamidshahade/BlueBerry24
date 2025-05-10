@@ -1,5 +1,6 @@
 ﻿using BlueBerry24.Domain.Entities.Base;
 using BlueBerry24.Domain.Entities.ShopEntities;
+using BlueBerry24.Domain.Entities.StockEntities;
 
 namespace BlueBerry24.Domain.Entities.ProductEntities
 {
@@ -10,7 +11,7 @@ namespace BlueBerry24.Domain.Entities.ProductEntities
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         public int ShopId { get; set; }
-        public int StockId { get; set; }
+        public Stock Stock { get; set; }
         public Shop Shop { get; set; }
         public List<ProductCategory> ProductCategories { get; set; }
     }

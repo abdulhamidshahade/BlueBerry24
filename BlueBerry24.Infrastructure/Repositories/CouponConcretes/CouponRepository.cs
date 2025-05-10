@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Domain.Entities.Coupon;
+﻿using BlueBerry24.Domain.Entities.CouponEntities;
 using BlueBerry24.Domain.Repositories.CouponInterfaces;
 using BlueBerry24.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -7,9 +7,15 @@ using System.Linq.Expressions;
 
 namespace BlueBerry24.Infrastructure.Repositories.CouponConcretes
 {
-    class CouponRepository : ICouponRepository
+    public class CouponRepository : ICouponRepository
     {
         private readonly ApplicationDbContext _context;
+
+        //for factory pattern
+        public CouponRepository()
+        {
+
+        }
         public CouponRepository(ApplicationDbContext context)
         {
             _context = context;

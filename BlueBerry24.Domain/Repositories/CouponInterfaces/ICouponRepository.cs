@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Domain.Entities.Coupon;
+﻿using BlueBerry24.Domain.Entities.CouponEntities;
 using System.Linq.Expressions;
 
 namespace BlueBerry24.Domain.Repositories.CouponInterfaces

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using BlueBerry24.Application.Dtos.ShopDtos;
-using BlueBerry24.Domain.Entities.Shop;
+using BlueBerry24.Domain.Entities.ShopEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

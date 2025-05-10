@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using BlueBerry24.Application.Dtos.StockDtos;
-using BlueBerry24.Domain.Entities.Stock;
+using BlueBerry24.Domain.Entities.StockEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -3,7 +3,7 @@ using BlueBerry24.Application.Config.Settings;
 using BlueBerry24.Application.Dtos.ShoppingCartDtos;
 using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces.Cache;
-using BlueBerry24.Domain.Entities.ShoppingCart;
+using BlueBerry24.Domain.Entities.ShoppingCartEntities;
 using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.ShoppingCartInterfaces.Cache;
 using Microsoft.Extensions.Options;

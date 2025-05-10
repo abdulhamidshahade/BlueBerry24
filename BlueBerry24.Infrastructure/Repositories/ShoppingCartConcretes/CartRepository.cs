@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Domain.Entities.ShoppingCart;
+﻿using BlueBerry24.Domain.Entities.ShoppingCartEntities;
 using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.ShoppingCartInterfaces;
 using BlueBerry24.Infrastructure.Data;
@@ -22,7 +22,6 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
             var shoppingCart = new ShoppingCart
             {
                 UserId = userId,
-                CartHeaderId = headerId
             };
 
 

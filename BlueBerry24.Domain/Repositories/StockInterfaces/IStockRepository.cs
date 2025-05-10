@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Domain.Entities.Stock;
+﻿using BlueBerry24.Domain.Entities.StockEntities;
 
 namespace BlueBerry24.Domain.Repositories.StockInterfaces
 {
@@ -8,7 +8,7 @@ namespace BlueBerry24.Domain.Repositories.StockInterfaces
         Task<bool> UpdateStockByIdAsync(int id, Stock stock);
         Task<bool> DeleteStockByIdAsync(Stock stock);
         Task<Stock> GetStockByIdAsync(int id);
-        Task<List<Stock>> GetStocksByShopIdAsync(int shopId);
+        //Task<List<Stock>> GetStocksByShopIdAsync(int shopId);
 
         Task CheckStock(int productId, int shopId, int quantity);
 

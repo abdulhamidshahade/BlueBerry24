@@ -1,5 +1,5 @@
 ﻿using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
-using BlueBerry24.Domain.Entities.Auth;
+using BlueBerry24.Domain.Entities.AuthEntities;
 using Microsoft.AspNetCore.Identity;
 
 namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes

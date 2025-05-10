@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Domain.Entities.Shop;
+﻿using BlueBerry24.Domain.Entities.ShopEntities;
 
 namespace BlueBerry24.Domain.Repositories.ShopInterfaces
 {

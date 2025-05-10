@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Domain.Entities.Product;
+﻿using BlueBerry24.Domain.Entities.ProductEntities;
 
 namespace BlueBerry24.Domain.Repositories.ProductInterfaces
 {

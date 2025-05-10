@@ -1,5 +1,5 @@
 ﻿using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
-using BlueBerry24.Domain.Entities.Auth;
+using BlueBerry24.Domain.Entities.AuthEntities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -49,7 +49,7 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
                 issuer: _jwtOptions.Issuer,
                 audience: _jwtOptions.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
+                expires: DateTime.UtcNow.AddMinutes(15),
                 signingCredentials: credentials
             );
 

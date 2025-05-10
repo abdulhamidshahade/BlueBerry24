@@ -3,7 +3,7 @@ using BlueBerry24.Application.Dtos.AuthDtos;
 using BlueBerry24.Application.Dtos.CouponDtos;
 using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.CouponServiceInterfaces;
-using BlueBerry24.Domain.Entities.Coupon;
+using BlueBerry24.Domain.Entities.CouponEntities;
 using BlueBerry24.Domain.Repositories.CouponInterfaces;
 
 namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes

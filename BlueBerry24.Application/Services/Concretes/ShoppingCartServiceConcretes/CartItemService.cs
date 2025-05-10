@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using BlueBerry24.Application.Dtos.ShoppingCartDtos;
 using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
-using BlueBerry24.Domain.Entities.ShoppingCart;
+using BlueBerry24.Domain.Entities.ShoppingCartEntities;
 using BlueBerry24.Domain.Repositories.ShoppingCartInterfaces;
 using System;
 using System.Collections.Generic;
