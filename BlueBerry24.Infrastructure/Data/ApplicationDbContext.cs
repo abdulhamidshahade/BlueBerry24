@@ -1,9 +1,10 @@
-﻿using BlueBerry24.Domain.Entities.Auth;
-using BlueBerry24.Domain.Entities.Coupon;
-using BlueBerry24.Domain.Entities.Product;
-using BlueBerry24.Domain.Entities.Shop;
-using BlueBerry24.Domain.Entities.ShoppingCart;
-using BlueBerry24.Domain.Entities.Stock;
+﻿using BlueBerry24.Domain.Entities.AuthEntities;
+using BlueBerry24.Domain.Entities.Base;
+using BlueBerry24.Domain.Entities.CouponEntities;
+using BlueBerry24.Domain.Entities.ProductEntities;
+using BlueBerry24.Domain.Entities.ShopEntities;
+using BlueBerry24.Domain.Entities.ShoppingCartEntities;
+using BlueBerry24.Domain.Entities.StockEntities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,6 +41,60 @@ namespace BlueBerry24.Infrastructure.Data
                 .HasOne(c => c.Category)
                 .WithMany(p => p.ProductCategories)
                 .HasForeignKey(fk => fk.CategoryId);
+
+
+            builder.Entity<UserCoupon>()
+                .HasOne(u => u.User)
+                .WithMany(uc => uc.UserCoupons)
+                .HasForeignKey(fk => fk.UserId);
+
+            builder.Entity<UserCoupon>()
+                .HasOne(o => o.Coupon)
+                .WithMany(uc => uc.UserCoupons)
+                .HasForeignKey(fk => fk.CouponId);
+
+
+            builder.Entity<Shop>()
+                .HasMany(p => p.Products)
+                .WithOne(s => s.Shop)
+                .HasForeignKey(fk => fk.ShopId);
+
+            builder.Entity<ShoppingCart>()
+                .HasMany(ci => ci.CartItems)
+                .WithOne(s => s.ShoppingCart)
+                .HasForeignKey(fk => fk.ShoppingCartId);
+
+
+            builder.Entity<ShoppingCart>()
+                .HasOne(ch => ch.CartHeader)
+                .WithOne(sc => sc.ShoppingCart)
+                .HasForeignKey<CartHeader>(fk => fk.ShoppingCartId);
+
+            builder.Entity<Product>()
+                .HasOne(s => s.Stock)
+                .WithOne(p => p.Product)
+                .HasForeignKey<Stock>(s => s.ProductId);
+        }
+
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var entries = ChangeTracker.Entries<IAuditableEntity>().
+                Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+
+            foreach(var entry in entries)
+            {
+                var entity = entry.Entity;
+
+                if(entry.State == EntityState.Added)
+                {
+                    entity.CreatedAt = DateTime.UtcNow;
+                }
+
+                entity.UpdatedAt = DateTime.UtcNow;
+            }
+
+            return await base.SaveChangesAsync(cancellationToken);
         }
     }
 }
