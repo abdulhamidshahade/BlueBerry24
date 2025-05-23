@@ -1,7 +1,8 @@
 ﻿using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.ShoppingCartDtos;
+using BlueBerry24.Application.Services.Interfaces.CouponServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
-using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces.Cache;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -9,322 +10,119 @@ namespace BlueBerry24.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ShoppingCartsController : ControllerBase
+    public class ShoppingCartsController : BaseController
     {
         private readonly ILogger<ShoppingCartsController> _logger;
-
-        private readonly ICartHeaderService _cartHeaderService;
-        private readonly ICartItemService _cartItemService;
-        private readonly ICartHeaderCacheService _cartHeaderCacheService;
-        private readonly ICartItemCacheService _cartItemCacheService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly int? _userId;
-        private readonly ICartCacheService _cartCacheService;
+        private readonly IUserCouponService _userCouponService;
+        private readonly ICartService _cartService;
 
-        public ShoppingCartsController(ILogger<ShoppingCartsController> logger,
-                                       ICartHeaderService cartHeaderService,
-                                       ICartItemService cartItemService,
-                                       ICartHeaderCacheService cartHeaderCacheService,
-                                       ICartItemCacheService cartItemCacheService,
-                                       IHttpContextAccessor httpContextAccessor,
-                                       ICartCacheService cartCacheService)
+        public ShoppingCartsController(
+            ILogger<ShoppingCartsController> logger,
+            IHttpContextAccessor httpContextAccessor,
+            IUserCouponService userCouponService,
+            ICartService cartService) : base(logger)
         {
             _logger = logger;
-            _cartHeaderService = cartHeaderService;
-            _cartItemService = cartItemService;
-            _cartHeaderCacheService = cartHeaderCacheService;
-            _cartItemCacheService = cartItemCacheService;
             _httpContextAccessor = httpContextAccessor;
-            _userId = Convert.ToInt16(httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            _cartCacheService = cartCacheService;
+            _userId = Convert.ToInt32(_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            _userCouponService = userCouponService;
+            _cartService = cartService;
         }
 
-
-        [HttpGet]
-        [Route("{userId}")]
-        public async Task<ActionResult<ResponseDto>> GetCurrentUserCart(int userId)
+        [HttpGet("{cartId:int}")]
+        public async Task<IActionResult> GetCartById(int cartId)
         {
-            //if (string.IsNullOrEmpty(userId))
-            //{
-            //    throw new ArgumentException("userId parameter is null or empty!", nameof(userId));
-            //}
+            var cart = await _cartService.GetCartByIdAsync(cartId);
+            if (cart == null) return NotFound();
 
-            if (_userId != userId)
-            {
-                return BadRequest(new ResponseDto
-                {
-                    IsSuccess = false,
-                    StatusCode = 400,
-                    StatusMessage = "The requested shopping cart is not match with the current authenticated user."
-                });
-            }
-
-            var cart = await _cartCacheService.GetCartAsync(userId);
-
-            if (cart == null)
-            {
-                return NotFound(new ResponseDto
-                {
-                    IsSuccess = false,
-                    StatusCode = 404,
-                    StatusMessage = "The cart is not found"
-                });
-            }
-
-            return Ok(new ResponseDto
-            {
-                Data = cart,
-                IsSuccess = true,
-                StatusCode = 200
-            });
+            return Ok(cart);
         }
 
-
-
-        [HttpPost]
-        [Route("add-product")]
-        public async Task<ActionResult<ResponseDto>> AddProductToShoppingCart(int userId, CartItemDto cartItemDto)
+        [HttpGet("session/{sessionId}")]
+        public async Task<IActionResult> GetCartBySessionId(string sessionId)
         {
-            var isAdded = await _cartItemCacheService.
-                AddItemAsync(cartItemDto, userId);
+            var cart = await _cartService.GetCartBySessionIdAsync(sessionId);
+            if (cart == null) return NotFound();
 
-            if (isAdded)
-            {
-                return BadRequest(new ResponseDto
-                {
-                    IsSuccess = false,
-                    StatusCode = 400,
-                    StatusMessage = "Failed to add the item to the shopping cart"
-                });
-            }
-            else
-            {
-                return Ok(new ResponseDto
-                {
-                    IsSuccess = true,
-                    StatusMessage = "Item added successfully",
-                    StatusCode = 200
-                });
-            }
+            return Ok(cart);
         }
 
-
-        [HttpPut]
-        [Route("increase-item/{userId}")]
-        public async Task<ActionResult<ResponseDto>> IncreaseItem(int userId, CartItemDto cartItemDto)
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateCart([FromQuery] int? userId, [FromQuery] string? sessionId)
         {
-            //if (string.IsNullOrEmpty(userId))
-            //{
-            //    return new ResponseDto
-            //    {
-            //        IsSuccess = false,
-            //        StatusCode = 400,
-            //        StatusMessage = "User id can't be empty or null"
-            //    };
-            //}
+            var cart = await _cartService.CreateCartAsync(userId, sessionId);
+            if (cart == null) return BadRequest("Cart could not be created.");
 
-
-            var itemToIncrease = await _cartItemCacheService.IncreaseItemAsync(cartItemDto, userId);
-
-            if (itemToIncrease)
-            {
-                return new ResponseDto
-                {
-                    IsSuccess = true,
-                    StatusCode = 200,
-                    StatusMessage = "Item increased successfully"
-                };
-            }
-            else
-            {
-                return new ResponseDto
-                {
-                    IsSuccess = false,
-                    StatusCode = 400,
-                    StatusMessage = "Failed to increase item"
-                };
-            }
+            return Ok(cart);
         }
 
-
-        [HttpPut]
-        [Route("decrease-item/{userId}")]
-        public async Task<ActionResult<ResponseDto>> DecreaseItem(int userId, CartItemDto cartItemDto)
+        [HttpPost("{cartId}/add")]
+        public async Task<IActionResult> AddItemToCart(int cartId, [FromQuery] int productId, [FromQuery] int quantity)
         {
-            //if (string.IsNullOrEmpty(userId))
-            //{
-            //    return new ResponseDto
-            //    {
-            //        IsSuccess = false,
-            //        StatusCode = 400,
-            //        StatusMessage = "User id can't be empty or null"
-            //    };
-            //}
+            var updatedCart = await _cartService.AddItemAsync(cartId, productId, quantity);
+            if (updatedCart == null) return BadRequest("Failed to add item to cart.");
 
-
-            var itemToDecrease = await _cartItemCacheService.DecreaseItemAsync(cartItemDto, userId);
-
-            if (itemToDecrease)
-            {
-                return new ResponseDto
-                {
-                    IsSuccess = true,
-                    StatusCode = 200,
-                    StatusMessage = "Item decreased successfully"
-                };
-            }
-            else
-            {
-                return new ResponseDto
-                {
-                    IsSuccess = false,
-                    StatusCode = 400,
-                    StatusMessage = "Failed to decrease item"
-                };
-            }
+            return Ok(updatedCart);
         }
 
-
-        [HttpDelete]
-        [Route("delete-item{userId}")]
-        public async Task<ActionResult<ResponseDto>> RemoveItem(int userId, CartItemDto cartItemDto)
+        [HttpPut("{cartId}/update")]
+        public async Task<IActionResult> UpdateItemQuantity(int cartId, [FromQuery] int productId, [FromQuery] int quantity)
         {
-            //if (string.IsNullOrEmpty(userId))
-            //{
-            //    return new ResponseDto
-            //    {
-            //        IsSuccess = false,
-            //        StatusCode = 400,
-            //        StatusMessage = "User Id can't be empty or null"
-            //    };
-            //}
+            var updatedCart = await _cartService.UpdateItemQuantityAsync(cartId, productId, quantity);
+            if (updatedCart == null) return BadRequest("Failed to update item quantity.");
 
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var itemToRemove = await _cartItemCacheService.RemoveItemAsync(cartItemDto, userId);
-
-            if (itemToRemove)
-            {
-                return new ResponseDto
-                {
-                    IsSuccess = true,
-                    StatusCode = 200,
-                    StatusMessage = "Item deleted successfully"
-                };
-            }
-            else
-            {
-                return new ResponseDto
-                {
-                    IsSuccess = false,
-                    StatusCode = 400,
-                    StatusMessage = "Failed to deleted item"
-                };
-            }
+            return Ok(updatedCart);
         }
 
-
-        [HttpDelete]
-        [Route("{userId}")]
-        public async Task<ActionResult<ResponseDto>> DeleteShoppingCart(int userId, [FromQuery] int headerId)
+        [HttpDelete("{cartId}/remove/{productId}")]
+        public async Task<IActionResult> RemoveItemFromCart(int cartId, int productId)
         {
-            //if (string.IsNullOrEmpty(userId))
-            //{
-            //    return new ResponseDto
-            //    {
-            //        IsSuccess = false,
-            //        StatusCode = 400,
-            //        StatusMessage = "User Id can't be empty or null"
-            //    };
-            //}
+            var success = await _cartService.RemoveItemAsync(cartId, productId);
+            if (!success) return NotFound("Item not found in cart.");
 
+            return NoContent();
+        }
 
-            var cartToDelete = await _cartCacheService.DeleteCartAsync(userId);
+        [HttpDelete("{cartId}/clear")]
+        public async Task<IActionResult> ClearCart(int cartId)
+        {
+            var success = await _cartService.ClearCartAsync(cartId);
+            if (!success) return BadRequest("Failed to clear the cart.");
 
-            if (cartToDelete)
-            {
-                return new ResponseDto
-                {
-                    IsSuccess = true,
-                    StatusMessage = "Cart Deleted Successfully",
-                    StatusCode = 200
-                };
-            }
-            else
-            {
-                return new ResponseDto
-                {
-                    IsSuccess = false,
-                    StatusCode = 400,
-                    StatusMessage = "Failed deleting cart"
-                };
-            }
+            return NoContent();
+        }
+
+        [HttpPost("{cartId}/complete")]
+        public async Task<IActionResult> CompleteCart(int cartId)
+        {
+            var success = await _cartService.CompleteCartAsync(cartId);
+            if (!success) return BadRequest("Failed to complete the cart.");
+
+            return Ok("Cart completed successfully.");
+        }
+
+        [HttpGet("{cartId}/refresh")]
+        public async Task<IActionResult> RefreshCart(int cartId)
+        {
+            var cart = await _cartService.RefreshCartAsync(cartId);
+            if (cart == null) return NotFound();
+
+            return Ok(cart);
+        }
+
+        [HttpGet("{cartId}/item/{productId}")]
+        public async Task<IActionResult> GetCartItem(int cartId, int productId)
+        {
+            var item = await _cartService.GetItemAsync(cartId, productId);
+            if (item == null) return NotFound();
+
+            return Ok(item);
         }
 
 
 
-
-
-        //[HttpPut]
-        //[Route("redeem-coupon/{couponCode}")]
-        //public async Task<ActionResult<ResponseDto>> RedeemCoupon(string couponCode, 
-        //                                                          RedeemCouponRequestDto redeemCouponDto)
-        //{
-
-        //    if (string.IsNullOrEmpty(couponCode))
-        //    {
-        //        return new ResponseDto
-        //        {
-        //            StatusCode = 400,
-        //            IsSuccess = false,
-        //            StatusMessage = "Coupon code can't be null or empty value"
-        //        };
-        //    }
-
-
-        //    var cart = await _cartService.ExistsByHeaderIdAsync(redeemCouponDto.UserId, redeemCouponDto.HeaderId);
-
-        //    if (cart == null)
-        //    {
-        //        return NotFound(new ResponseDto
-        //        {
-        //            IsSuccess = false,
-        //            StatusCode = 404,
-        //            StatusMessage = "The cart is not found"
-        //        });
-        //    }
-
-        //    var cartDto = _mapper.Map<CartHeaderDto>(cart);
-
-        //    var couponToRedeem = await _cartService.RedeemCouponAsync(redeemCouponDto.UserId, cartDto);
-
-
-        //    if (couponToRedeem)
-        //    {
-        //        return BadRequest(new ResponseDto
-        //        {
-        //            IsSuccess = false,
-        //            StatusCode = 400,
-        //            StatusMessage = "The total price doesn't match the minimum required for coupon"
-        //        });
-        //    }
-        //    else
-        //    {
-
-        //        return Ok(new ResponseDto
-        //        {
-        //            IsSuccess = true,
-        //            StatusCode = 200,
-        //            StatusMessage = "Coupon applied successfully",
-        //            Data = new RedeemCouponResponseDto
-        //            {
-
-        //            }
-        //        });
-        //    }
     }
 }
 
