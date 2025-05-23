@@ -1,19 +1,21 @@
 ﻿using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.CategoryDtos;
 using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlueBerry24.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriesController : ControllerBase
+    public class CategoriesController : BaseController
     {
         private readonly ICategoryService _categoryService;
 
+
         private readonly ILogger<CategoriesController> _logger;
         public CategoriesController(ILogger<CategoriesController> logger,
-                                    ICategoryService categoryService)
+                                    ICategoryService categoryService) : base(logger)
         {
             _logger = logger;
             _categoryService = categoryService;
@@ -27,7 +29,9 @@ namespace BlueBerry24.API.Controllers
 
             var categories = await _categoryService.GetAllAsync();
 
-            if (categories != null)
+
+
+            if (categories == null)
             {
                 return StatusCode(400, new ResponseDto
                 {
@@ -124,19 +128,6 @@ namespace BlueBerry24.API.Controllers
         [HttpPost]
         public async Task<ActionResult<ResponseDto>> Create([FromBody] CreateCategoryDto categoryDto)
         {
-            //if (categoryDto == null)
-            //{
-            //    var badRequestResponse = new ResponseDto
-            //    {
-            //        IsSuccess = false,
-            //        StatusCode = StatusCodes.Status400BadRequest,
-            //        StatusMessage = "Invalid request",
-            //        Errors = new List<string> { "Category data is required" }
-            //    };
-            //    return BadRequest(badRequestResponse);
-            //}
-
-
             _logger.LogInformation($"Creating new category with name: {categoryDto.Name}");
             var createdCategory = await _categoryService.CreateAsync(categoryDto);
 
@@ -159,26 +150,13 @@ namespace BlueBerry24.API.Controllers
                 StatusMessage = "Category created successfully",
                 Data = createdCategory
             };
-            return CreatedAtRoute("GetCategoryById", new { id = createdCategory.Id }, response);
+            return response;
         }
 
         [HttpPut]
         [Route("{id}")]
         public async Task<ActionResult<ResponseDto>> Update(int id, [FromBody] UpdateCategoryDto categoryDto)
         {
-            //if (categoryDto == null)
-            //{
-            //    var badRequestResponse = new ResponseDto
-            //    {
-            //        IsSuccess = false,
-            //        StatusCode = StatusCodes.Status400BadRequest,
-            //        StatusMessage = "Invalid request",
-            //        Errors = new List<string> { "Category data is required" }
-            //    };
-            //    return BadRequest(badRequestResponse);
-            //}
-
-
             _logger.LogInformation($"Updating category with Id: {id}");
             var updatedCategory = await _categoryService.UpdateAsync(id, categoryDto);
 
