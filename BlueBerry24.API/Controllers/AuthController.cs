@@ -1,20 +1,21 @@
 ﻿using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.AuthDtos;
 using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlueBerry24.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    [Route("api/[controller]")]
+    public class AuthController : BaseController
     {
         private readonly IAuthService _authService;
         private readonly ILogger<AuthController> _logger;
         private readonly IUserService _userService;
         public AuthController(IAuthService authService,
                               ILogger<AuthController> logger, 
-                              IUserService userService)
+                              IUserService userService) : base(logger)
         {
             _authService = authService;
             _logger = logger;
