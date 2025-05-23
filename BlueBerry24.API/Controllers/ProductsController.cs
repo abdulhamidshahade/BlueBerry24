@@ -8,13 +8,13 @@ namespace BlueBerry24.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class ProductsController : BaseController
     {
         private readonly IProductService _productService;
         private readonly ILogger<ProductsController> _logger;
 
         public ProductsController(IProductService productService,
-                                  ILogger<ProductsController> logger)
+                                  ILogger<ProductsController> logger) : base(logger)
         {
             _productService = productService;
             _logger = logger;
@@ -88,19 +88,6 @@ namespace BlueBerry24.API.Controllers
         [Route("name/{name}")]
         public async Task<ActionResult<ResponseDto>> GetByName(string name)
         {
-            //if (string.IsNullOrWhiteSpace(name))
-            //{
-            //    var badRequestResponse = new ResponseDto
-            //    {
-            //        IsSuccess = false,
-            //        StatusCode = StatusCodes.Status400BadRequest,
-            //        StatusMessage = "Invalid request",
-            //        Errors = new List<string> { "Product name cannot be empty" }
-            //    };
-            //    return BadRequest(badRequestResponse);
-            //}
-
-
             _logger.LogInformation($"Getting product with name: {name}");
             var product = await _productService.GetByNameAsync(name);
 
@@ -130,19 +117,6 @@ namespace BlueBerry24.API.Controllers
         public async Task<ActionResult<ResponseDto>> Create([FromBody] CreateProductDto productDto,
             [FromQuery] List<int> categories)
         {
-            //if (productDto == null)
-            //{
-            //    var badRequestResponse = new ResponseDto
-            //    {
-            //        IsSuccess = false,
-            //        StatusCode = StatusCodes.Status400BadRequest,
-            //        StatusMessage = "Invalid request",
-            //        Errors = new List<string> { "Product data is required" }
-            //    };
-            //    return BadRequest(badRequestResponse);
-            //}
-
-
             _logger.LogInformation($"Creating new product with name: {productDto.Name}");
             var createdProduct = await _productService.CreateAsync(productDto, categories);
 
@@ -167,7 +141,7 @@ namespace BlueBerry24.API.Controllers
                 Data = createdProduct
             };
 
-            return CreatedAtRoute("GetProductById", new { id = createdProduct.Id }, response);
+            return response;
         }
 
         [HttpPut]
