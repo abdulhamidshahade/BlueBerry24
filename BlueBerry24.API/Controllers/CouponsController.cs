@@ -9,13 +9,13 @@ namespace BlueBerry24.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CouponsController : ControllerBase
+    public class CouponsController : BaseController
     {
         private readonly ICouponService _couponService;
         private readonly ILogger<CouponsController> _logger;
 
         public CouponsController(ICouponService couponService,
-                                 ILogger<CouponsController> logger)
+                                 ILogger<CouponsController> logger) : base(logger)
         {
             _couponService = couponService ?? throw new ArgumentNullException(nameof(couponService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -136,19 +136,6 @@ namespace BlueBerry24.API.Controllers
         [HttpPost]
         public async Task<ActionResult<ResponseDto>> Create([FromBody] CreateCouponDto couponDto)
         {
-            //if (couponDto == null)
-            //{
-            //    var badRequestResponse = new ResponseDto
-            //    {
-            //        IsSuccess = false,
-            //        StatusCode = StatusCodes.Status400BadRequest,
-            //        StatusMessage = "Invalid request",
-            //        Errors = new List<string> { "Coupon data is required" }
-            //    };
-            //    return BadRequest(badRequestResponse);
-            //}
-
-
             _logger.LogInformation($"Creating new coupon with code: {couponDto.Code}");
             var createdCoupon = await _couponService.CreateAsync(couponDto);
 
@@ -171,7 +158,7 @@ namespace BlueBerry24.API.Controllers
                 StatusMessage = "Coupon created successfully",
                 Data = createdCoupon
             };
-            return CreatedAtRoute("GetCouponById", new { id = createdCoupon.Id }, response);
+            return response;
 
 
         }
