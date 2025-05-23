@@ -7,13 +7,13 @@ namespace BlueBerry24.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserCouponsController : ControllerBase
+    public class UserCouponsController : BaseController
     {
         private readonly IUserCouponService _userCouponService;
         private readonly ILogger<UserCouponsController> _logger;
 
         public UserCouponsController(IUserCouponService userCouponService,
-                                     ILogger<UserCouponsController> logger)
+                                     ILogger<UserCouponsController> logger) : base(logger)
         {
             _userCouponService = userCouponService;
             _logger = logger;
@@ -119,11 +119,11 @@ namespace BlueBerry24.API.Controllers
 
 
         [HttpGet]
-        [Route("used-coupon/{userId}")]
-        public async Task<ActionResult<ResponseDto>> HasUserUsedCoupon(int userId, [FromQuery] int couponId)
+        [Route("used-coupon/{couponCode}")]
+        public async Task<ActionResult<ResponseDto>> HasUserUsedCoupon(int userId, string couponCode)
         {
 
-            var hasUsed = await _userCouponService.IsCouponUsedByUser(userId, couponId);
+            var hasUsed = await _userCouponService.IsCouponUsedByUser(userId, couponCode);
 
             if (hasUsed)
             {
@@ -134,14 +134,25 @@ namespace BlueBerry24.API.Controllers
                     StatusMessage = "The coupon has used"
                 });
             }
-
-
-            return NotFound(new ResponseDto
+            else if (!hasUsed)
             {
-                StatusMessage = "The coupon has not used",
-                StatusCode = 404,
-                IsSuccess = false
-            });
+                return Ok(new ResponseDto
+                {
+                    StatusMessage = "The coupon has not used",
+                    StatusCode = 200,
+                    IsSuccess = true
+                });
+            }
+
+            else
+            {
+                return BadRequest(new ResponseDto
+                {
+                    StatusMessage = "Error exists while checking",
+                    StatusCode = 400,
+                    IsSuccess = false
+                });
+            }
         }
 
     }
