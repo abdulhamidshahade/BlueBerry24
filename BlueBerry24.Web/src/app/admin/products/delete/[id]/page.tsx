@@ -121,7 +121,7 @@ export default async function DeleteProductPage({ params }: PageProps) {
                   <i className="bi bi-x-circle me-1"></i>Cancel
                 </Link>
                 <Link 
-                  href={`/admin/products/${product.id}/edit`}
+                  href={`/admin/products/update/${product.id}`}
                   className="btn btn-outline-warning"
                 >
                   <i className="bi bi-pencil-square me-1"></i>Edit Instead
