@@ -60,7 +60,11 @@ export class ProductService implements IProductService{
     
     async create(data: CreateProductDto, categories: number[]): Promise<ProductDto> {
         try {
-            const json: ResponseDto<ProductDto> = await apiRequest(`${API_BASE}`, {
+
+            const queryString = categories.map(c => `categories=${c}`).join('&');
+            const url = `${API_BASE}?${queryString}`;
+
+            const json: ResponseDto<ProductDto> = await apiRequest(url, {
                 method: 'POST',
                 body: JSON.stringify(data),
                 requireAuth: true
