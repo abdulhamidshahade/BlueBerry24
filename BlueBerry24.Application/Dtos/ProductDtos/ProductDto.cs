@@ -9,5 +9,7 @@ namespace BlueBerry24.Application.Dtos.ProductDtos
     public class ProductDto : ProductBaseDto
     {
         public int Id { get; set; }
+
+        public List<string> ProductCategoryNames { get; set; }
     }
 }
