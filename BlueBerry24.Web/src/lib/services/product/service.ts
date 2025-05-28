@@ -79,7 +79,11 @@ export class ProductService implements IProductService{
     
     async update(id: number, data: UpdateProductDto, categories: number[]): Promise<ProductDto> {
         try {
-            const json: ResponseDto<ProductDto> = await apiRequest(`${API_BASE}/${id}`, {
+
+            const categoriesQuery = categories.map(c => `categories=${c}`).join('&');
+            const url = `${API_BASE}/${id}?${categoriesQuery}`;
+
+            const json: ResponseDto<ProductDto> = await apiRequest(url, {
                 method: 'PUT',
                 body: JSON.stringify(data),
                 requireAuth: true
