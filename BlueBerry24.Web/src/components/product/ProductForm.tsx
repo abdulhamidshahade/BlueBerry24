@@ -40,7 +40,7 @@ export default function ProductForm({
               </h4>
             </div>
             <div className="card-body">
-              <form action={createProduct}>
+              <form action={action}>
                 {isEdit && product && (
                   <input type="hidden" name="id" value={product.id} />
                 )}
@@ -191,7 +191,7 @@ export default function ProductForm({
                       }
                     >
                       {categories.map((category) => (
-                        <option key={category.id} value={category.id}>
+                        <option key={category.id} value={String(category.id)}>
                           {category.name}
                         </option>
                       ))}
