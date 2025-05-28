@@ -9,7 +9,10 @@ export interface ProductDto{
     lowStockThreshold: number;
     isActive: boolean;
     sku: string;
-    productCategoryNames: string[]
+    productCategories: {id: number, 
+                        name: string, 
+                        description: string, 
+                        imageUrl: string}[];
 }
 
 export interface CreateProductDto{
