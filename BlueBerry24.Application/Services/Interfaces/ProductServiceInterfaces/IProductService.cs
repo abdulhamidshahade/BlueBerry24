@@ -17,6 +17,5 @@ namespace BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces
         Task<bool> DeleteAsync(int id);
         Task<bool> ExistsByIdAsync(int id);
         Task<bool> ExistsByNameAsync(string name);
-        //Task<bool> ExistsByShopIdAsync(string productId, string shopId);
     }
 }

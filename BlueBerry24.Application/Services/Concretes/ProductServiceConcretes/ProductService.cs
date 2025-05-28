@@ -5,8 +5,6 @@ using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
 using BlueBerry24.Domain.Entities.ProductEntities;
 using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.ProductInterfaces;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using System.Runtime.InteropServices;
 
 namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
 { 
@@ -110,18 +108,12 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
                 return null;
             }
 
-            //var ProductWithSameName = await _productRepository.GetAsync(c => c.Name == productDto.Name && c.Id != id);
+            var isProductExists = await GetByNameAsync(productDto.Name);
 
-            //if (ProductWithSameName != null)
-            //{
-            //    throw new DuplicateEntityException($"Product with name: {productDto.Name} already exists");
-            //}
-
-            //existingProduct.Name = productDto.Name;
-            //existingProduct.Description = productDto.Description;
-            //existingProduct.Price = productDto.Price;
-            //existingProduct.StockQuantity = productDto.StockQuantity;
-            //existingProduct.ImageUrl = productDto.ImageUrl;
+            if(isProductExists != null && isProductExists.Id != id)
+            {
+                return null;
+            }
 
             var mappedProduct = _mapper.Map<Product>(productDto);
 
@@ -130,8 +122,6 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
             var updatedProduct = await _productRepository.UpdateAsync(id, mappedProduct);
 
             var productToDto = _mapper.Map<ProductDto>(updatedProduct);
-
-            //_productRepository.Update(existingProduct);
 
             if(!await _productCategoryService.UpdateProductCategoryAsync(productToDto, categories))
             {
