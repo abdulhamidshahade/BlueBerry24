@@ -2,7 +2,7 @@
 
 namespace BlueBerry24.Domain.Entities.ProductEntities.Validations.ProductValidations
 {
-    public class ProductBaseValidator<T> : AbstractValidator<T> where T : ProductBase
+    public class ProductBaseValidator<T> : AbstractValidator<T> where T : Product
     {
         public ProductBaseValidator()
         {
