@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BlueBerry24.Application.Dtos.ProductDtos
 {
-    class DeleteProductDto
+    class DeleteProductDto : ProductBaseDto
     {
         public int Id { get; set; }
     }
