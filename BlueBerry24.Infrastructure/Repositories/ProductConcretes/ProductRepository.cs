@@ -84,7 +84,11 @@ namespace BlueBerry24.Infrastructure.Repositories.ProductConcretes
             productModel.Name = product.Name;
             productModel.StockQuantity = product.StockQuantity;
             productModel.ImageUrl = product.ImageUrl;
-            productModel.ShopId = product.ShopId;
+            productModel.ReservedStock = product.ReservedStock;
+            productModel.LowStockThreshold = product.LowStockThreshold;
+            productModel.IsActive = product.IsActive;
+            productModel.SKU = product.SKU;
+
 
             _context.Products.Update(productModel);
             await _context.SaveChangesAsync();
