@@ -9,12 +9,13 @@ interface Props {
   params: {
     id: string;
   };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-export default async function DeleteCategoryPage({ params }: Props) {
-    const { id } = await params;
-    const categoryId = parseInt(id);
-  
+export default async function DeleteCategoryPage({ params, searchParams }: Props) {
+  const { id } = await params;
+  const categoryId = parseInt(id);
+
   if (isNaN(categoryId)) {
     notFound();
   }
@@ -32,8 +33,8 @@ export default async function DeleteCategoryPage({ params }: Props) {
       <div className="row mb-4">
         <div className="col-12">
           <div className="d-flex align-items-center">
-            <a 
-              href="/admin/categories" 
+            <a
+              href="/admin/categories"
               className="btn btn-outline-secondary me-3"
               title="Back to Categories"
             >
@@ -75,8 +76,8 @@ export default async function DeleteCategoryPage({ params }: Props) {
             <div className="card-body p-4">
               <div className="row mb-4">
                 <div className="col-md-4">
-                  <img 
-                    src={category.imageUrl} 
+                  <img
+                    src={category.imageUrl}
                     alt={category.name}
                     className="img-fluid rounded"
                     style={{ width: '100%', height: '150px', objectFit: 'cover' }}
@@ -95,11 +96,11 @@ export default async function DeleteCategoryPage({ params }: Props) {
 
               <hr className="my-4" />
 
-              <DeleteCategoryForm category={category} />
+              <DeleteCategoryForm category={category} searchParams={searchParams} />
             </div>
           </div>
         </div>
       </div>
     </div>
   );
-} 
+}
