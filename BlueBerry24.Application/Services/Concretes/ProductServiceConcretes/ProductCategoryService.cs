@@ -18,16 +18,18 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
         private readonly IUnitOfWork _unitOfWork;
         public ProductCategoryService(IProductCategoryRepository productCategoryRepository, 
             IMapper mapper,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IProductRepository productRepository)
         {
             _productCategoryRepository = productCategoryRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _productRepository = productRepository;
         }
 
         public async Task<bool> AddProductCategoryAsync(ProductDto product, List<int> categories)
         {
-            if(categories.Count == 0 || !await _productRepository.ExistsByIdAsync(product.Id))
+            if(categories.Count == 0)
             {
                 return false;
             }
@@ -46,17 +48,17 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
                 return false;
             }
 
-            await _unitOfWork.BeginTransactionAsync();
+            //await _unitOfWork.BeginTransactionAsync();
 
             var existingCategories = await _productCategoryRepository.GetCategoriesByProuductId(product.Id);
             
             if(!await _productCategoryRepository.RemoveCategoriesByProductId(product.Id))
             {
-                await _unitOfWork.RollbackTransactionAsync();
+                //await _unitOfWork.RollbackTransactionAsync();
                 return false;
             }
 
-            await _unitOfWork.CommitTransactionAsync();
+            //await _unitOfWork.CommitTransactionAsync();
 
             var mappedProduct = _mapper.Map<Product>(product);
 
