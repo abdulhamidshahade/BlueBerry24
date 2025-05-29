@@ -1,6 +1,11 @@
 import CategoryForm from "@/components/category/CategoryForm";
+import { createCategory } from '@/lib/actions/category-actions';
 
-export default function CreateCategoryPage() {
+interface Props {
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export default function CreateCategoryPage({ searchParams }: Props) {
   return (
     <div className="container-fluid">
       <div className="row mb-4">
@@ -36,11 +41,16 @@ export default function CreateCategoryPage() {
               </h5>
             </div>
             <div className="card-body p-4">
-              <CategoryForm mode="create" />
+              <CategoryForm 
+                action={createCategory}
+                isEdit={false}
+                submitText='Create Category'
+                searchParams={searchParams}
+              />
             </div>
           </div>
         </div>
       </div>
     </div>
   );
-} 
+}
