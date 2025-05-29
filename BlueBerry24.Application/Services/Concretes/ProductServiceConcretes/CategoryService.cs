@@ -1,11 +1,8 @@
-﻿
-
-using AutoMapper;
+﻿using AutoMapper;
 using BlueBerry24.Application.Dtos.CategoryDtos;
 using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
 using BlueBerry24.Domain.Entities.ProductEntities;
 using BlueBerry24.Domain.Repositories.ProductInterfaces;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
 {
@@ -81,22 +78,19 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
                 return null;
             }
 
-            //var existingCategory = await _categoryRepository.GetByIdAsync(id);
-            //if (existingCategory == null)
-            //{
-            //    return null;
-            //}
+            var existingCategory = await _categoryRepository.GetByIdAsync(id);
 
-            //var categoryWithName = await _categoryRepository.GetAsync(c => c.Name == categoryDto.Name && c.Id != id);
+            if (existingCategory == null)
+            {
+                return null;
+            }
 
-            //if (categoryWithName != null)
-            //{
-            //    return null;
-            //}
+            var isNameExists = await GetByNameAsync(categoryDto.Name);
 
-            //existingCategory.Name = categoryDto.Name;
-            //existingCategory.Description = categoryDto.Description;
-            //existingCategory.ImageUrl = categoryDto.ImageUrl;
+            if(isNameExists != null && isNameExists.Id != id)
+            {
+                return null;
+            }
 
             var mappedCategory = _mapper.Map<Category>(categoryDto);
 
@@ -106,8 +100,15 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
             return _mapper.Map<CategoryDto>(updatedCategory);
         }
 
+        
+
         public async Task<bool> DeleteAsync(int id)
         {
+            if(id <= 0)
+            {
+                return false;
+            }
+
             var category = await _categoryRepository.GetByIdAsync(id);
             if (category == null)
             {
@@ -122,6 +123,11 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
 
         public async Task<bool> ExistsAsync(int id)
         {
+            if(id <= 0)
+            {
+                return false;
+            }
+
             return await _categoryRepository.ExistsByIdAsync(id);
         }
 
