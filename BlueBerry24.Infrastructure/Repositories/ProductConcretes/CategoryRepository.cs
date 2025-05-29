@@ -46,13 +46,46 @@ namespace BlueBerry24.Infrastructure.Repositories.ProductConcretes
 
         public async Task<Category> GetByIdAsync(int id)
         {
-            var category = await _context.Categories.Where(i => i.Id == id).FirstOrDefaultAsync();
+            var category = await _context.Categories.Where(i => i.Id == id)
+                .Include(c => c.ProductCategories)
+                .ThenInclude(c => c.Product)
+                .FirstOrDefaultAsync();
+
+            if(category != null)
+            {
+                //TODO Add pagination here
+                var products = category.ProductCategories
+                    .Select(p => p.Product)
+                    .ToList();
+
+                category.ProductCategories = category.ProductCategories
+                    .Where(pc => products.Contains(pc.Product))
+                    .ToList();
+            }
+
             return category;
         }
 
         public async Task<Category> GetByNameAsync(string name)
         {
-            var category = await _context.Categories.Where(n => n.Name == name).FirstOrDefaultAsync();
+            var category = await _context.Categories
+                .Where(n => n.Name == name)
+                .Include(c => c.ProductCategories)
+                .ThenInclude(p => p.Product)
+                .FirstOrDefaultAsync();
+
+            if(category != null)
+            {
+                var products =
+                    category.ProductCategories
+                    .Select(p => p.Product)
+                    .ToList();
+
+                category.ProductCategories = category.ProductCategories
+                    .Where(pc => products.Contains(pc.Product))
+                    .ToList();
+            }
+
             return category;
         }
 
