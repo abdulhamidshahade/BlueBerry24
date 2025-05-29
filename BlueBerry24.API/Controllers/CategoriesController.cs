@@ -207,7 +207,7 @@ namespace BlueBerry24.API.Controllers
         }
 
         [HttpGet]
-        [Route("exists/{id}")]
+        [Route("exists-by-id/{id}")]
         [AdminAndAbove]
         public async Task<ActionResult<ResponseDto>> ExistsById(int id)
         {
@@ -239,7 +239,7 @@ namespace BlueBerry24.API.Controllers
         }
 
         [HttpGet]
-        [Route("exists/name/{name}")]
+        [Route("exists-by-name/{name}")]
         [AdminAndAbove]
         public async Task<ActionResult<ResponseDto>> ExistsByName(string name)
         {
