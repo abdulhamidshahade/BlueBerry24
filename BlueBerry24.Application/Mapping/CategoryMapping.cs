@@ -4,14 +4,23 @@ using BlueBerry24.Domain.Entities.ProductEntities;
 
 namespace BlueBerry24.Application.Mapping
 {
-    class CategoryMapping : Profile
+    public class CategoryMapping : Profile
     {
         public CategoryMapping()
         {
             CreateMap<CategoryDto, CreateCategoryDto>().ReverseMap();
             CreateMap<CategoryDto, UpdateCategoryDto>().ReverseMap();
             CreateMap<CategoryDto, DeleteCategoryDto>().ReverseMap();
-            CreateMap<CategoryDto, Category>().ReverseMap();
+            
+
+
+            CreateMap<Category, CreateCategoryDto>().ReverseMap();
+            CreateMap<Category, UpdateCategoryDto>().ReverseMap();
+
+
+            CreateMap<Category, CategoryDto>()
+                .ForMember(dest => dest.Products, opt => opt.MapFrom(src => src.ProductCategories.Select(p => p.Product)));
+
         }
     }
 }
