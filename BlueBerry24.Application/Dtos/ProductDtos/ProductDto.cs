@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlueBerry24.Application.Dtos.CategoryDtos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,6 @@ namespace BlueBerry24.Application.Dtos.ProductDtos
     {
         public int Id { get; set; }
 
-        public List<string> ProductCategoryNames { get; set; }
+        public List<CategoryDto> ProductCategories { get; set; }
     }
 }
