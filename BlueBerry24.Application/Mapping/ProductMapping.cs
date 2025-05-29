@@ -24,10 +24,12 @@ namespace BlueBerry24.Application.Mapping
 
 
             CreateMap<Product, ProductDto>()
-                .ForMember(dest => dest.ProductCategoryNames,
-                            opt => opt.MapFrom(src => src.ProductCategories.Select(c => c.Category.Name)));
+                .ForMember(dest => dest.ProductCategories,
+                            opt => opt.MapFrom(src => src.ProductCategories.Select(c => c.Category)));
 
-            CreateMap<ProductDto, Product>();
+            CreateMap<ProductDto, Product>()
+                .ForMember(dest => dest.ProductCategories, opt => opt.Ignore());
+            
         }
     }
 }
