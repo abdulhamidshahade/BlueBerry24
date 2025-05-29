@@ -2,18 +2,21 @@ import { notFound } from 'next/navigation';
 import CategoryForm from "@/components/category/CategoryForm";
 import { CategoryService } from "@/lib/services/category/service";
 import { ICategoryService } from "@/lib/services/category/interface";
+import { updateCategory } from '@/lib/actions/category-actions';
 
 const categoryService: ICategoryService = new CategoryService();
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export default async function EditCategoryPage({ params }: Props) {
-  const categoryId = parseInt(params.id);
-  
+export default async function EditCategoryPage({ params, searchParams }: Props) {
+  const resolvedParams = await params;
+  const categoryId = parseInt(resolvedParams.id);
+
   if (isNaN(categoryId)) {
     notFound();
   }
@@ -21,6 +24,9 @@ export default async function EditCategoryPage({ params }: Props) {
   let category;
   try {
     category = await categoryService.getById(categoryId);
+    if (!category) {
+      notFound();
+    }
   } catch (error) {
     console.error("Failed to load category:", error);
     notFound();
@@ -31,8 +37,8 @@ export default async function EditCategoryPage({ params }: Props) {
       <div className="row mb-4">
         <div className="col-12">
           <div className="d-flex align-items-center">
-            <a 
-              href="/admin/categories" 
+            <a
+              href="/admin/categories"
               className="btn btn-outline-secondary me-3"
               title="Back to Categories"
             >
@@ -61,10 +67,12 @@ export default async function EditCategoryPage({ params }: Props) {
               </h5>
             </div>
             <div className="card-body p-4">
-              <CategoryForm 
-                mode="edit" 
-                categoryId={categoryId}
-                initialData={category}
+              <CategoryForm
+                category={category}
+                action={updateCategory}
+                isEdit={true}
+                submitText='Update Category'
+                searchParams={searchParams}
               />
             </div>
           </div>
@@ -72,4 +80,4 @@ export default async function EditCategoryPage({ params }: Props) {
       </div>
     </div>
   );
-} 
+}
