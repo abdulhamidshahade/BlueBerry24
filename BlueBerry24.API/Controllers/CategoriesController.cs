@@ -1,7 +1,8 @@
-﻿using BlueBerry24.Application.Dtos;
+﻿using BlueBerry24.Application.Authorization.Attributes;
+using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.CategoryDtos;
 using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlueBerry24.API.Controllers
@@ -11,9 +12,9 @@ namespace BlueBerry24.API.Controllers
     public class CategoriesController : BaseController
     {
         private readonly ICategoryService _categoryService;
-
-
         private readonly ILogger<CategoriesController> _logger;
+
+
         public CategoriesController(ILogger<CategoriesController> logger,
                                     ICategoryService categoryService) : base(logger)
         {
@@ -23,13 +24,11 @@ namespace BlueBerry24.API.Controllers
 
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponseDto>> GetAll()
         {
             _logger.LogInformation("Getting all categories");
-
             var categories = await _categoryService.GetAllAsync();
-
-
 
             if (categories == null)
             {
@@ -54,6 +53,7 @@ namespace BlueBerry24.API.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponseDto>> GetById(int id)
         {
 
@@ -80,27 +80,13 @@ namespace BlueBerry24.API.Controllers
             };
 
             return Ok(response);
-
         }
-
 
         [HttpGet]
         [Route("name/{name}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponseDto>> GetByName(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                var badRequestResponse = new ResponseDto
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    StatusMessage = "Invalid request",
-                    Errors = new List<string> { "Category name cannot be empty" }
-                };
-                return BadRequest(badRequestResponse);
-            }
-
-
             _logger.LogInformation($"Getting category with name: {name}");
             var product = await _categoryService.GetByNameAsync(name);
 
@@ -126,6 +112,7 @@ namespace BlueBerry24.API.Controllers
         }
 
         [HttpPost]
+        [AdminAndAbove]
         public async Task<ActionResult<ResponseDto>> Create([FromBody] CreateCategoryDto categoryDto)
         {
             _logger.LogInformation($"Creating new category with name: {categoryDto.Name}");
@@ -155,6 +142,7 @@ namespace BlueBerry24.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [AdminAndAbove]
         public async Task<ActionResult<ResponseDto>> Update(int id, [FromBody] UpdateCategoryDto categoryDto)
         {
             _logger.LogInformation($"Updating category with Id: {id}");
@@ -181,12 +169,12 @@ namespace BlueBerry24.API.Controllers
                 Data = updatedCategory
             };
             return Ok(response);
-
         }
 
 
         [HttpDelete]
         [Route("{id}")]
+        [AdminAndAbove]
         public async Task<ActionResult<ResponseDto>> Delete(int id)
         {
 
@@ -201,7 +189,8 @@ namespace BlueBerry24.API.Controllers
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
                     StatusMessage = "Category not found",
-                    Errors = new List<string> { $"Category with ID {id} not found" }
+                    Errors = new List<string> { $"Category with ID {id} not found" },
+                    Data = false
                 };
                 return NotFound(notFoundResponse);
             }
@@ -210,7 +199,8 @@ namespace BlueBerry24.API.Controllers
             {
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
-                StatusMessage = "Category deleted successfully"
+                StatusMessage = "Category deleted successfully",
+                Data = true
             };
             return Ok(response);
 
@@ -218,6 +208,7 @@ namespace BlueBerry24.API.Controllers
 
         [HttpGet]
         [Route("exists/{id}")]
+        [AdminAndAbove]
         public async Task<ActionResult<ResponseDto>> ExistsById(int id)
         {
 
@@ -247,24 +238,11 @@ namespace BlueBerry24.API.Controllers
 
         }
 
-
         [HttpGet]
         [Route("exists/name/{name}")]
+        [AdminAndAbove]
         public async Task<ActionResult<ResponseDto>> ExistsByName(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                var badRequestResponse = new ResponseDto
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    StatusMessage = "Invalid request",
-                    Errors = new List<string> { "Category name cannot be empty" }
-                };
-                return BadRequest(badRequestResponse);
-            }
-
-
             var exists = await _categoryService.ExistsByNameAsync(name);
 
             if (exists)
@@ -288,8 +266,5 @@ namespace BlueBerry24.API.Controllers
             };
             return NotFound(notFoundResponse);
         }
-
-
     }
-
 }
