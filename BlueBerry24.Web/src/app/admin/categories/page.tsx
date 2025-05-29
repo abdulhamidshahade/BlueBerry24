@@ -6,9 +6,16 @@ import CategoryActionButtons from '@/components/category/CategoryActionButtons';
 
 const categoryService: ICategoryService = new CategoryService();
 
-export default async function AdminCategoriesPage() {
+interface Props {
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export default async function AdminCategoriesPage({ searchParams }: Props) {
   let categories: CategoryDto[] = [];
   let hasError = false;
+
+  const successMessage = searchParams?.success as string;
+  const errorMessage = searchParams?.error as string;
 
   try {
     categories = await categoryService.getAll();
@@ -31,8 +38,8 @@ export default async function AdminCategoriesPage() {
                 Create, edit, and manage product categories
               </p>
             </div>
-            <Link 
-              href="/admin/categories/create" 
+            <Link
+              href="/admin/categories/create"
               className="btn btn-primary"
             >
               <i className="bi bi-plus-circle me-2"></i>
@@ -41,6 +48,34 @@ export default async function AdminCategoriesPage() {
           </div>
         </div>
       </div>
+
+      {successMessage && (
+        <div className="row mb-4">
+          <div className="col-12">
+            <div className="alert alert-success d-flex align-items-center alert-dismissible fade show" role="alert">
+              <i className="bi bi-check-circle-fill me-2"></i>
+              <div>
+                <strong>Success!</strong> {successMessage}
+              </div>
+              <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="row mb-4">
+          <div className="col-12">
+            <div className="alert alert-danger d-flex align-items-center alert-dismissible fade show" role="alert">
+              <i className="bi bi-exclamation-triangle-fill me-2"></i>
+              <div>
+                <strong>Error!</strong> {errorMessage}
+              </div>
+              <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {hasError && (
         <div className="row mb-4">
@@ -68,30 +103,30 @@ export default async function AdminCategoriesPage() {
                   <span className="input-group-text bg-light border-end-0">
                     <i className="bi bi-search"></i>
                   </span>
-                  <input 
-                    type="text" 
-                    className="form-control border-start-0" 
+                  <input
+                    type="text"
+                    className="form-control border-start-0"
                     placeholder="Search categories..."
                   />
                 </div>
               </div>
             </div>
-            
+
             <div className="card-body p-0">
-              {categories.length === 0 ? (
+              {categories.length === 0 && !hasError ? (
                 <div className="text-center py-5">
                   <i className="bi bi-folder-x display-1 text-muted mb-3"></i>
                   <h5 className="text-muted">No Categories Found</h5>
                   <p className="text-muted mb-4">Get started by creating your first category.</p>
-                  <Link 
-                    href="/admin/categories/create" 
+                  <Link
+                    href="/admin/categories/create"
                     className="btn btn-primary"
                   >
                     <i className="bi bi-plus-circle me-2"></i>
                     Create First Category
                   </Link>
                 </div>
-              ) : (
+              ) : !hasError ? (
                 <div className="table-responsive">
                   <table className="table table-hover mb-0">
                     <thead className="table-light">
@@ -106,14 +141,14 @@ export default async function AdminCategoriesPage() {
                       {categories.map((category) => (
                         <tr key={category.id}>
                           <td>
-                            <img 
-                              src={category.imageUrl} 
+                            <img
+                              src={category.imageUrl}
                               alt={category.name}
                               className="rounded"
-                              style={{ 
-                                width: '50px', 
-                                height: '50px', 
-                                objectFit: 'cover' 
+                              style={{
+                                width: '50px',
+                                height: '50px',
+                                objectFit: 'cover'
                               }}
                             />
                           </td>
@@ -125,7 +160,7 @@ export default async function AdminCategoriesPage() {
                           </td>
                           <td>
                             <span className="text-muted">
-                              {category.description.length > 100 
+                              {category.description.length > 100
                                 ? category.description.substring(0, 100) + '...'
                                 : category.description
                               }
@@ -139,11 +174,11 @@ export default async function AdminCategoriesPage() {
                     </tbody>
                   </table>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
       </div>
     </div>
   );
-} 
+}
