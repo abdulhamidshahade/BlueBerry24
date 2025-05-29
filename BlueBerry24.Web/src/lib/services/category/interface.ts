@@ -1,5 +1,4 @@
 import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from "@/types/category";
-
 export interface ICategoryService{
     getById(id: number): Promise<CategoryDto>;
     getByName(name: string): Promise<CategoryDto>;
