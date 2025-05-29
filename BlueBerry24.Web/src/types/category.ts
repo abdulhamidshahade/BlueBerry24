@@ -1,8 +1,11 @@
-export interface CategoryDto{
-    id: number;
-    name: string;
-    description: string;
-    imageUrl: string;
+import { ProductDto } from "./product";
+
+export interface CategoryDto {
+  id: number;
+  name: string;
+  description: string;
+  imageUrl: string;
+  products: ProductDto[]
 }
 
 export interface CreateCategoryDto {
