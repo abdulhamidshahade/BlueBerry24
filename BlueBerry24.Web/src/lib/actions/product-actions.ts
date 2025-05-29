@@ -27,11 +27,14 @@ export async function createProduct(formData: FormData): Promise<void> {
     };
 
     await productService.create(productData, categoryIds);
-    
+
     revalidatePath('/admin/products');
     revalidatePath('/products');
     redirect('/admin/products?success=created');
   } catch (error) {
+    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+      throw error;
+    }
     console.error('Error creating product:', error);
     throw new Error('Failed to create product');
   }
@@ -57,11 +60,14 @@ export async function updateProduct(formData: FormData) {
     };
 
     await productService.update(id, productData, categoryIds);
-    
+
     revalidatePath('/admin/products');
     revalidatePath('/products');
     redirect('/admin/products?success=updated');
   } catch (error) {
+    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+      throw error;
+    }
     console.error('Error updating product:', error);
     throw new Error('Failed to update product');
   }
@@ -70,13 +76,16 @@ export async function updateProduct(formData: FormData) {
 export async function deleteProduct(formData: FormData) {
   try {
     const id = parseInt(formData.get('id') as string);
-    
+
     await productService.delete(id);
-    
+
     revalidatePath('/admin/products');
     revalidatePath('/products');
     redirect('/admin/products?success=deleted');
   } catch (error) {
+    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+      throw error;
+    }
     console.error('Error deleting product:', error);
     throw new Error('Failed to delete product');
   }
