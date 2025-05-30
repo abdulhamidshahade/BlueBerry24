@@ -23,9 +23,23 @@ namespace BlueBerry24.Infrastructure.Repositories.CouponConcretes
             _unifOfWork = unitOfWork;
         }
 
-        public Task<UserCoupon> AddCouponToUserAsync(int userId, int couponId)
+        public async Task<UserCoupon> AddCouponToUserAsync(int userId, int couponId)
         {
-            throw new NotImplementedException();
+            var userCoupon = new UserCoupon
+            {
+                UserId = userId,
+                CouponId = couponId,
+                IsUsed = false,
+            };
+
+            await _context.UserCoupons.AddAsync(userCoupon);
+
+            if(await _unifOfWork.SaveDbChangesAsync())
+            {
+                return userCoupon;
+            }
+
+            return null;
         }
 
         public async Task<UserCoupon> AddUserToCouponAsync(int userId, int couponId)
@@ -56,7 +70,6 @@ namespace BlueBerry24.Infrastructure.Repositories.CouponConcretes
         {
             var coupons = await _context.UserCoupons.Where(i => i.UserId == userId)
                 .Select(c => c.Coupon)
-                //.Select(c => c.ToString())
                 .ToListAsync();
 
             return coupons;
@@ -66,15 +79,14 @@ namespace BlueBerry24.Infrastructure.Repositories.CouponConcretes
         {
             var users = await _context.UserCoupons.Where(c => c.CouponId == couponId)
                 .Select(u => u.User)
-                //.Select(u => u.ToString())
                 .ToListAsync();
 
             return users;
         }
 
-        public async Task<bool> IsCouponUsedByUserAsync(int userId, int couponId)
+        public async Task<bool> IsCouponUsedByUserAsync(int userId, string couponCode)
         {
-            var coupon = await _context.UserCoupons.Where(i => i.UserId == userId && couponId == couponId)
+            var coupon = await _context.UserCoupons.Where(i => i.UserId == userId && i.Coupon.Code == couponCode)
                 .FirstOrDefaultAsync();
 
             return coupon.IsUsed;
