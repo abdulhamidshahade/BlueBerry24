@@ -10,6 +10,6 @@ namespace BlueBerry24.Application.Dtos.CouponDtos
     {
         public int UserId { get; set; }
         public int CouponId { get; set; }
-        public bool IsUsed { get; set; }
+        public bool IsUsed { get; set; } = false;
     }
 }
