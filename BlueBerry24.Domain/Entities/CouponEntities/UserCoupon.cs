@@ -17,7 +17,6 @@ namespace BlueBerry24.Domain.Entities.CouponEntities
 
         public int CouponId { get; set; }
         public Coupon Coupon { get; set; }
-
         public bool IsUsed { get; set; }
 
         public DateTime CreatedAt { get; set; }
