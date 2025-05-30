@@ -3,7 +3,6 @@ using BlueBerry24.Application.Dtos.AuthDtos;
 using BlueBerry24.Application.Dtos.CouponDtos;
 using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.CouponServiceInterfaces;
-using BlueBerry24.Domain.Entities.CouponEntities;
 using BlueBerry24.Domain.Repositories.CouponInterfaces;
 
 namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
@@ -28,6 +27,11 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
 
         public async Task<UserCouponDto> AddCouponToUserAsync(int userId, int couponId)
         {
+            if(userId <= 0 || couponId <= 0)
+            {
+                return null;
+            }
+
             var userExists = await _userService.IsUserExistsByIdAsync(userId);
             var couponExists = await _couponService.ExistsByIdAsync(couponId);
 
@@ -35,13 +39,6 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
             {
                 return null;
             }
-
-            var userCoupon = new UserCoupon
-            {
-                CouponId = couponId,
-                UserId = userId,
-                IsUsed = false
-            };
 
             var addedCouponToUser = await _userCouponRepository.AddCouponToUserAsync(userId, couponId);
             var userCouponDto = _mapper.Map<UserCouponDto>(addedCouponToUser);
@@ -58,8 +55,6 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
                 return false;
             }
 
-            //var userCoupon = await _context.Users_Coupons.FirstOrDefaultAsync(u => u.UserId == userId && u.CouponId == couponId && !u.IsUsed);
-
             List<CouponDto> userHasCoupons = _mapper.Map<List<CouponDto>>
                 (await _userCouponRepository.GetCouponsByUserIdAsync(userId));
 
@@ -73,84 +68,48 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
             return disabledCoupon;
         }
 
-        public async Task<List<string>> GetCouponsByUserIdAsync(int userId)
+        public async Task<List<CouponDto>> GetCouponsByUserIdAsync(int userId)
         {
             if (!await _userService.IsUserExistsByIdAsync(userId))
             {
                 return null;
             }
 
-            //var coupons = await _context.Users_Coupons.Where(u => u.UserId == userId && !u.IsUsed).ToListAsync();
-
-            List<CouponDto> couponCodes = 
+            List<CouponDto> coupons = 
                 _mapper.Map<List<CouponDto>>(await _userCouponRepository.GetCouponsByUserIdAsync(userId));
 
-            if(couponCodes == null)
+            if(coupons == null)
             {
                 return null;
             }
 
-            //foreach (var userCoupon in coupons)
-            //{
-            //    couponCodes.Add(userCoupon.CouponId.ToString());
-            //}
-
-            return couponCodes.Select(c => c.Code).ToList();
+            return coupons.ToList();
         }
 
-        public async Task<List<string>> GetUsersByCouponIdAsync(int couponId)
+        public async Task<List<ApplicationUserDto>> GetUsersByCouponIdAsync(int couponId)
         {
             if (!await _couponService.ExistsByIdAsync(couponId))
             {
                 return null;
             }
 
-
-            //var users = await _context.Users_Coupons.Where(u => u.CouponId == couponId).Select(u => u.UserId).Distinct().ToListAsync();
-
             List<ApplicationUserDto> userList = 
                 _mapper.Map<List<ApplicationUserDto>>(await _userCouponRepository.GetUsersByCouponIdAsync(couponId));
 
-            //foreach (var userCoupon in users)
-            //{
-            //    userList.Add(userCoupon.ToString());
-            //}
-
-            return userList.Select(n => n.FirstName).ToList();
+            return userList.ToList();
         }
 
-        public async Task<bool> IsCouponUsedByUser(int userId, int couponId)
+        public async Task<bool> IsCouponUsedByUser(int userId, string couponCode)
         {
-            //var userExists = await _userService.IsUserExistsByIdAsync(userId);
-            //var couponExists = await _couponService.IsCouponExistsByIdAsync(couponId);
-
-            //var couponClient = new CouponRpcClient(_configuration);
-            //await couponClient.InitializeRabbitMqConnection();
-
-            //var userClinet = new UserRpcClient(_configuration);
-            //await userClinet.InitializeRabbitMqConnection();
-
-            //var couponExists = await couponClient.IsCouponAvaiableAsync(couponCode);
-            //var userExists = await userClinet.IsUserAvailabeAsync(userId);
-
-            //if (!couponExists || !userExists)
-            //{
-            //    throw new NotFoundException("User or coupon doesn't exists!");
-            //}
-
-            //var used = await _context.Users_Coupons.AnyAsync(u => u.UserId == userId && u.CouponId == couponCode && u.IsUsed);
-
-            //return used;
-
             var userExists = await _userService.IsUserExistsByIdAsync(userId);
-            var couponExists = await _couponService.ExistsByIdAsync(couponId);
+            var couponExists = await _couponService.ExistsByCodeAsync(couponCode);
 
             if (!userExists || !couponExists)
             {
                 return false;
             }
 
-            var isCouponUsed = await _userCouponRepository.IsCouponUsedByUserAsync(userId, couponId);
+            var isCouponUsed = await _userCouponRepository.IsCouponUsedByUserAsync(userId, couponCode);
 
             return isCouponUsed;
         }
