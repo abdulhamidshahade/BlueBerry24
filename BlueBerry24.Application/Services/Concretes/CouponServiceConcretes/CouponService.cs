@@ -21,6 +21,11 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
 
         public async Task<CouponDto> GetByIdAsync(int id)
         {
+            if(id <= 0)
+            {
+                return null;
+            }
+
             var coupon = await _couponRepository.GetByIdAsync(id);
 
             if (coupon == null)
@@ -60,23 +65,16 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
                 return null;
             }
 
-            //await ValidateCouponDto(couponDto);
-
             if (await ExistsByCodeAsync(couponDto.Code))
             {
                 return null;
             }
 
             var coupon = _mapper.Map<Coupon>(couponDto);
-
             var createdCoupon = await _couponRepository.CreateAsync(coupon);
             
-            //business doesn't worry about db operations.
-            //await _unitOfWork.SaveDbChangesAsync();
-
             return _mapper.Map<CouponDto>(createdCoupon);
         }
-
 
         public async Task<CouponDto> UpdateAsync(int id, UpdateCouponDto couponDto)
         {
@@ -85,23 +83,19 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
                 return null;
             }
 
+            var existingCoupon = await _couponRepository.GetByIdAsync(id);
+            
+            if (existingCoupon == null)
+            {
+                return null;
+            }
 
+            var isCouponExists = await GetByCodeAsync(couponDto.Code);
 
-            //var existingCoupon = await _couponRepository.GetByIdAsync(id);
-            //if (existingCoupon == null)
-            //{
-            //    return null;
-            //}
-
-            //var couponWithSameCode = await _couponRepository.GetAsync(c => c.Code == couponDto.Code && c.Id != id);
-
-            //if (couponWithSameCode != null)
-            //{
-            //    return null;
-            //}
-
-            //existingCoupon.DiscountAmount = couponDto.DiscountAmount;
-            //existingCoupon.MinimumAmount = couponDto.MinimumAmount;
+            if(isCouponExists != null && isCouponExists.Id != couponDto.Id)
+            {
+                return null;
+            }
 
             var mappedCoupon = _mapper.Map<Coupon>(couponDto);
 
@@ -111,6 +105,11 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
 
         public async Task<bool> DeleteAsync(int id)
         {
+            if(id <= 0)
+            {
+                return false;
+            }
+
             var coupon = await _couponRepository.GetByIdAsync(id);
             if (coupon == null)
             {
@@ -135,24 +134,5 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
 
             return await _couponRepository.ExistsAsync(c => c.Code == code);
         }
-
-
-        //private async Task ValidateCouponDto(CreateCouponDto couponDto)
-        //{
-        //    if (string.IsNullOrWhiteSpace(couponDto.Code))
-        //    {
-        //        throw new ValidationException("Coupon code cannot be empty");
-        //    }
-
-        //    if (couponDto.DiscountAmount <= 0)
-        //    {
-        //        throw new ValidationException("Discount amount must be greater than zero");
-        //    }
-
-        //    if (couponDto.MinimumAmount < 0)
-        //    {
-        //        throw new ValidationException("Minimum amount cannot be negative");
-        //    }
-        //}
     }
 }
