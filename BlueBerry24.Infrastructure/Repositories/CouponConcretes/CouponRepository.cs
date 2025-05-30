@@ -58,9 +58,15 @@ namespace BlueBerry24.Infrastructure.Repositories.CouponConcretes
 
             if (couponModel == null) return null;
 
-            couponModel.MinimumAmount = coupon.MinimumAmount;
+            couponModel.MinimumOrderAmount = coupon.MinimumOrderAmount;
             couponModel.DiscountAmount = coupon.DiscountAmount;
             couponModel.IsActive = coupon.IsActive;
+            couponModel.Code = coupon.Code;
+            couponModel.Description = coupon.Description;
+            couponModel.IsActive = coupon.IsActive;
+            couponModel.Value = coupon.Value;
+            couponModel.Type = coupon.Type;
+            couponModel.IsForNewUsersOnly = coupon.IsForNewUsersOnly;
 
             _context.Coupons.Update(couponModel);
             await _context.SaveChangesAsync();
