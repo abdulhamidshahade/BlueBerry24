@@ -14,6 +14,6 @@ namespace BlueBerry24.Domain.Repositories.CouponInterfaces
         Task<bool> DisableCouponForUserAsync(int userId, int couponId);
         Task<IReadOnlyList<Coupon>> GetCouponsByUserIdAsync(int userId);
         Task<IReadOnlyList<ApplicationUser>> GetUsersByCouponIdAsync(int couponId);
-        Task<bool> IsCouponUsedByUserAsync(int userId, int couponId);
+        Task<bool> IsCouponUsedByUserAsync(int userId, string couponCode);
     }
 }
