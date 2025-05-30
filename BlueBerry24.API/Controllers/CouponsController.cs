@@ -1,9 +1,8 @@
-﻿
+﻿using BlueBerry24.Application.Authorization.Attributes;
 using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.CouponDtos;
 using BlueBerry24.Application.Services.Interfaces.CouponServiceInterfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace BlueBerry24.API.Controllers
 {
@@ -12,16 +11,22 @@ namespace BlueBerry24.API.Controllers
     public class CouponsController : BaseController
     {
         private readonly ICouponService _couponService;
+        private readonly IUserCouponService _userCouponService;
         private readonly ILogger<CouponsController> _logger;
 
+
         public CouponsController(ICouponService couponService,
-                                 ILogger<CouponsController> logger) : base(logger)
+                                 ILogger<CouponsController> logger,
+                                 IUserCouponService userCouponService) : base(logger)
         {
             _couponService = couponService ?? throw new ArgumentNullException(nameof(couponService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _userCouponService = userCouponService;
         }
 
+
         [HttpGet]
+        [AdminAndAbove]
         public async Task<ActionResult<ResponseDto>> GetAll()
         {
             _logger.LogInformation("Getting all coupons");
@@ -47,16 +52,13 @@ namespace BlueBerry24.API.Controllers
                 Data = coupons
             };
             return Ok(response);
-
-
         }
-
 
         [HttpGet]
         [Route("{id}")]
+        [UserAndAbove]
         public async Task<ActionResult<ResponseDto>> GetById(int id)
         {
-
             _logger.LogInformation($"Getting coupon with ID: {id}");
             var coupon = await _couponService.GetByIdAsync(id);
 
@@ -80,33 +82,19 @@ namespace BlueBerry24.API.Controllers
                 Data = coupon
             };
             return Ok(response);
-
-
         }
 
         [HttpGet]
         [Route("code/{code}")]
+        [UserAndAbove]
         public async Task<ActionResult<ResponseDto>> GetByCode(string code)
         {
-            //if (string.IsNullOrWhiteSpace(code))
-            //{
-            //    var badRequestResponse = new ResponseDto
-            //    {
-            //        IsSuccess = false,
-            //        StatusCode = StatusCodes.Status400BadRequest,
-            //        StatusMessage = "Invalid request",
-            //        Errors = new List<string> { "Coupon code cannot be empty" }
-            //    };
-            //    return BadRequest(badRequestResponse);
-            //}
-
-
             _logger.LogInformation($"Getting coupon with code: {code}");
             var coupon = await _couponService.GetByCodeAsync(code);
 
             if (coupon == null)
             {
-                _logger.LogError("Error retrieving coupon with code {code}");
+                _logger.LogError($"Error retrieving coupon with code {code}");
                 return new ResponseDto
                 {
                     IsSuccess = false,
@@ -124,16 +112,10 @@ namespace BlueBerry24.API.Controllers
                 Data = coupon
             };
             return Ok(response);
-
-
-
-
-
-
         }
 
-
         [HttpPost]
+        [AdminAndAbove]
         public async Task<ActionResult<ResponseDto>> Create([FromBody] CreateCouponDto couponDto)
         {
             _logger.LogInformation($"Creating new coupon with code: {couponDto.Code}");
@@ -165,21 +147,9 @@ namespace BlueBerry24.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [AdminAndAbove]
         public async Task<ActionResult<ResponseDto>> Update(int id, [FromBody] UpdateCouponDto couponDto)
         {
-            //if (couponDto == null)
-            //{
-            //    var badRequestResponse = new ResponseDto
-            //    {
-            //        IsSuccess = false,
-            //        StatusCode = StatusCodes.Status400BadRequest,
-            //        StatusMessage = "Invalid request",
-            //        Errors = new List<string> { "Coupon data is required" }
-            //    };
-            //    return BadRequest(badRequestResponse);
-            //}
-
-
             _logger.LogInformation($"Updating coupon with ID: {id}");
             var updatedCoupon = await _couponService.UpdateAsync(id, couponDto);
 
@@ -205,16 +175,11 @@ namespace BlueBerry24.API.Controllers
             return Ok(response);
         }
 
-
-
-
-
-
         [HttpDelete]
         [Route("{id}")]
+        [AdminAndAbove]
         public async Task<ActionResult<ResponseDto>> Delete(int id)
         {
-
             _logger.LogInformation($"Deleting coupon with ID: {id}");
             var deleted = await _couponService.DeleteAsync(id);
 
@@ -238,16 +203,13 @@ namespace BlueBerry24.API.Controllers
                 StatusMessage = "Coupon deleted successfully"
             };
             return Ok(response);
-
-
-
         }
 
         [HttpGet]
-        [Route("exists/{id}")]
+        [Route("exists-by-id/{id}")]
+        [UserAndAbove]
         public async Task<ActionResult<ResponseDto>> Exists(int id)
         {
-
             var exists = await _couponService.ExistsByIdAsync(id);
 
             if (exists)
@@ -268,35 +230,13 @@ namespace BlueBerry24.API.Controllers
                 StatusMessage = "Coupon not found",
             };
             return NotFound(notFoundResponse);
-
         }
 
-        //[HttpHead]
-        //[Route("exists/{id:guid}")]
-        //public async Task<IActionResult> ExistsById(string id)
-        //{
-        //    var exists = await _couponService.ExistsByIdAsync(id);
-
-        //    return (!exists) ? NotFound() : Ok();
-        //}
-
         [HttpGet]
-        [Route("exists/code/{code}")]
+        [Route("exists-by-code/{code}")]
+        [UserAndAbove]
         public async Task<ActionResult<ResponseDto>> ExistsByCode(string code)
         {
-            //if (string.IsNullOrWhiteSpace(code))
-            //{
-            //    var badRequestResponse = new ResponseDto
-            //    {
-            //        IsSuccess = false,
-            //        StatusCode = StatusCodes.Status400BadRequest,
-            //        StatusMessage = "Invalid request",
-            //        Errors = new List<string> { "Coupon code cannot be empty" }
-            //    };
-            //    return BadRequest(badRequestResponse);
-            //}
-
-
             var exists = await _couponService.ExistsByCodeAsync(code);
 
             if (exists)
@@ -319,5 +259,143 @@ namespace BlueBerry24.API.Controllers
             return NotFound(notFoundResponse);
         }
 
+        [HttpPost]
+        [Route("users/{userId}/coupons")]
+        [AdminAndAbove]
+        public async Task<ActionResult<ResponseDto>> AddCouponToUser(int userId, [FromBody] AddCouponToUserDto addCouponToUserDto)
+        {
+            var entity = await _userCouponService.AddCouponToUserAsync(userId, addCouponToUserDto.CouponId);
+
+            if (entity != null)
+            {
+                return Ok(new ResponseDto
+                {
+                    Data = entity,
+                    IsSuccess = true,
+                    StatusCode = 201
+                });
+            }
+
+            return BadRequest(new ResponseDto
+            {
+                IsSuccess = false,
+                StatusCode = 400,
+                StatusMessage = "An error occurred while apply coupon to user"
+            });
+        }
+
+        [HttpPut]
+        [Route("users/{userId}/coupons/{couponId}/disable")]
+        [AdminAndAbove]
+
+        public async Task<ActionResult<ResponseDto>> DisableUserCoupon(int userId, int couponId)
+        {
+            var isDisabled = await _userCouponService.DisableCouponToUser(userId, couponId);
+
+            if (isDisabled)
+            {
+                return Ok(new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    StatusMessage = $"The coupon has disabled for the user: {userId}"
+                });
+            }
+
+            return BadRequest(new ResponseDto
+            {
+                IsSuccess = false,
+                StatusCode = 400,
+                StatusMessage = "En error occurred while disabling the coupon"
+            });
+        }
+
+        [HttpGet]
+        [Route("users/{userId}/coupons")]
+        [UserAndAbove]
+        public async Task<ActionResult<ResponseDto>> GetCouponsByUserId(int userId)
+        {
+            var coupons = await _userCouponService.GetCouponsByUserIdAsync(userId);
+
+            if (coupons.Count != 0)
+            {
+                return Ok(new ResponseDto
+                {
+                    Data = coupons,
+                    IsSuccess = true,
+                    StatusCode = 200
+                });
+            }
+
+            return NotFound(new ResponseDto
+            {
+                IsSuccess = false,
+                StatusCode = 404,
+                StatusMessage = "There is no coupons found by user"
+            });
+        }
+
+        [HttpGet]
+        [Route("{couponId}/users")]
+        [AdminAndAbove]
+        public async Task<ActionResult<ResponseDto>> GetUsersByCouponId(int couponId)
+        {
+            var users = await _userCouponService.GetUsersByCouponIdAsync(couponId);
+
+            if (users.Count != 0)
+            {
+                return Ok(new ResponseDto
+                {
+                    Data = users,
+                    IsSuccess = true,
+                    StatusCode = 200
+                });
+            }
+
+            return NotFound(new ResponseDto
+            {
+                IsSuccess = false,
+                StatusCode = 404,
+                StatusMessage = "There is no users found by coupon"
+            });
+        }
+
+        [HttpGet]
+        [Route("users/{userId}/coupons/{couponCode}/used")]
+        [UserAndAbove]
+        public async Task<ActionResult<ResponseDto>> HasUserUsedCoupon(int userId, string couponCode)
+        {
+
+            var hasUsed = await _userCouponService.IsCouponUsedByUser(userId, couponCode);
+
+            if (hasUsed)
+            {
+                return Ok(new ResponseDto
+                {
+                    StatusCode = 200,
+                    IsSuccess = true,
+                    StatusMessage = "The coupon has used"
+                });
+            }
+            else if (!hasUsed)
+            {
+                return Ok(new ResponseDto
+                {
+                    StatusMessage = "The coupon has not used",
+                    StatusCode = 200,
+                    IsSuccess = true
+                });
+            }
+
+            else
+            {
+                return BadRequest(new ResponseDto
+                {
+                    StatusMessage = "Error exists while checking",
+                    StatusCode = 400,
+                    IsSuccess = false
+                });
+            }
+        }
     }
 }
