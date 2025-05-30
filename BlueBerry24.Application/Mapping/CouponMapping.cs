@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BlueBerry24.Application.Mapping
 {
-    class CouponMapping : Profile
+    public class CouponMapping : Profile
     {
         public CouponMapping()
         {
@@ -17,6 +17,11 @@ namespace BlueBerry24.Application.Mapping
             CreateMap<CouponDto, UpdateCouponDto>().ReverseMap();
             CreateMap<CouponDto, DeleteCouponDto>().ReverseMap();
             CreateMap<CouponDto, Coupon>().ReverseMap();
+
+            CreateMap<Coupon, CreateCouponDto>().ReverseMap();
+            CreateMap<Coupon, UpdateCouponDto>().ReverseMap();
+
+            CreateMap<UserCoupon, UserCouponDto>().ReverseMap();
         }
     }
 }
