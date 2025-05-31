@@ -287,7 +287,6 @@ namespace BlueBerry24.API.Controllers
         [HttpPut]
         [Route("users/{userId}/coupons/{couponId}/disable")]
         [AdminAndAbove]
-
         public async Task<ActionResult<ResponseDto>> DisableUserCoupon(int userId, int couponId)
         {
             var isDisabled = await _userCouponService.DisableCouponToUser(userId, couponId);
@@ -396,6 +395,82 @@ namespace BlueBerry24.API.Controllers
                     IsSuccess = false
                 });
             }
+        }
+
+
+        [HttpPost]
+        [Route("add-coupon-to-specific-users/{couponId}")]
+        [AdminAndAbove]
+        public async Task<ActionResult<ResponseDto>> AddCouponToSpecificUsers(int couponId, [FromQuery]List<int> UserIds)
+        {
+            var addedCoupon = await _userCouponService.AddCouponToUsersAsync(UserIds, couponId);
+
+            if (!addedCoupon)
+            {
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 400,
+                    StatusMessage = "An error occurred while applying coupon to users"
+                });
+            }
+
+            return Ok(new ResponseDto
+            {
+                IsSuccess = true,
+                StatusCode = 200,
+                StatusMessage = "Coupon added to specific users successfully"
+            });
+        }
+
+        [HttpPost]
+        [Route("add-coupon-to-all-users/{couponId}")]
+        [AdminAndAbove]
+        public async Task<ActionResult<ResponseDto>> AddCouponToAllUsers(int couponId)
+        {
+            var addedCoupon = await _userCouponService.AddCouponToAllUsersAsync(couponId);
+
+            if (!addedCoupon)
+            {
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 400,
+                    StatusMessage = "An error occurred while applying coupon to all users"
+                });
+            }
+
+            return Ok(new ResponseDto
+            {
+                IsSuccess = true,
+                StatusCode = 200,
+                StatusMessage = "Coupon added to all users successfully"
+            });
+        }
+
+        [HttpPost]
+        [Route("add-coupon-to-new-users/{couponId}")]
+        [AdminAndAbove]
+        public async Task<ActionResult<ResponseDto>> AddCouponToNewUsers(int couponId)
+        {
+            var addedCoupon = await _userCouponService.AddCouponToNewUsersAsync(couponId);
+
+            if (!addedCoupon)
+            {
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 400,
+                    StatusMessage = "An error occurred while applying coupon to new users"
+                });
+            }
+
+            return Ok(new ResponseDto
+            {
+                IsSuccess = true,
+                StatusCode = 200,
+                StatusMessage = "Coupon added to new users successfully"
+            });
         }
     }
 }
