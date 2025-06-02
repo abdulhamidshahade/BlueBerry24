@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Domain.Entities.OrderEntities;
+﻿using BlueBerry24.Domain.Constants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +24,7 @@ namespace BlueBerry24.Application.Dtos.OrderDtos
         public int PaymentTransactionId { get; set; }
         public bool IsPaid { get; set; }
         public DateTime PaidAt { get; set; }
-        public int ReferenceNumber { get; set; }
+        public string? ReferenceNumber { get; set; }
         public DateTime? CompletedAt { get; set; }
         public DateTime? CancelledAt { get; set; }
         public string? ShippingName { get; set; }
