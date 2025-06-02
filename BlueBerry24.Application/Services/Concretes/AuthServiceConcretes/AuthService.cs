@@ -11,19 +11,19 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
     public class AuthService : IAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IRoleService _roleService;
         private readonly ILogger<AuthService> _logger;
         private readonly ITokenService _tokenService;
+        private readonly IRoleManagementService _roleService;
 
         public AuthService(UserManager<ApplicationUser> userManager,
-                           IRoleService roleService,
                            ILogger<AuthService> logger,
-                           ITokenService tokenService)
+                           ITokenService tokenService,
+                           IRoleManagementService roleService)
         {
             _userManager = userManager;
-            _roleService = roleService;
             _logger = logger;
             _tokenService = tokenService;
+            _roleService = roleService;
         }
 
         public async Task<RegisterResponseDto> Register(RegisterRequestDto requestDto)
@@ -54,19 +54,19 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
                 {
                     string defaultRole = "User";
 
-                    if (_roleService.IsValidRole(defaultRole))
-                    {
-                        bool IsRoleAssignmentSuccess = await _roleService.AssignRoleToUserAsync(user, defaultRole);
 
-                        if (!IsRoleAssignmentSuccess)
+                    bool IsRoleAssignmentSuccess = await _roleService.AssignRoleToUserAsync(user.Id, defaultRole);
+
+                    if (!IsRoleAssignmentSuccess)
+                    {
+                        return new RegisterResponseDto
                         {
-                            return new RegisterResponseDto
-                            {
-                                IsSuccess = false,
-                                ErrorMessage = "Failed to assign role to the user!"
-                            };
-                        }
+                            IsSuccess = false,
+                            ErrorMessage = "Failed to assign role to the user!"
+                        };
                     }
+
+                    var userRoles = await _userManager.GetRolesAsync(user);
 
                     ApplicationUserDto userDto = new()
                     {
@@ -74,6 +74,8 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
                         Email = user.Email,
                         FirstName = user.FirstName,
                         LastName = user.LastName,
+                        UserName = user.UserName,
+                        Roles = userRoles.ToList()
                     };
 
                     return new RegisterResponseDto
@@ -104,7 +106,7 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
         public async Task<LoginResponseDto> Login(LoginRequestDto requestDto)
         {
             var normalizedEmail = requestDto.Email.Trim().ToLower();
-            var user = await _userManager.FindByEmailAsync(EmailNormalizer.NormalizeEmail(requestDto.Email));
+            var user = await _userManager.FindByEmailAsync(normalizedEmail);
 
             if (user == null)
             {
@@ -120,13 +122,16 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
                 return new LoginResponseDto { User = null, Token = "" };
             }
 
+            var userRoles = await _userManager.GetRolesAsync(user);
+
             ApplicationUserDto userDto = new()
             {
                 Email = requestDto.Email,
                 Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                UserName = user.UserName
+                UserName = user.UserName,
+                Roles = userRoles.ToList()
             };
 
             var token = await _tokenService.GenerateToken(user);
