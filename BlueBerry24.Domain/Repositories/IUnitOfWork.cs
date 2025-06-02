@@ -14,8 +14,6 @@ namespace BlueBerry24.Domain.Repositories
         Task RollbackTransactionAsync();
         Task<bool> SaveDbChangesAsync();
 
-        void BeginCacheTransaction();
-        Task<bool> CacheCommitTransactionAsync();
-        Task ExecuteInTransactionCacheAsync(Func<ITransaction, Task> action);
+     
     }
 }
