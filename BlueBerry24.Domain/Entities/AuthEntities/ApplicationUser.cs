@@ -1,6 +1,11 @@
 ﻿
 using BlueBerry24.Domain.Entities.CouponEntities;
+using BlueBerry24.Domain.Entities.OrderEntities;
+using BlueBerry24.Domain.Entities.ShopEntities;
+using BlueBerry24.Domain.Entities.ShoppingCartEntities;
+using BlueBerry24.Domain.Entities.WishlistEntities;
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlueBerry24.Domain.Entities.AuthEntities
 {
@@ -10,5 +15,14 @@ namespace BlueBerry24.Domain.Entities.AuthEntities
         public string LastName { get; set; }
 
         public List<UserCoupon> UserCoupons { get; set; }
+
+        public Cart Cart { get; set; }
+
+        public List<Order> Orders { get; set; }
+
+        [NotMapped]
+        public IList<string> roles { get; set; }
+
+        public Wishlist Wishlist { get; set; }
     }
 }
