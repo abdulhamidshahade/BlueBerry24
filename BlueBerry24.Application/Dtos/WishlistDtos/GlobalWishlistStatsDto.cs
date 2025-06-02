@@ -1,0 +1,15 @@
+﻿namespace BlueBerry24.Application.Dtos.WishlistDtos
+{
+    public class GlobalWishlistStatsDto
+    {
+        public int TotalUsers { get; set; }
+        public int TotalWishlists { get; set; }
+        public int TotalItems { get; set; }
+        public decimal TotalValue { get; set; }
+        public double AverageItemsPerWishlist { get; set; }
+        public double AverageWishlistsPerUser { get; set; }
+        public int PublicWishlists { get; set; }
+        public int PrivateWishlists { get; set; }
+        public List<RecentActivityDto> RecentActivity { get; set; } = new List<RecentActivityDto>();
+    }
+}
