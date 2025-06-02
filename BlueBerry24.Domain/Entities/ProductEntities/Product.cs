@@ -3,6 +3,7 @@ using BlueBerry24.Domain.Entities.InventoryEntities;
 using BlueBerry24.Domain.Entities.OrderEntities;
 using BlueBerry24.Domain.Entities.ShopEntities;
 using BlueBerry24.Domain.Entities.ShoppingCartEntities;
+using BlueBerry24.Domain.Entities.WishlistEntities;
 
 
 namespace BlueBerry24.Domain.Entities.ProductEntities
@@ -36,5 +37,6 @@ namespace BlueBerry24.Domain.Entities.ProductEntities
         public List<CartItem> CartItems { get; set; }
 
         public List<OrderItem> OrderItems { get; set; }
+
     }
 }

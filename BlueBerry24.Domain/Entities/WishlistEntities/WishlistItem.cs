@@ -23,7 +23,6 @@ namespace BlueBerry24.Domain.Entities.WishlistEntities
 
         public int Priority { get; set; } = 1; // 1=Low, 2=Medium, 3=High
 
-        // Navigation properties
         public Wishlist Wishlist { get; set; }
         public Product Product { get; set; }
         public DateTime CreatedAt { get; set; }
