@@ -1,4 +1,5 @@
-﻿using BlueBerry24.Domain.Entities.Base;
+﻿using BlueBerry24.Domain.Constants;
+using BlueBerry24.Domain.Entities.Base;
 using BlueBerry24.Domain.Entities.ProductEntities;
 using System;
 using System.Collections.Generic;
@@ -30,17 +31,5 @@ namespace BlueBerry24.Domain.Entities.InventoryEntities
         public string Notes { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-    }
-
-    public enum InventoryChangeType
-    {
-        Purchase,         
-        Return,           
-        StockAdjustment,  
-        InitialStock,      
-        Reserved,         
-        ReleaseReservation,
-        Damaged,          
-        Restock         
     }
 }
