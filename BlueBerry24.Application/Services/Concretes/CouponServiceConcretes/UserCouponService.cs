@@ -14,6 +14,7 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
         private readonly IMapper _mapper;
         private readonly IUserCouponRepository _userCouponRepository;
 
+
         public UserCouponService(IUserService userService, 
             ICouponService couponService,
             IMapper mapper,
@@ -23,6 +24,50 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
             _couponService = couponService;
             _mapper = mapper;
             _userCouponRepository = userCouponRepository;
+        }
+
+
+        public async Task<bool> AddCouponToAllUsersAsync(int couponId)
+        {
+            if(couponId <= 0)
+            {
+                return false;
+            }
+
+            var users = await _userService.GetAllUsers();
+            List<int> allUserIds = users.Select(i => i.Id).ToList();
+
+            foreach(var userId in allUserIds)
+            {
+                var addedCouponToUser = await AddCouponToUserAsync(userId, couponId);
+
+                if(addedCouponToUser == null)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public async Task<bool> AddCouponToNewUsersAsync(int couponId)
+        {
+            var users = await _userService.GetAllUsers();
+
+            //TODO this is a temporary solution
+            var newUsers = users.Where(i => i.FirstName == "new").Select(i => i.Id).ToList();
+
+            foreach(var userId in newUsers)
+            {
+                var addedCoupon = await AddCouponToUserAsync(userId, couponId);
+
+                if(addedCoupon == null)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public async Task<UserCouponDto> AddCouponToUserAsync(int userId, int couponId)
@@ -43,6 +88,21 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
             var addedCouponToUser = await _userCouponRepository.AddCouponToUserAsync(userId, couponId);
             var userCouponDto = _mapper.Map<UserCouponDto>(addedCouponToUser);
             return userCouponDto;
+        }
+
+        public async Task<bool> AddCouponToUsersAsync(List<int> userIds, int couponId)
+        {
+            foreach( var userId in userIds)
+            {
+                var addedCoupon = await AddCouponToUserAsync(userId, couponId);
+
+                if(addedCoupon == null)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public async Task<bool> DisableCouponToUser(int userId, int couponId)
