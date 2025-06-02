@@ -1,14 +1,16 @@
 ﻿
 
+using BlueBerry24.Application.Dtos.ProductDtos;
+
 namespace BlueBerry24.Application.Dtos.ShoppingCartDtos
 {
     public class CartItemDto
     {
-        public string Id { get; set; }
-        public string CartHeaderId { get; set; }
-        public string ProductId { get; set; }
-        public string ShopId { get; set; }
-        public int Count { get; set; }
-        public decimal unitPrice { get; set; }
+        public int Id { get; set; }
+        public int ShoppingCartId { get; set; }
+        public int ProductId { get; set; }
+        public int Quantity { get; set; }
+        public decimal UnitPrice { get; set; }
+        public ProductDto Product { get; set; }
     }
 }
