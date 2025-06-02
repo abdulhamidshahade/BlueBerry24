@@ -8,42 +8,11 @@ namespace BlueBerry24.Domain.Repositories
     {
         private readonly ApplicationDbContext _context;
         private IDbContextTransaction _currentTransaction;
-        private ITransaction _cacheTransaction;
-        private readonly StackExchange.Redis.IDatabase _db;
-        public UnitOfWork(ApplicationDbContext context, 
-                          IConnectionMultiplexer redis)
+        public UnitOfWork(ApplicationDbContext context
+                          )
         {
             _context = context;
-            _db = redis.GetDatabase();
         }
-
-
-        public void BeginCacheTransaction()
-        {
-            _cacheTransaction = _db.CreateTransaction();
-        }
-
-        public async Task<bool> CacheCommitTransactionAsync()
-        {
-            if(_cacheTransaction == null)
-            {
-                return false;
-            }
-
-            return await _cacheTransaction.ExecuteAsync();
-        }
-
-
-        public async Task ExecuteInTransactionCacheAsync(Func<ITransaction, Task> action)
-        {
-            if(_cacheTransaction == null)
-            {
-                BeginCacheTransaction();
-            }
-
-            await action(_cacheTransaction!);
-        }
-
 
 
         public async Task BeginTransactionAsync()
