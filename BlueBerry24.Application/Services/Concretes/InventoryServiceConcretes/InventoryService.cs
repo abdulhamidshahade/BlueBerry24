@@ -1,4 +1,5 @@
 ﻿using BlueBerry24.Application.Services.Interfaces.InventoryServiceInterfaces;
+using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Entities.InventoryEntities;
 using BlueBerry24.Domain.Entities.ProductEntities;
 using BlueBerry24.Domain.Repositories;
@@ -13,7 +14,7 @@ namespace BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes
         private readonly IInventoryRepository _inventoryRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public InventoryService(IProductRepository productRepository, 
+        public InventoryService(IProductRepository productRepository,
                                 IInventoryRepository inventoryRepository,
                                 IUnitOfWork unitOfWork)
         {
@@ -25,7 +26,7 @@ namespace BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes
         public async Task<bool> IsInStockAsync(int productId, int quantity)
         {
             var product = await _productRepository.GetByIdAsync(productId);
-            return product != null && (product.StockQuantity - product.ReservedStock) >= quantity;
+            return product != null && product.StockQuantity >= quantity;
         }
 
         public async Task<bool> AddStockAsync(int productId, int quantity, string notes, int? performedByUserId)
@@ -42,7 +43,6 @@ namespace BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes
                 return false;
             }
 
-            // Increase stock
             product.StockQuantity += quantity;
             product.UpdatedAt = DateTime.UtcNow;
 
@@ -54,7 +54,7 @@ namespace BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes
 
                 ProductId = productId,
                 CurrentStockQuantity = product.StockQuantity,
-                QuantityChanged = quantity, // Positive because it's added
+                QuantityChanged = quantity,
                 ChangeType = InventoryChangeType.Restock,
                 Notes = notes,
                 CreatedAt = DateTime.UtcNow,
@@ -63,7 +63,7 @@ namespace BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes
 
             var createdInventory = await _inventoryRepository.CreateInventory(inventoryLog);
 
-            if(createdInventory == null)
+            if (createdInventory == null)
             {
                 return false;
             }
@@ -88,12 +88,10 @@ namespace BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes
 
             InventoryChangeType changeType = difference >= 0
                 ? InventoryChangeType.StockAdjustment
-                : InventoryChangeType.StockAdjustment;
+                : InventoryChangeType.Restock;
 
-            // Update stock quantity
             product.StockQuantity = newQuantity;
 
-            // If new stock is less than reserved, adjust reserved too
             if (product.StockQuantity < product.ReservedStock)
             {
                 product.ReservedStock = product.StockQuantity;
@@ -101,7 +99,6 @@ namespace BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes
 
             product.UpdatedAt = DateTime.UtcNow;
 
-            // Create inventory log entry
             var inventoryLog = new InventoryLog
             {
                 ProductId = productId,
@@ -126,59 +123,54 @@ namespace BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes
         public async Task<bool> ConfirmStockDeductionAsync(int productId, int quantity, int referenceId, string referenceType)
         {
             var product = await _productRepository.GetByIdAsync(productId);
-            
             if (product == null)
             {
                 return false;
             }
 
-            if(product.StockQuantity < quantity)
+            if (product.ReservedStock < quantity)
             {
                 return false;
             }
 
-            int reservedDeduction = quantity;
-            product.ReservedStock -= reservedDeduction;
-
-
-            product.StockQuantity -= reservedDeduction;
-
-            product.UpdatedAt = DateTime.UtcNow;
-
-            // Create inventory log entry
-            var inventoryLog = new InventoryLog
-            {
-                ProductId = productId,
-                CurrentStockQuantity = product.StockQuantity,
-                QuantityChanged = -quantity, // Negative because it's deducted
-                ChangeType = InventoryChangeType.Purchase,
-                ReferenceId = referenceId,
-                ReferenceType = referenceType,
-                Notes = $"Purchased {quantity} units via {referenceType} {referenceId}",
-                CreatedAt = DateTime.UtcNow
-            };
-
             await _unitOfWork.BeginTransactionAsync();
-            
-             
-            var updatedProduct = await _productRepository.UpdateAsync(product.Id, product);
 
-            var createdInventory = await _inventoryRepository.CreateInventory(inventoryLog);
-            if (createdInventory == null || updatedProduct == null)
+            try
+            {
+                product.ReservedStock -= quantity;
+                product.StockQuantity -= quantity;
+                product.UpdatedAt = DateTime.UtcNow;
+
+                var inventoryLog = new InventoryLog
+                {
+                    ProductId = productId,
+                    CurrentStockQuantity = product.StockQuantity,
+                    QuantityChanged = -quantity,
+                    ChangeType = InventoryChangeType.Purchase,
+                    ReferenceId = referenceId,
+                    ReferenceType = referenceType,
+                    Notes = $"Purchased {quantity} units via {referenceType} {referenceId}",
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                var updatedProduct = await _productRepository.UpdateAsync(product.Id, product);
+                var createdInventory = await _inventoryRepository.CreateInventory(inventoryLog);
+
+                if (createdInventory == null || updatedProduct == null)
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                    return false;
+                }
+
+                return await _unitOfWork.CommitTransactionAsync();
+            }
+            catch
             {
                 await _unitOfWork.RollbackTransactionAsync();
                 return false;
             }
-
-            return await _unitOfWork.CommitTransactionAsync();
-
-            
-            //if (product.StockQuantity <= product.LowStockThreshold)
-            //{
-            //    In a real implementation, could trigger notification here
-            //    await _notificationService.SendLowStockNotificationAsync(product);
-            //}
         }
+
 
         public async Task<List<InventoryLog>> GetInventoryHistoryAsync(int productId, int limit = 50)
         {
@@ -187,20 +179,34 @@ namespace BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes
             return inventoryHistory;
         }
 
-        public Task<List<Product>> GetLowStockProductsAsync(int limit = 50)
+        public async Task<List<Product>> GetLowStockProductsAsync(int limit = 50)
         {
-            throw new NotImplementedException();
+            return await _inventoryRepository.GetLowStockProductsAsync(limit);
         }
 
-        public Task<Product> GetProductWithStockInfoAsync(int productId)
+        public async Task<Product> GetProductWithStockInfoAsync(int productId)
         {
-            throw new NotImplementedException();
+            return await _inventoryRepository.GetProductWithStockInfoAsync(productId);
         }
 
-
-        public Task ProcessStockNotificationsAsync()
+        public async Task ProcessStockNotificationsAsync()
         {
-            throw new NotImplementedException();
+            var lowStockProducts = await GetLowStockProductsAsync(100);
+
+            foreach (var product in lowStockProducts)
+            {
+                var inventoryLog = new InventoryLog
+                {
+                    ProductId = product.Id,
+                    CurrentStockQuantity = product.StockQuantity,
+                    QuantityChanged = 0,
+                    ChangeType = InventoryChangeType.StockAdjustment,
+                    Notes = $"Low stock notification: {product.Name} has {product.StockQuantity} units (threshold: {product.LowStockThreshold})",
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                await _inventoryRepository.CreateInventory(inventoryLog);
+            }
         }
 
         public async Task<bool> ReleaseReservedStockAsync(int productId, int quantity, int referenceId, string referenceType)
@@ -211,41 +217,49 @@ namespace BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes
                 return false;
             }
 
-            // Cannot release more than what's reserved
             if (product.ReservedStock < quantity)
-            {
-                quantity = product.ReservedStock; // Release what we can
-            }
-
-            // Release the reserved stock
-            product.ReservedStock -= quantity;
-            product.UpdatedAt = DateTime.UtcNow;
-
-            // Create inventory log entry
-            var inventoryLog = new InventoryLog
-            {
-                ProductId = productId,
-                CurrentStockQuantity = product.StockQuantity,
-                QuantityChanged = quantity, // Positive because it's released back to available
-                ChangeType = InventoryChangeType.ReleaseReservation,
-                ReferenceId = referenceId,
-                ReferenceType = referenceType,
-                Notes = $"Released {quantity} units from {referenceType} {referenceId}",
-                CreatedAt = DateTime.UtcNow
-            };
-
-            var createdInventory = await _inventoryRepository.CreateInventory(inventoryLog);
-
-            if (createdInventory == null)
             {
                 return false;
             }
 
-            return true;
+            await _unitOfWork.BeginTransactionAsync();
+
+            try
+            {
+                product.ReservedStock -= quantity;
+                product.UpdatedAt = DateTime.UtcNow;
+
+                var inventoryLog = new InventoryLog
+                {
+                    ProductId = productId,
+                    CurrentStockQuantity = product.StockQuantity,
+                    QuantityChanged = 0,
+                    ChangeType = InventoryChangeType.ReleaseReservation,
+                    ReferenceId = referenceId,
+                    ReferenceType = referenceType,
+                    Notes = $"Released {quantity} units from {referenceType} {referenceId}",
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                var updatedProduct = await _productRepository.UpdateAsync(product.Id, product);
+                var createdInventory = await _inventoryRepository.CreateInventory(inventoryLog);
+
+                if (createdInventory == null || updatedProduct == null)
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                    return false;
+                }
+
+                return await _unitOfWork.CommitTransactionAsync();
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                return false;
+            }
         }
 
-        public async Task<bool> ReserveStockAsync(int productId, int quantity, 
-            int referenceId, string referenceType)
+        public async Task<bool> ReserveStockAsync(int productId, int quantity, int referenceId, string referenceType)
         {
             var product = await _productRepository.GetByIdAsync(productId);
             if (product == null)
@@ -254,40 +268,47 @@ namespace BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes
             }
 
             int availableStock = product.StockQuantity - product.ReservedStock;
-
             if (availableStock < quantity)
             {
                 return false;
             }
 
+            await _unitOfWork.BeginTransactionAsync();
 
-            product.ReservedStock += quantity;
-            product.UpdatedAt = DateTime.UtcNow;
-
-            var inventoryLog = new InventoryLog
+            try
             {
-                ProductId = productId,
-                CurrentStockQuantity = product.StockQuantity,
-                QuantityChanged = -quantity,
-                ChangeType = InventoryChangeType.Reserved,
-                ReferenceId = referenceId,
-                ReferenceType = referenceType,
-                Notes = $"Reserved {quantity} units for {referenceType} {referenceId}",
-                CreatedAt = DateTime.UtcNow
-            };
+                product.ReservedStock += quantity;
+                product.UpdatedAt = DateTime.UtcNow;
 
+                var inventoryLog = new InventoryLog
+                {
+                    ProductId = productId,
+                    CurrentStockQuantity = product.StockQuantity,
+                    QuantityChanged = 0,
+                    ChangeType = InventoryChangeType.Reserved,
+                    ReferenceId = referenceId,
+                    ReferenceType = referenceType,
+                    Notes = $"Reserved {quantity} units for {referenceType} {referenceId}",
+                    CreatedAt = DateTime.UtcNow
+                };
 
-            var createdInventory = await _inventoryRepository.CreateInventory(inventoryLog);
+                var updatedProduct = await _productRepository.UpdateAsync(product.Id, product);
+                var createdInventory = await _inventoryRepository.CreateInventory(inventoryLog);
 
-            if(createdInventory == null)
+                if (createdInventory == null || updatedProduct == null)
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                    return false;
+                }
+
+                return await _unitOfWork.CommitTransactionAsync();
+            }
+            catch
             {
+                await _unitOfWork.RollbackTransactionAsync();
                 return false;
             }
-
-            return true;
         }
-
-
 
     }
 }
