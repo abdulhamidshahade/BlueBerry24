@@ -1,10 +1,12 @@
 ﻿using BlueBerry24.Domain.Entities.AuthEntities;
 using BlueBerry24.Domain.Entities.Base;
 using BlueBerry24.Domain.Entities.CouponEntities;
+using BlueBerry24.Domain.Entities.InventoryEntities;
+using BlueBerry24.Domain.Entities.OrderEntities;
 using BlueBerry24.Domain.Entities.ProductEntities;
 using BlueBerry24.Domain.Entities.ShopEntities;
 using BlueBerry24.Domain.Entities.ShoppingCartEntities;
-using BlueBerry24.Domain.Entities.StockEntities;
+using BlueBerry24.Domain.Entities.WishlistEntities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,10 +21,17 @@ namespace BlueBerry24.Infrastructure.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<Shop> Shops { get; set; }
-        public DbSet<CartHeader> CartHeaders { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
-        public DbSet<Stock> Stocks { get; set; }
-        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+        public DbSet<Cart> ShoppingCarts { get; set; }
+        public DbSet<CartCoupon> CartCoupons { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
+
+        public DbSet<Wishlist> Wishlists { get; set; }
+        public DbSet<WishlistItem> WishlistItems { get; set; }
+
+
+        public DbSet<InventoryLog> InventoryLogs { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
 
@@ -32,16 +41,15 @@ namespace BlueBerry24.Infrastructure.Data
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<ProductCategory>()
-                .HasOne(p => p.Product)
-                .WithMany(c => c.ProductCategories)
-                .HasForeignKey(fk => fk.ProductId);
+            builder.Entity<ApplicationUser>()
+                .HasOne(c => c.Cart)
+                .WithOne(u => u.User)
+                .HasForeignKey<Cart>(fk => fk.UserId);
 
-            builder.Entity<ProductCategory>()
-                .HasOne(c => c.Category)
-                .WithMany(p => p.ProductCategories)
-                .HasForeignKey(fk => fk.CategoryId);
-
+            builder.Entity<ApplicationUser>()
+                .HasMany(o => o.Orders)
+                .WithOne(u => u.User)
+                .HasForeignKey(u => u.UserId);
 
             builder.Entity<UserCoupon>()
                 .HasOne(u => u.User)
@@ -53,27 +61,62 @@ namespace BlueBerry24.Infrastructure.Data
                 .WithMany(uc => uc.UserCoupons)
                 .HasForeignKey(fk => fk.CouponId);
 
+            builder.Entity<CartCoupon>()
+                .HasOne(c => c.Cart)
+                .WithMany(cc => cc.CartCoupons)
+                .HasForeignKey(cc => cc.CartId);
 
-            builder.Entity<Shop>()
-                .HasMany(p => p.Products)
-                .WithOne(s => s.Shop)
-                .HasForeignKey(fk => fk.ShopId);
+            builder.Entity<CartCoupon>()
+                .HasOne(c => c.Coupon)
+                .WithMany(cc => cc.CartCoupons)
+                .HasForeignKey(fk => fk.CouponId);
 
-            builder.Entity<ShoppingCart>()
-                .HasMany(ci => ci.CartItems)
-                .WithOne(s => s.ShoppingCart)
-                .HasForeignKey(fk => fk.ShoppingCartId);
+            builder.Entity<InventoryLog>()
+                .HasOne(p => p.Product)
+                .WithMany(ig => ig.InventoryLogs)
+                .HasForeignKey(p => p.ProductId);
 
+            builder.Entity<ProductCategory>()
+                .HasOne(p => p.Product)
+                .WithMany(c => c.ProductCategories)
+                .HasForeignKey(fk => fk.ProductId);
 
-            builder.Entity<ShoppingCart>()
-                .HasOne(ch => ch.CartHeader)
-                .WithOne(sc => sc.ShoppingCart)
-                .HasForeignKey<CartHeader>(fk => fk.ShoppingCartId);
+            builder.Entity<ProductCategory>()
+                .HasOne(c => c.Category)
+                .WithMany(p => p.ProductCategories)
+                .HasForeignKey(fk => fk.CategoryId);
 
-            builder.Entity<Product>()
-                .HasOne(s => s.Stock)
-                .WithOne(p => p.Product)
-                .HasForeignKey<Stock>(s => s.ProductId);
+            builder.Entity<Order>()
+                .HasMany(oi => oi.OrderItems)
+                .WithOne(o => o.Order)
+                .HasForeignKey(fk => fk.OrderId);
+
+            builder.Entity<Order>()
+                .HasOne(c => c.Cart)
+                .WithOne(o => o.Order)
+                .HasForeignKey<Order>(fk => fk.CartId);
+
+            builder.Entity<OrderItem>()
+                .HasOne(p => p.Product)
+                .WithMany(oi => oi.OrderItems)
+                .HasForeignKey(fk => fk.ProductId);
+
+            builder.Entity<CartItem>()
+                .HasOne(ci => ci.ShoppingCart)
+                .WithMany(c => c.CartItems)
+                .HasForeignKey(ci => ci.ShoppingCartId);
+
+            builder.Entity<Wishlist>()
+                .HasMany(wli => wli.WishlistItems)
+                .WithOne(wl => wl.Wishlist)
+                .HasForeignKey(fk => fk.WishlistId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Wishlist>()
+                .HasOne(u => u.User)
+                .WithOne(w => w.Wishlist)
+                .HasForeignKey<Wishlist>(fk => fk.UserId);
+
         }
 
 
@@ -82,11 +125,11 @@ namespace BlueBerry24.Infrastructure.Data
             var entries = ChangeTracker.Entries<IAuditableEntity>().
                 Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
-            foreach(var entry in entries)
+            foreach (var entry in entries)
             {
                 var entity = entry.Entity;
 
-                if(entry.State == EntityState.Added)
+                if (entry.State == EntityState.Added)
                 {
                     entity.CreatedAt = DateTime.UtcNow;
                 }
