@@ -1,0 +1,149 @@
+﻿using BlueBerry24.Domain.Constants;
+using BlueBerry24.Domain.Entities.OrderEntities;
+using BlueBerry24.Domain.Repositories;
+using BlueBerry24.Domain.Repositories.OrderInterfaces;
+using BlueBerry24.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
+namespace BlueBerry24.Infrastructure.Repositories.OrderConcretes
+{
+    public class OrderRepository : IOrderRepository
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
+
+        public OrderRepository(ApplicationDbContext context,
+                               IUnitOfWork unitOfWork)
+        {
+            _context = context;
+            _unitOfWork = unitOfWork;
+        }
+
+        public async Task<Order?> GetOrderByIdAsync(int orderId)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+        }
+
+        //TODO to fix
+        public async Task<List<Order>> GetUserOrdersAsync(string sessionId, int page = 1, int pageSize = 10)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .Where(o => o.SessionId == sessionId)
+                .OrderByDescending(o => o.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<List<Order>> GetAllOrdersAsync(int page = 1, int pageSize = 50)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .Include(o => o.User)
+                .OrderByDescending(o => o.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<bool> MarkOrderAsPaidAsync(int orderId, int paymentTransactionId, string paymentProvider)
+        {
+            var order = await _context.Orders.FindAsync(orderId);
+
+            if (order == null) return false;
+
+            order.IsPaid = true;
+            order.PaidAt = DateTime.UtcNow;
+            order.PaymentTransactionId = paymentTransactionId;
+            order.PaymentProvider = paymentProvider;
+
+            _context.Orders.Update(order);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> UpdateOrderStatusAsync(int orderId, OrderStatus newStatus)
+        {
+            var order = await _context.Orders.FindAsync(orderId);
+
+            if (order == null) return false;
+
+            order.Status = newStatus;
+            order.UpdatedAt = DateTime.UtcNow;
+
+            switch (newStatus)
+            {
+                case OrderStatus.Completed:
+                    order.CompletedAt = DateTime.UtcNow;
+                    break;
+                case OrderStatus.Cancelled:
+                    order.CancalledAt = DateTime.UtcNow;
+                    break;
+            }
+
+            _context.Orders.Update(order);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public Task<string> GenerateUniqueReferenceNumberAsync()
+        {
+            var uniqueRef = $"ORD-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}";
+            return Task.FromResult(uniqueRef);
+        }
+
+        public async Task<Order> CreateOrderAsync(Order order)
+        {
+            var createdOrder = await _context.Orders.AddAsync(order);
+
+            if (await _unitOfWork.SaveDbChangesAsync())
+            {
+                return order;
+            }
+
+            return null;
+        }
+
+        public async Task<OrderItem> CreateOrderItemAsync(OrderItem item)
+        {
+            var createdItem = await _context.OrderItems.AddAsync(item);
+
+            if (await _unitOfWork.SaveDbChangesAsync())
+            {
+                return item;
+            }
+
+            return null;
+        }
+
+        public async Task<Order?> GetOrderByReferenceNumberAsync(string referenceNumber)
+        {
+            if (string.IsNullOrWhiteSpace(referenceNumber))
+                return null;
+
+            return await _context.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .Include(o => o.User)
+                .Include(o => o.Cart)
+                .FirstOrDefaultAsync(o => o.ReferenceNumber == referenceNumber);
+        }
+
+        public async Task<List<Order>> GetOrdersByStatusAsync(OrderStatus status, int page = 1, int pageSize = 10)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .Include(o => o.User)
+                .Where(o => o.Status == status)
+                .OrderByDescending(o => o.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+    }
+}
