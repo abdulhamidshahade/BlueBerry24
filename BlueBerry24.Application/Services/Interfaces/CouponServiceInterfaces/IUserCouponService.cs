@@ -10,5 +10,8 @@ namespace BlueBerry24.Application.Services.Interfaces.CouponServiceInterfaces
         Task<List<CouponDto>> GetCouponsByUserIdAsync(int userId);
         Task<List<ApplicationUserDto>> GetUsersByCouponIdAsync(int couponId);
         Task<bool> IsCouponUsedByUser(int userId, string couponCode);
+        Task<bool> AddCouponToUsersAsync(List<int> userIds, int couponId);
+        Task<bool> AddCouponToAllUsersAsync(int couponId);
+        Task<bool> AddCouponToNewUsersAsync(int couponId);
     }
 }
