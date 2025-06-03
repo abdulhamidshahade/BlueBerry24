@@ -13,7 +13,6 @@ namespace BlueBerry24.Domain.Entities.WishlistEntities
     {
         [Key]
         public int Id { get; set; }
-        [Required]
         public int UserId { get; set; }
 
         public string? Name { get; set; } = "My Wishlist";
