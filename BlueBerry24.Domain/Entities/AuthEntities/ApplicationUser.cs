@@ -23,6 +23,6 @@ namespace BlueBerry24.Domain.Entities.AuthEntities
         [NotMapped]
         public IList<string> roles { get; set; }
 
-        public Wishlist Wishlist { get; set; }
+        public List<Wishlist> Wishlists { get; set; }
     }
 }
