@@ -1,8 +1,10 @@
 ﻿using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.ShoppingCartDtos;
 using BlueBerry24.Application.Services.Interfaces.CouponServiceInterfaces;
+using BlueBerry24.Application.Services.Interfaces.InventoryServiceInterfaces;
+using BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
-using Microsoft.AspNetCore.Authorization;
+using BlueBerry24.Domain.Constants;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -17,112 +19,701 @@ namespace BlueBerry24.API.Controllers
         private readonly int? _userId;
         private readonly IUserCouponService _userCouponService;
         private readonly ICartService _cartService;
+        private readonly IInventoryService _inventoryService;
+        private readonly IOrderService _orderService;
 
         public ShoppingCartsController(
             ILogger<ShoppingCartsController> logger,
             IHttpContextAccessor httpContextAccessor,
             IUserCouponService userCouponService,
-            ICartService cartService) : base(logger)
+            ICartService cartService,
+            IInventoryService inventoryService,
+            IOrderService orderService) : base(logger)
         {
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _userId = Convert.ToInt32(_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             _userCouponService = userCouponService;
             _cartService = cartService;
+            _inventoryService = inventoryService;
+            _orderService = orderService;
         }
 
-        [HttpGet("{cartId:int}")]
-        public async Task<IActionResult> GetCartById(int cartId)
+        [HttpGet("user-id")]
+        public async Task<ActionResult<ResponseDto>> GetCartByUserId()
         {
-            var cart = await _cartService.GetCartByIdAsync(cartId);
-            if (cart == null) return NotFound();
+            try
+            {
+                var cart = await _cartService.GetCartByUserIdAsync(GetCurrentUserId());
+                if (cart == null)
+                {
+                    return NotFound(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 404,
+                        StatusMessage = "Cart not found"
+                    });
+                }
 
-            return Ok(cart);
+                return Ok(new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    StatusMessage = "Cart retrieved successfully",
+                    Data = cart
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving cart {UserId}", GetCurrentUserId());
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "Error retrieving cart",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
         }
 
         [HttpGet("session/{sessionId}")]
-        public async Task<IActionResult> GetCartBySessionId(string sessionId)
+        public async Task<ActionResult<ResponseDto>> GetCartBySessionId(string sessionId)
         {
-            var cart = await _cartService.GetCartBySessionIdAsync(sessionId);
-            if (cart == null) return NotFound();
+            try
+            {
+                if (string.IsNullOrWhiteSpace(GetSessionId()))
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Session ID is required"
+                    });
+                }
 
-            return Ok(cart);
+                var cart = await _cartService.GetCartBySessionIdAsync(sessionId, CartStatus.Active);
+                if (cart == null)
+                {
+                    return NotFound(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 404,
+                        StatusMessage = "Cart not found for session"
+                    });
+                }
+
+                return Ok(new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    StatusMessage = "Cart retrieved successfully",
+                    Data = cart
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving cart for session {SessionId}", GetSessionId());
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "Error retrieving cart",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
         }
 
-        [HttpPost("create")]
-        public async Task<IActionResult> CreateCart([FromQuery] int? userId, [FromQuery] string? sessionId)
-        {
-            var cart = await _cartService.CreateCartAsync(userId, sessionId);
-            if (cart == null) return BadRequest("Cart could not be created.");
 
-            return Ok(cart);
+        [HttpGet("{cartId:int}")]
+        public async Task<ActionResult<ResponseDto>> GetCartByCartId(int cartId)
+        {
+            try
+            {
+                //if (string.IsNullOrWhiteSpace(GetSessionId()))
+                //{
+                //    return BadRequest(new ResponseDto
+                //    {
+                //        IsSuccess = false,
+                //        StatusCode = 400,
+                //        StatusMessage = "Session ID is required"
+                //    });
+                //}
+
+                var cart = await _cartService.GetCartByIdAsync(cartId, CartStatus.Active);
+                if (cart == null)
+                {
+                    return NotFound(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 404,
+                        StatusMessage = "Cart not found for id"
+                    });
+                }
+
+                return Ok(new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    StatusMessage = "Cart retrieved successfully",
+                    Data = cart
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving cart for id {cartId}", cartId);
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "Error retrieving cart",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
         }
 
-        [HttpPost("{cartId}/add")]
-        public async Task<IActionResult> AddItemToCart(int cartId, [FromQuery] int productId, [FromQuery] int quantity)
+        [HttpPost("create/{sessionId}")]
+        public async Task<ActionResult<ResponseDto>> CreateCart(string sessionId)
         {
-            var updatedCart = await _cartService.AddItemAsync(cartId, productId, quantity);
-            if (updatedCart == null) return BadRequest("Failed to add item to cart.");
+            try
+            {
+                if (_userId == null && string.IsNullOrWhiteSpace(GetSessionId()))
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Either userId or sessionId must be provided"
+                    });
+                }
 
-            return Ok(updatedCart);
+                var cart = await _cartService.CreateCartAsync(GetCurrentUserId(), sessionId);
+                if (cart == null)
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Cart could not be created"
+                    });
+                }
+
+                return Ok(new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = 201,
+                    StatusMessage = "Cart created successfully",
+                    Data = cart
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating cart for user {UserId} or session {SessionId}", _userId, GetSessionId());
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "Error creating cart",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
+        }
+
+        [HttpPost("add-item")]
+        public async Task<ActionResult<ResponseDto>> AddItemToCart(int cartId, [FromBody] AddItemRequest itemRequest)
+        {
+            try
+            {
+                if (itemRequest.Quantity <= 0)
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Quantity must be greater than 0"
+                    });
+                }
+
+                var isInStock = await _inventoryService.IsInStockAsync(itemRequest.ProductId, itemRequest.Quantity);
+                if (!isInStock)
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Insufficient stock for the requested quantity",
+                        Errors = new List<string> { $"Product {itemRequest.ProductId} does not have {itemRequest.Quantity} items in stock" }
+                    });
+                }
+
+                var updatedCart = await _cartService.AddItemAsync(itemRequest.CartId, GetCurrentUserId(), itemRequest.SessionId, itemRequest.ProductId, itemRequest.Quantity);
+                if (updatedCart == null)
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Failed to add item to cart",
+                        Errors = new List<string> { "Cart not found or product invalid" }
+                    });
+                }
+
+                return Ok(new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    StatusMessage = "Item added to cart successfully",
+                    Data = updatedCart
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error adding item {ProductId} to cart {CartId}", itemRequest.ProductId, itemRequest.CartId);
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "Error adding item to cart",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
         }
 
         [HttpPut("{cartId}/update")]
-        public async Task<IActionResult> UpdateItemQuantity(int cartId, [FromQuery] int productId, [FromQuery] int quantity)
+        public async Task<ActionResult<ResponseDto>> UpdateItemQuantity([FromBody] AddItemRequest itemRequest)
         {
-            var updatedCart = await _cartService.UpdateItemQuantityAsync(cartId, productId, quantity);
-            if (updatedCart == null) return BadRequest("Failed to update item quantity.");
+            try
+            {
+                if (itemRequest.Quantity < 0)
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Quantity cannot be negative"
+                    });
+                }
 
-            return Ok(updatedCart);
+                if (itemRequest.Quantity == 0)
+                {
+                    var removeResult = await RemoveItemFromCart(itemRequest.CartId, itemRequest.ProductId);
+                    return removeResult;
+                }
+
+                var isInStock = await _inventoryService.IsInStockAsync(itemRequest.ProductId, itemRequest.Quantity);
+                if (!isInStock)
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Insufficient stock for the requested quantity",
+                        Errors = new List<string> { $"Product {itemRequest.ProductId} does not have {itemRequest.Quantity} items in stock" }
+                    });
+                }
+
+                var updatedCart = await _cartService.UpdateItemQuantityAsync(itemRequest.CartId, itemRequest.UserId, itemRequest.SessionId, itemRequest.ProductId, itemRequest.Quantity);
+                if (updatedCart == null)
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Failed to update item quantity",
+                        Errors = new List<string> { "Cart or item not found" }
+                    });
+                }
+
+                return Ok(new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    StatusMessage = "Item quantity updated successfully",
+                    Data = updatedCart
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating quantity for item {ProductId} in cart {CartId}", itemRequest.ProductId, itemRequest.CartId);
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "Error updating item quantity",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
         }
 
         [HttpDelete("{cartId}/remove/{productId}")]
-        public async Task<IActionResult> RemoveItemFromCart(int cartId, int productId)
+        public async Task<ActionResult<ResponseDto>> RemoveItemFromCart(int cartId, int productId)
         {
-            var success = await _cartService.RemoveItemAsync(cartId, productId);
-            if (!success) return NotFound("Item not found in cart.");
+            try
+            {
+                var success = await _cartService.RemoveItemAsync(cartId, GetCurrentUserId(), GetSessionId(), productId);
+                if (!success)
+                {
+                    return NotFound(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 404,
+                        StatusMessage = "Item not found in cart"
+                    });
+                }
 
-            return NoContent();
+                return Ok(new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    StatusMessage = "Item removed from cart successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error removing item {ProductId} from cart {CartId}", productId, cartId);
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "Error removing item from cart",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
         }
 
         [HttpDelete("{cartId}/clear")]
-        public async Task<IActionResult> ClearCart(int cartId)
+        public async Task<ActionResult<ResponseDto>> ClearCart(int cartId)
         {
-            var success = await _cartService.ClearCartAsync(cartId);
-            if (!success) return BadRequest("Failed to clear the cart.");
+            try
+            {
+                var success = await _cartService.ClearCartAsync(cartId, GetCurrentUserId(), GetSessionId());
+                if (!success)
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Failed to clear the cart",
+                        Errors = new List<string> { "Cart not found or already empty" }
+                    });
+                }
 
-            return NoContent();
+                return Ok(new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    StatusMessage = "Cart cleared successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error clearing cart {CartId}", cartId);
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "Error clearing cart",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
         }
 
         [HttpPost("{cartId}/complete")]
-        public async Task<IActionResult> CompleteCart(int cartId)
+        public async Task<ActionResult<ResponseDto>> CompleteCart(int cartId)
         {
-            var success = await _cartService.CompleteCartAsync(cartId);
-            if (!success) return BadRequest("Failed to complete the cart.");
+            try
+            {
+                var success = await _cartService.CompleteCartAsync(cartId, GetCurrentUserId(), GetSessionId());
+                if (!success)
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Failed to complete the cart",
+                        Errors = new List<string> { "Cart not found or cannot be completed" }
+                    });
+                }
 
-            return Ok("Cart completed successfully.");
+                return Ok(new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    StatusMessage = "Cart completed successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error completing cart {CartId}", cartId);
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "Error completing cart",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
         }
 
-        [HttpGet("{cartId}/refresh")]
-        public async Task<IActionResult> RefreshCart(int cartId)
-        {
-            var cart = await _cartService.RefreshCartAsync(cartId);
-            if (cart == null) return NotFound();
 
-            return Ok(cart);
-        }
 
         [HttpGet("{cartId}/item/{productId}")]
-        public async Task<IActionResult> GetCartItem(int cartId, int productId)
+        public async Task<ActionResult<ResponseDto>> GetCartItem(int cartId, int productId)
         {
-            var item = await _cartService.GetItemAsync(cartId, productId);
-            if (item == null) return NotFound();
+            try
+            {
+                var item = await _cartService.GetItemAsync("", productId);
+                if (item == null)
+                {
+                    return NotFound(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 404,
+                        StatusMessage = "Item not found in cart"
+                    });
+                }
 
-            return Ok(item);
+                return Ok(new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    StatusMessage = "Cart item retrieved successfully",
+                    Data = item
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving item {ProductId} from cart {CartId}", productId, cartId);
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "Error retrieving cart item",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
         }
 
+        [HttpPost("{cartId}/apply-coupon")]
+        public async Task<ActionResult<ResponseDto>> ApplyCoupon(int cartId, [FromBody] ApplyCouponRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request?.CouponCode))
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Coupon code is required"
+                    });
+                }
 
+                var cart = await _cartService.ApplyCouponAsync(cartId, GetCurrentUserId(), GetSessionId(), request.CouponCode);
+                if (cart == null)
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Failed to apply coupon",
+                        Errors = new List<string> { "Invalid coupon code or cart not found" }
+                    });
+                }
+
+                return Ok(new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    StatusMessage = "Coupon applied successfully",
+                    Data = cart
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error applying coupon {CouponCode} to cart {CartId}", request?.CouponCode, cartId);
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 400,
+                    StatusMessage = "Error applying coupon",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
+        }
+
+        [HttpDelete("{cartId}/remove-coupon/{couponId}")]
+        public async Task<ActionResult<ResponseDto>> RemoveCoupon(int cartId, int couponId)
+        {
+            try
+            {
+                var cart = await _cartService.RemoveCouponAsync(cartId, GetCurrentUserId(), GetSessionId(), couponId);
+                if (cart == null)
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Failed to remove coupon",
+                        Errors = new List<string> { "Coupon not found in cart or cart not found" }
+                    });
+                }
+
+                return Ok(new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    StatusMessage = "Coupon removed successfully",
+                    Data = cart
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error removing coupon {CouponId} from cart {CartId}", couponId, cartId);
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 400,
+                    StatusMessage = "Error removing coupon",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
+        }
+
+        [HttpPost("{cartId}/checkout")]
+        public async Task<ActionResult<ResponseDto>> CheckoutCart(int cartId, [FromBody] CheckoutRequest request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Checkout data is required"
+                    });
+                }
+
+                var cart = await _cartService.GetCartByIdAsync(cartId, CartStatus.Active);
+                if (cart == null)
+                {
+                    return NotFound(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 404,
+                        StatusMessage = "Cart not found"
+                    });
+                }
+
+                if (cart.CartItems == null || cart.CartItems.Count == 0)
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Cart is empty"
+                    });
+                }
+
+                // Validate stock for all items before proceeding
+                foreach (var item in cart.CartItems)
+                {
+                    var isInStock = await _inventoryService.IsInStockAsync(item.ProductId, item.Quantity);
+                    if (!isInStock)
+                    {
+                        return BadRequest(new ResponseDto
+                        {
+                            IsSuccess = false,
+                            StatusCode = 400,
+                            StatusMessage = $"Insufficient stock for product ID {item.ProductId}. Requested: {item.Quantity}"
+                        });
+                    }
+                }
+
+                var createOrderDto = new Application.Dtos.OrderDtos.CreateOrderDto
+                {
+                    UserId = GetCurrentUserId() ?? 0,
+                    CartId = cartId,
+                    CustomerEmail = request.Email,
+                    CustomerPhone = request.Phone,
+                    ShippingName = $"{request.FirstName} {request.LastName}",
+                    ShippingAddressLine1 = request.Address,
+                    ShippingAddressLine2 = request.Address2,
+                    ShippingCity = request.City,
+                    ShippingState = request.State,
+                    ShippingPostalCode = request.ZipCode,
+                    ShippingCountry = request.Country ?? "US",
+                    PaymentProvider = "Manual", 
+                    PaymentTransactionId = 0,
+                    IsPaid = false
+                };
+
+                var order = await _orderService.CreateOrderFromCartAsync(cartId, createOrderDto);
+
+                if (order == null)
+                {
+                    return BadRequest(new ResponseDto
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Failed to create order"
+                    });
+                }
+
+                await _cartService.CompleteCartAsync(cartId, GetCurrentUserId(), GetSessionId());
+
+                return Ok(new ResponseDto
+                {
+                    IsSuccess = true,
+                    StatusCode = 201,
+                    StatusMessage = "Order created successfully",
+                    Data = new
+                    {
+                        id = order.Id,
+                        orderNumber = "11",
+                        total = 10,
+                        status = "yes"
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during checkout for cart {CartId}", cartId);
+                return BadRequest(new ResponseDto
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "Error processing checkout",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
+        }
 
     }
+
+    public class CheckoutRequest
+    {
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string? Phone { get; set; }
+        public string Address { get; set; } = string.Empty;
+        public string? Address2 { get; set; }
+        public string City { get; set; } = string.Empty;
+        public string State { get; set; } = string.Empty;
+        public string ZipCode { get; set; } = string.Empty;
+        public string? Country { get; set; }
+        public string CardNumber { get; set; } = string.Empty;
+        public string ExpiryDate { get; set; } = string.Empty;
+        public string CVV { get; set; } = string.Empty;
+        public string CardName { get; set; } = string.Empty;
+        public int? userId { get; set; }
+    }
+
+    public class ApplyCouponRequest
+    {
+        public string CouponCode { get; set; } = string.Empty;
+    }
+
 }
 
