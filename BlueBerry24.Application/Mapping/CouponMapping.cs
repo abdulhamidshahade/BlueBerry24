@@ -15,7 +15,6 @@ namespace BlueBerry24.Application.Mapping
         {
             CreateMap<CouponDto, CreateCouponDto>().ReverseMap();
             CreateMap<CouponDto, UpdateCouponDto>().ReverseMap();
-            CreateMap<CouponDto, DeleteCouponDto>().ReverseMap();
             CreateMap<CouponDto, Coupon>().ReverseMap();
 
             CreateMap<Coupon, CreateCouponDto>().ReverseMap();
