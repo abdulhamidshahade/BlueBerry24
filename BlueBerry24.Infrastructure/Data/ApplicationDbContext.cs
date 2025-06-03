@@ -114,8 +114,8 @@ namespace BlueBerry24.Infrastructure.Data
 
             builder.Entity<Wishlist>()
                 .HasOne(u => u.User)
-                .WithOne(w => w.Wishlist)
-                .HasForeignKey<Wishlist>(fk => fk.UserId);
+                .WithMany(w => w.Wishlists)
+                .HasForeignKey(fk => fk.UserId);
 
         }
 
