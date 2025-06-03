@@ -28,6 +28,7 @@ namespace BlueBerry24.API.Controllers
             if (string.IsNullOrEmpty(sessionId) && !GetCurrentUserId().HasValue)
             {
                 sessionId = Guid.NewGuid().ToString();
+                SetSessionCookie(sessionId);
             }
 
             return sessionId;
@@ -35,13 +36,13 @@ namespace BlueBerry24.API.Controllers
 
         protected void SetSessionCookie(string sessionId)
         {
-            // Set or update session cookie with a 30-day expiration
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true, // For HTTPS
-                SameSite = SameSiteMode.Lax,
-                Expires = DateTimeOffset.UtcNow.AddDays(30)
+                Secure = false,
+                SameSite = SameSiteMode.Lax, // Default for security
+                Expires = DateTimeOffset.UtcNow.AddDays(30),
+                Domain = "localhost"
             };
 
             Response.Cookies.Append("ShoppingCartSession", sessionId, cookieOptions);
