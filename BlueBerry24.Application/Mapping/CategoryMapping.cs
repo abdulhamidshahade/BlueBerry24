@@ -9,7 +9,7 @@ namespace BlueBerry24.Application.Mapping
         public CategoryMapping()
         {
             CreateMap<CategoryDto, CreateCategoryDto>().ReverseMap();
-            CreateMap<CategoryDto, UpdateCategoryDto>().ReverseMap()
+            CreateMap<CategoryDto, UpdateCategoryDto>().ReverseMap();
             CreateMap<Category, CreateCategoryDto>().ReverseMap();
             CreateMap<Category, UpdateCategoryDto>().ReverseMap();
 
