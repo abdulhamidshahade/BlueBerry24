@@ -14,7 +14,6 @@ export interface ProductDto{
                         description: string, 
                         imageUrl: string}[];
 }
-
 export interface CreateProductDto{
     name: string;
     description: string;
@@ -26,7 +25,6 @@ export interface CreateProductDto{
     isActive: boolean;
     sku: string;
 }
-
 export interface UpdateProductDto{
     id: number;
     name: string;
@@ -39,7 +37,6 @@ export interface UpdateProductDto{
     isActive: boolean;
     sku: string;
 }
-
 export interface DeleteProductDto{
     id: number;
     name: string;
