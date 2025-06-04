@@ -14,7 +14,7 @@ The solution is split into four projects:
 
 ## ✨ Features
 
-* CRUD endpoints for Products, Shops, Stock, Shopping Carts, Coupons and Auth.
+* Advanced endpoints for Products, Shops, Stock, Shopping Carts, Coupons and Auth.
 * FluentValidation-based model validation.
 * Entity Framework Core with SQL Server provider.
 * ASP.NET Identity (custom `ApplicationUser` / `ApplicationRole`).
