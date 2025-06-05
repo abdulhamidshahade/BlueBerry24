@@ -1,13 +1,5 @@
-import { createProduct } from "@/lib/actions/product-actions";
 import { CategoryDto } from "@/types/category";
 import { ProductDto } from "@/types/product";
-
-interface Category {
-  id: number;
-  name: string;
-  description: string;
-  imageUrl: string;
-}
 
 interface ProductFormProps {
   product?: ProductDto;
@@ -15,6 +7,7 @@ interface ProductFormProps {
   submitText: string;
   isEdit?: boolean;
   categories: CategoryDto[];
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 export default function ProductForm({
@@ -23,7 +16,10 @@ export default function ProductForm({
   submitText,
   isEdit = false,
   categories,
+  searchParams
 }: ProductFormProps) {
+  
+    const errorImageFile = searchParams?.error_imageFile as string;
   return (
     <div className="container-fluid">
       <div className="row justify-content-center">
@@ -159,18 +155,64 @@ export default function ProductForm({
                     />
                   </div>
 
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="imageUrl" className="form-label">
-                      <i className="bi bi-image me-1"></i>Image URL
+                  {isEdit && product?.imageUrl && (
+                  <div className="mb-3">
+                    <label className="form-label">
+                      <i className="bi bi-image me-1"></i>Current Image
                     </label>
-                    <input
-                      type="url"
-                      className="form-control"
-                      id="imageUrl"
-                      name="imageUrl"
-                      defaultValue={product?.imageUrl || ""}
-                      placeholder="https://example.com/image.jpg"
-                    />
+                    <div className="border rounded p-3 bg-light">
+                      <img
+                        src={product.imageUrl}
+                        alt="Current category image"
+                        className="img-thumbnail mb-2"
+                        style={{
+                          maxWidth: "200px",
+                          maxHeight: "150px",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <div className="form-check">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          name="keepCurrentImage"
+                          value="true"
+                          id="keepCurrentImage"
+                        />
+                        <label
+                          className="form-check-label"
+                          htmlFor="keepCurrentImage"
+                        >
+                          Keep current image (don't upload a new one)
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                  <div className="col-md-6 mb-3">
+                    <label htmlFor="imageFile" className="form-label">
+                    <i className="bi bi-image me-1"></i>
+                    {isEdit ? "New Product Image" : "Product Image"} *
+                  </label>
+                  <input
+                    type="file"
+                    className={`form-control ${
+                      errorImageFile ? "is-invalid" : ""
+                    }`}
+                    id="imageFile"
+                    name="imageFile"
+                    accept="image/*"
+                    required={!isEdit}
+                  />
+                  <div className="form-text">
+                    <i className="bi bi-info-circle me-1"></i>
+                    Upload JPG, PNG, GIF, or WebP (max 5MB)
+                    {isEdit && " - Leave empty to keep current image"}
+                  </div>
+                  {errorImageFile && (
+                    <div className="invalid-feedback">{errorImageFile}</div>
+                  )}
                   </div>
                 </div>
 
