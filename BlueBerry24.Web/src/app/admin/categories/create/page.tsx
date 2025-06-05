@@ -31,26 +31,13 @@ export default function CreateCategoryPage({ searchParams }: Props) {
         </div>
       </div>
 
-      <div className="row justify-content-center">
-        <div className="col-lg-8 col-xl-6">
-          <div className="card shadow-sm border-0">
-            <div className="card-header bg-white py-3">
-              <h5 className="card-title mb-0">
-                <i className="bi bi-info-circle me-2"></i>
-                Category Information
-              </h5>
-            </div>
-            <div className="card-body p-4">
-              <CategoryForm 
-                action={createCategory}
-                isEdit={false}
-                submitText='Create Category'
-                searchParams={searchParams}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      <CategoryForm 
+        action={createCategory}
+        isEdit={false}
+        submitText='Create Category'
+        searchParams={searchParams}
+
+      />
     </div>
   );
 }
