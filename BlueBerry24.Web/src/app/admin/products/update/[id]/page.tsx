@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 import { updateProduct, getProduct } from '@/lib/actions/product-actions';
 import ProductForm from '@/components/product/ProductForm';
-import { ICategoryService } from '@/lib/services/category/interface';
-import { CategoryService } from '@/lib/services/category/service';
+import { ICategoryService } from '@/lib/services/category/interface'
+import { CategoryService } from '@/lib/services/category/service'
 
 interface PageProps {
   params: { id: string };
@@ -19,10 +19,19 @@ export default async function EditProductPage({ params }: PageProps) {
 
   if (!product) {
     notFound();
+    
   }
 
   const categoryService: ICategoryService = new CategoryService();
   const categories = await categoryService.getAll();
+  
+  async function handleUpdateProduct(formData: FormData) {
+    'use server';
+    const product = await getProduct(parseInt(formData.get('id') as string));
+    await updateProduct(formData, product!.imageUrl);
+  }
+
+  
 
   return (
     <div className="container-fluid">
@@ -48,7 +57,7 @@ export default async function EditProductPage({ params }: PageProps) {
           
           <ProductForm 
             product={product}
-            action={updateProduct}
+            action={handleUpdateProduct}
             submitText="Update Product"
             isEdit={true}
             categories={categories}
