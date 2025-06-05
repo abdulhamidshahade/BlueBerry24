@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getProduct } from '@/lib/actions/product-actions';
 import AddToCartForm from '@/components/cart/AddToCartForm';
+import WishlistButton from '@/components/product/WishlistButton';
 
 interface PageProps {
   params: { id: string };
@@ -56,7 +57,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   src={product.imageUrl} 
                   className="card-img-top"
                   alt={product.name}
-                  style={{ height: '500px', objectFit: 'cover' }}
+                  style={{ height: '500px', objectFit: 'contain' }}
                 />
               ) : (
                 <div 
@@ -135,9 +136,13 @@ export default async function ProductDetailPage({ params }: PageProps) {
               
               <div className="row g-2">
                 <div className="col">
-                  <Link href="#" className="btn btn-outline-secondary w-100">
-                    <i className="bi bi-heart me-2"></i>Add to Wishlist
-                  </Link>
+                  <WishlistButton 
+                    productId={product.id}
+                    size="md"
+                    variant="button"
+                    className="w-100"
+                    returnUrl={`/products/${product.id}`}
+                  />
                 </div>
                 <div className="col">
                   <Link href="#" className="btn btn-outline-info w-100">
