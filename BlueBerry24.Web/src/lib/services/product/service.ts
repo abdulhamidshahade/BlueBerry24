@@ -11,9 +11,7 @@ export class ProductService implements IProductService{
         try {
             const json: ResponseDto<ProductDto> = await apiRequest(`${API_BASE}/${id}`, {
                 isPublic: true,
-                next:{
-                    revalidate: 60 * 5 // 5 minutes
-                }
+                cache: 'no-cache',
             });
             if(!json.isSuccess || !json.data) throw new Error(json.statusMessage);
             return json.data;
@@ -25,11 +23,9 @@ export class ProductService implements IProductService{
     
     async getByName(name: string): Promise<ProductDto> {
         try {
-            const json: ResponseDto<ProductDto> = await apiRequest(`${API_BASE}/${name}`, {
+            const json: ResponseDto<ProductDto> = await apiRequest(`${API_BASE}/name/${name}`, {
                 isPublic: true,
-                next: {
-                    revalidate: 60 * 5 // 5 minutes
-                }
+                cache: 'no-cache'
             });
             if(!json.isSuccess || !json.data) throw new Error(json.statusMessage);
             return json.data;
@@ -43,9 +39,7 @@ export class ProductService implements IProductService{
         try {
             const json: ResponseDto<ProductDto[]> = await apiRequest(`${API_BASE}`, {
                 isPublic: true,
-                next: {
-                    revalidate: 60 * 5   //5 minutes
-                }
+                cache: 'no-cache'
             });
             if(!json.isSuccess || !json.data) {
                 console.warn('Products API returned no data, returning empty array');
@@ -112,8 +106,8 @@ export class ProductService implements IProductService{
     
     async existsById(id: number): Promise<boolean> {
         try {
-            const json: ResponseDto<boolean> = await apiRequest(`${API_BASE}/exists/${id}`, {
-                requireAuth: true
+            const json: ResponseDto<boolean> = await apiRequest(`${API_BASE}/exists-by-id/${id}`, {
+                requireAuth: true,
             });
             return json.isSuccess && json.data;
         } catch (error) {
@@ -124,7 +118,7 @@ export class ProductService implements IProductService{
     
     async existsByName(name: string): Promise<boolean> {
         try {
-            const json: ResponseDto<boolean> = await apiRequest(`${API_BASE}/exists/name/${encodeURIComponent(name)}`, {
+            const json: ResponseDto<boolean> = await apiRequest(`${API_BASE}/exists-by-name/${encodeURIComponent(name)}`, {
                 requireAuth: true
             });
             return json.isSuccess && json.data;
