@@ -31,21 +31,51 @@ function ProductsLoadingSkeleton() {
   );
 }
 
-async function ProductsList() {
+async function ProductsList({ category, sortBy }: any) {
   const allProducts = await getProducts();
   
-  const products = allProducts.filter(product => product.isActive);
+  let products = allProducts.filter(product => product.isActive);
+
+  if (category && category !== 'all') {
+    products = products.filter(product => 
+      product?.productCategories.some(c => c.name.toLowerCase() === category.toLowerCase())
+    );
+  }
+
+  if (sortBy) {
+    switch (sortBy) {
+      case 'price-low':
+        products.sort((a, b) => (a.price || 0) - (b.price || 0));
+        break;
+      case 'price-high':
+        products.sort((a, b) => (b.price || 0) - (a.price || 0));
+        break;
+      // case 'newest':
+      //   products.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      //   break;
+      case 'name':
+      default:
+        products.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+        break;
+    }
+  }
 
   if (products.length === 0) {
+    const categoryText = category && category !== 'all' ? ` in ${category}` : '';
     return (
       <div className="text-center py-5">
         <div className="mb-4">
           <i className="bi bi-box-seam display-1 text-muted"></i>
         </div>
-        <h3 className="text-muted">No products available</h3>
-        <p className="text-muted mb-4">Please check back later for new products.</p>
-        <a href="/" className="btn btn-primary">
-          <i className="bi bi-house me-2"></i>Back to Home
+        <h3 className="text-muted">No products available{categoryText}</h3>
+        <p className="text-muted mb-4">
+          {category && category !== 'all' 
+            ? `No products found in the ${category} category. Try selecting a different category.`
+            : 'Please check back later for new products.'
+          }
+        </p>
+        <a href="/products" className="btn btn-primary">
+          <i className="bi bi-arrow-clockwise me-2"></i>Show All Products
         </a>
       </div>
     );
@@ -64,17 +94,20 @@ async function ProductsList() {
   );
 }
 
-function ProductsHeader() {
+function ProductsHeader({ category, productsCount }: any) {
+  const categoryText = category && category !== 'all' ? `${category}` : 'Our Products';
+  const countText = productsCount !== undefined ? ` (${productsCount} items)` : '';
+  
   return (
     <div className="bg-primary text-white py-5 mb-5">
       <div className="container">
         <div className="row align-items-center">
           <div className="col-lg-8">
             <h1 className="display-4 fw-bold mb-3">
-              <i className="bi bi-shop me-3"></i>Our Products
+              <i className="bi bi-shop me-3"></i>{categoryText}
             </h1>
             <p className="lead mb-0">
-              Discover our amazing collection of high-quality products. 
+              Discover our amazing collection of high-quality products{countText}. 
               Find exactly what you're looking for with great prices and excellent service.
             </p>
           </div>
@@ -87,7 +120,36 @@ function ProductsHeader() {
   );
 }
 
-function ProductsFilters() {
+function ProductsFilters({ currentCategory, currentSort }: any) {
+  const createFilterUrl = (type: any, value: any) => {
+    const params = new URLSearchParams();
+    
+    if (type === 'category') {
+      if (value !== 'all') params.set('category', value);
+      if (currentSort && currentSort !== 'name') params.set('sort', currentSort);
+    } else if (type === 'sort') {
+      if (currentCategory && currentCategory !== 'all') params.set('category', currentCategory);
+      if (value !== 'name') params.set('sort', value);
+    }
+    
+    return `/products${params.toString() ? '?' + params.toString() : ''}`;
+  };
+
+  const categories = [
+    { value: 'all', label: 'All Categories' },
+    { value: 'Vegetables & Fruits', label: 'Vegetables & Fruits' },
+    { value: 'Water & Drinks', label: 'Water & Drinks' },
+    { value: 'Snack', label: 'Snack' },
+    { value: 'Breakfast', label: 'Breakfast' },
+  ];
+
+  const sortOptions = [
+    { value: 'name', label: 'Sort by Name' },
+    { value: 'price-low', label: 'Price: Low to High' },
+    { value: 'price-high', label: 'Price: High to Low' },
+    { value: 'newest', label: 'Newest First' }
+  ];
+
   return (
     <div className="card shadow-sm mb-4">
       <div className="card-body">
@@ -99,18 +161,49 @@ function ProductsFilters() {
           </div>
           <div className="col-md-6">
             <div className="d-flex gap-2 justify-content-md-end">
-              <select className="form-select form-select-sm" style={{ width: 'auto' }}>
-                <option value="name">Sort by Name</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="newest">Newest First</option>
-              </select>
-              <select className="form-select form-select-sm" style={{ width: 'auto' }}>
-                <option value="all">All Categories</option>
-                <option value="electronics">Electronics</option>
-                <option value="clothing">Clothing</option>
-                <option value="books">Books</option>
-              </select>
+              <div className="dropdown">
+                <button 
+                  className="btn btn-outline-secondary btn-sm dropdown-toggle" 
+                  type="button" 
+                  data-bs-toggle="dropdown"
+                >
+                  {sortOptions.find(opt => opt.value === (currentSort || 'name'))?.label}
+                </button>
+                <ul className="dropdown-menu">
+                  {sortOptions.map(option => (
+                    <li key={option.value}>
+                      <a 
+                        className={`dropdown-item ${(currentSort || 'name') === option.value ? 'active' : ''}`}
+                        href={createFilterUrl('sort', option.value)}
+                      >
+                        {option.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="dropdown">
+                <button 
+                  className="btn btn-outline-secondary btn-sm dropdown-toggle" 
+                  type="button" 
+                  data-bs-toggle="dropdown"
+                >
+                  {categories.find(cat => cat.value === (currentCategory || 'all'))?.label}
+                </button>
+                <ul className="dropdown-menu">
+                  {categories.map(category => (
+                    <li key={category.value}>
+                      <a 
+                        className={`dropdown-item ${(currentCategory || 'all') === category.value ? 'active' : ''}`}
+                        href={createFilterUrl('category', category.value)}
+                      >
+                        {category.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -119,13 +212,30 @@ function ProductsFilters() {
   );
 }
 
-export default async function ProductsPage() {
+export default async function ProductsPage({ searchParams }: any) {
+  const category = searchParams?.category || 'all';
+  const sortBy = searchParams?.sort || 'name';
+  
+  const allProducts = await getProducts();
+  const activeProducts = allProducts.filter(product => product.isActive);
+  const filteredProducts = category === 'all' 
+    ? activeProducts 
+    : activeProducts.filter(product => 
+        product.productCategories.some(c => c.name.toLowerCase() === category?.toLowerCase()) 
+      );
+
   return (
     <>
-      <ProductsHeader />
+      <ProductsHeader 
+        category={category} 
+        productsCount={filteredProducts.length}
+      />
       
       <div className="container">
-        <ProductsFilters />
+        <ProductsFilters 
+          currentCategory={category}
+          currentSort={sortBy}
+        />
         
         <div className="mb-4">
           <nav aria-label="breadcrumb">
@@ -137,13 +247,14 @@ export default async function ProductsPage() {
               </li>
               <li className="breadcrumb-item active" aria-current="page">
                 <i className="bi bi-box-seam me-1"></i>Products
+                {category !== 'all' && <span className="text-muted ms-1">({category})</span>}
               </li>
             </ol>
           </nav>
         </div>
 
         <Suspense fallback={<ProductsLoadingSkeleton />}>
-          <ProductsList />
+          <ProductsList category={category} sortBy={sortBy} />
         </Suspense>
 
         <div className="text-center py-5">
@@ -156,4 +267,4 @@ export default async function ProductsPage() {
       </div>
     </>
   );
-} 
+}
