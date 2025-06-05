@@ -1,4 +1,4 @@
-import { CategoryDto } from '@/types/category';
+import { CategoryDto } from "@/types/category";
 
 interface Props {
   category?: CategoryDto;
@@ -13,16 +13,15 @@ export default function CategoryForm({
   action,
   isEdit = false,
   submitText,
-  searchParams
+  searchParams,
 }: Props) {
   const errorName = searchParams?.error_name as string;
   const errorDescription = searchParams?.error_description as string;
-  const errorImageUrl = searchParams?.error_imageUrl as string;
+  const errorImageFile = searchParams?.error_imageFile as string;
   const generalError = searchParams?.error as string;
 
   const preservedName = searchParams?.name as string;
   const preservedDescription = searchParams?.description as string;
-  const preservedImageUrl = searchParams?.imageUrl as string;
 
   return (
     <div className="container-fluid">
@@ -32,8 +31,9 @@ export default function CategoryForm({
             <div className="card-header bg-primary text-white">
               <h4 className="mb-0">
                 <i
-                  className={`bi ${isEdit ? "bi-pencil-square" : "bi-plus-circle"
-                    } me-2`}
+                  className={`bi ${
+                    isEdit ? "bi-pencil-square" : "bi-plus-circle"
+                  } me-2`}
                 ></i>
                 {isEdit ? "Edit Category" : "Create New Category"}
               </h4>
@@ -46,7 +46,7 @@ export default function CategoryForm({
                 </div>
               )}
 
-              <form action={action}>
+              <form action={action} encType="multipart/form-data">
                 {isEdit && category && (
                   <input type="hidden" name="id" value={category.id} />
                 )}
@@ -57,7 +57,7 @@ export default function CategoryForm({
                   </label>
                   <input
                     type="text"
-                    className={`form-control ${errorName ? 'is-invalid' : ''}`}
+                    className={`form-control ${errorName ? "is-invalid" : ""}`}
                     id="name"
                     name="name"
                     defaultValue={preservedName || category?.name || ""}
@@ -65,9 +65,7 @@ export default function CategoryForm({
                     placeholder="Enter category name"
                   />
                   {errorName && (
-                    <div className="invalid-feedback">
-                      {errorName}
-                    </div>
+                    <div className="invalid-feedback">{errorName}</div>
                   )}
                 </div>
 
@@ -76,38 +74,81 @@ export default function CategoryForm({
                     <i className="bi bi-card-text me-1"></i>Description *
                   </label>
                   <textarea
-                    className={`form-control ${errorDescription ? 'is-invalid' : ''}`}
+                    className={`form-control ${
+                      errorDescription ? "is-invalid" : ""
+                    }`}
                     id="description"
                     name="description"
                     rows={4}
-                    defaultValue={preservedDescription || category?.description || ""}
+                    defaultValue={
+                      preservedDescription || category?.description || ""
+                    }
                     required
                     placeholder="Enter category description"
                   ></textarea>
                   {errorDescription && (
-                    <div className="invalid-feedback">
-                      {errorDescription}
-                    </div>
+                    <div className="invalid-feedback">{errorDescription}</div>
                   )}
                 </div>
 
+
+                {isEdit && category?.imageUrl && (
+                  <div className="mb-3">
+                    <label className="form-label">
+                      <i className="bi bi-image me-1"></i>Current Image
+                    </label>
+                    <div className="border rounded p-3 bg-light">
+                      <img
+                        src={category.imageUrl}
+                        alt="Current category image"
+                        className="img-thumbnail mb-2"
+                        style={{
+                          maxWidth: "200px",
+                          maxHeight: "150px",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <div className="form-check">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          name="keepCurrentImage"
+                          value="true"
+                          id="keepCurrentImage"
+                        />
+                        <label
+                          className="form-check-label"
+                          htmlFor="keepCurrentImage"
+                        >
+                          Keep current image (don't upload a new one)
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="mb-3">
-                  <label htmlFor="imageUrl" className="form-label">
-                    <i className="bi bi-image me-1"></i>Image URL *
+                  <label htmlFor="imageFile" className="form-label">
+                    <i className="bi bi-image me-1"></i>
+                    {isEdit ? "New Category Image" : "Category Image"} *
                   </label>
                   <input
-                    type="url"
-                    className={`form-control ${errorImageUrl ? 'is-invalid' : ''}`}
-                    id="imageUrl"
-                    name="imageUrl"
-                    defaultValue={preservedImageUrl || category?.imageUrl || ""}
-                    required
-                    placeholder="https://example.com/image.jpg"
+                    type="file"
+                    className={`form-control ${
+                      errorImageFile ? "is-invalid" : ""
+                    }`}
+                    id="imageFile"
+                    name="imageFile"
+                    accept="image/*"
+                    required={!isEdit}
                   />
-                  {errorImageUrl && (
-                    <div className="invalid-feedback">
-                      {errorImageUrl}
-                    </div>
+                  <div className="form-text">
+                    <i className="bi bi-info-circle me-1"></i>
+                    Upload JPG, PNG, GIF, or WebP (max 5MB)
+                    {isEdit && " - Leave empty to keep current image"}
+                  </div>
+                  {errorImageFile && (
+                    <div className="invalid-feedback">{errorImageFile}</div>
                   )}
                 </div>
 
@@ -120,8 +161,9 @@ export default function CategoryForm({
                     className={`btn ${isEdit ? "btn-warning" : "btn-success"}`}
                   >
                     <i
-                      className={`bi ${isEdit ? "bi-pencil-square" : "bi-plus-circle"
-                        } me-1`}
+                      className={`bi ${
+                        isEdit ? "bi-pencil-square" : "bi-plus-circle"
+                      } me-1`}
                     ></i>
                     {submitText}
                   </button>
