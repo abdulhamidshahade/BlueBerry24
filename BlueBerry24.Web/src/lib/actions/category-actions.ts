@@ -5,13 +5,84 @@ import { CategoryService } from "../services/category/service";
 import { ICategoryService } from "../services/category/interface";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import fs from 'fs';
+import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 
 const categoryService: ICategoryService = new CategoryService();
+
+async function uploadImageFile(file: File, currentImageUrl?: string): Promise<string> {
+  const useCloudflare = process.env.USE_CLOUDFLARE === 'true';
+
+  if (useCloudflare) {
+    try {
+      const cfRes = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT_ID}/images/v2/direct_upload`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${process.env.CF_API_TOKEN}`,
+          },
+        }
+      );
+
+      const cfJson = await cfRes.json();
+      const uploadURL = cfJson.result?.uploadURL;
+
+      if (!uploadURL) {
+        throw new Error('Failed to get upload URL from Cloudflare');
+      }
+
+      const cloudflareFormData = new FormData();
+      cloudflareFormData.append('file', file);
+
+      const uploadRes = await fetch(uploadURL, {
+        method: 'POST',
+        body: cloudflareFormData,
+      });
+
+      const data = await uploadRes.json();
+
+      if (!data.result || !data.result.id) {
+        throw new Error('Cloudflare upload failed');
+      }
+
+      return `https://imagedelivery.net/${process.env.NEXT_PUBLIC_CF_DELIVERY_ID}/${data.result.id}/public`;
+
+    } catch (cloudflareError) {
+      console.log('Cloudflare upload failed, falling back to local:', cloudflareError);
+    }
+  }
+
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+  
+  const fileExtension = file.name.substring(file.name.lastIndexOf('.'));
+
+  const fileName = `${Date.now()}_category_${uuidv4()}${fileExtension}`;
+  const uploadDir = path.join(process.cwd(), 'public/uploads/category');
+
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+
+  if(currentImageUrl){
+      var fullPath = path.join(process.cwd(), `public${currentImageUrl}`);
+      if(fs.existsSync(fullPath)){
+        fs.rmSync(fullPath, { recursive: true });
+      }
+    }
+
+  const filePath = path.join(uploadDir, fileName);
+  fs.writeFileSync(filePath, buffer);
+
+  return `/uploads/category/${fileName}`;
+}
 
 export async function createCategory(formData: FormData) {
   const name = formData.get('name') as string;
   const description = formData.get('description') as string;
-  const imageUrl = formData.get('imageUrl') as string;
+  const imageFile = formData.get('imageFile') as File;
   
   const errors: Record<string, string> = {};
   
@@ -27,13 +98,15 @@ export async function createCategory(formData: FormData) {
     errors.description = 'Description must be at least 10 characters';
   }
   
-  if (!imageUrl?.trim()) {
-    errors.imageUrl = 'Image URL is required';
+  if (!imageFile || imageFile.size === 0) {
+    errors.imageFile = 'Category image is required';
   } else {
-    try {
-      new URL(imageUrl);
-    } catch {
-      errors.imageUrl = 'Please enter a valid URL';
+    if (!imageFile.type.startsWith('image/')) {
+      errors.imageFile = 'Please select a valid image file';
+    }
+
+    else if (imageFile.size > 10 * 1024 * 1024) {
+      errors.imageFile = 'Image size must be less than 10MB';
     }
   }
   
@@ -44,16 +117,17 @@ export async function createCategory(formData: FormData) {
     });
     errorParams.set('name', name || '');
     errorParams.set('description', description || '');
-    errorParams.set('imageUrl', imageUrl || '');
     
     redirect(`/admin/categories/create?${errorParams.toString()}`);
   }
   
   try {
+    const imageUrl = await uploadImageFile(imageFile);
+    
     const createData: CreateCategoryDto = {
       name: name.trim(),
       description: description.trim(),
-      imageUrl: imageUrl.trim()
+      imageUrl: imageUrl
     };
     
     await categoryService.create(createData);
@@ -64,15 +138,16 @@ export async function createCategory(formData: FormData) {
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
       throw error;
     }
-    redirect(`/admin/categories/create?error=${encodeURIComponent(errorMessage)}&name=${encodeURIComponent(name || '')}&description=${encodeURIComponent(description || '')}&imageUrl=${encodeURIComponent(imageUrl || '')}`);
+    redirect(`/admin/categories/create?error=${encodeURIComponent(errorMessage)}&name=${encodeURIComponent(name || '')}&description=${encodeURIComponent(description || '')}`);
   }
 }
 
-export async function updateCategory(formData: FormData) {
+export async function updateCategory(formData: FormData, currentImageUrl: string) {
   const id = formData.get('id') as string;
   const name = formData.get('name') as string;
   const description = formData.get('description') as string;
-  const imageUrl = formData.get('imageUrl') as string;
+  const imageFile = formData.get('imageFile') as File;
+  const keepCurrentImage = formData.get('keepCurrentImage') as string;
   
   const errors: Record<string, string> = {};
   
@@ -92,13 +167,16 @@ export async function updateCategory(formData: FormData) {
     errors.description = 'Description must be at least 10 characters';
   }
   
-  if (!imageUrl?.trim()) {
-    errors.imageUrl = 'Image URL is required';
-  } else {
-    try {
-      new URL(imageUrl);
-    } catch {
-      errors.imageUrl = 'Please enter a valid URL';
+  const hasNewImage = imageFile && imageFile.size > 0;
+  const shouldKeepCurrent = keepCurrentImage === 'true';
+  
+  if (!hasNewImage && !shouldKeepCurrent) {
+    errors.imageFile = 'Please upload a new image or check "Keep current image"';
+  } else if (hasNewImage) {
+    if (!imageFile.type.startsWith('image/')) {
+      errors.imageFile = 'Please select a valid image file';
+    } else if (imageFile.size > 10 * 1024 * 1024) {
+      errors.imageFile = 'Image size must be less than 10MB';
     }
   }
   
@@ -109,17 +187,28 @@ export async function updateCategory(formData: FormData) {
     });
     errorParams.set('name', name || '');
     errorParams.set('description', description || '');
-    errorParams.set('imageUrl', imageUrl || '');
     
     redirect(`/admin/categories/update/${id}?${errorParams.toString()}`);
   }
   
   try {
+    let imageUrl: string;
+    
+    if (hasNewImage) {
+      imageUrl = await uploadImageFile(imageFile, currentImageUrl);
+    } else {
+      const existingCategory = await categoryService.getById(parseInt(id));
+      if (!existingCategory) {
+        redirect(`/admin/categories/update/${id}?error=Category not found`);
+      }
+      imageUrl = existingCategory.imageUrl;
+    }
+    
     const updateData: UpdateCategoryDto = {
       id: parseInt(id),
       name: name.trim(),
       description: description.trim(),
-      imageUrl: imageUrl.trim()
+      imageUrl: imageUrl
     };
     
     await categoryService.update(parseInt(id), updateData);
@@ -130,7 +219,7 @@ export async function updateCategory(formData: FormData) {
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
       throw error;
     }
-    redirect(`/admin/categories/update/${id}?error=${encodeURIComponent(errorMessage)}&name=${encodeURIComponent(name || '')}&description=${encodeURIComponent(description || '')}&imageUrl=${encodeURIComponent(imageUrl || '')}`);
+    redirect(`/admin/categories/update/${id}?error=${encodeURIComponent(errorMessage)}&name=${encodeURIComponent(name || '')}&description=${encodeURIComponent(description || '')}`);
   }
 }
 
@@ -175,18 +264,32 @@ export async function deleteCategory(formData: FormData) {
   }
   
   try {
-    const categoryExists = await categoryService.exists(categoryId);
+    const categoryExists = await categoryService.existsById(categoryId);
     console.log('Category exists:', categoryExists);
     
     if (!categoryExists) {
       redirect(`/admin/categories/delete/${categoryId}?error=Category not found&confirmed=true`);
     }
     
+    const category = await categoryService.getById(categoryId);
+
     const success = await categoryService.delete(categoryId);
     console.log('Delete result:', success);
     
     if (!success) {
       redirect(`/admin/categories/delete/${categoryId}?error=Failed to delete category - operation returned false&confirmed=true`);
+    }
+    
+    if (category && category.imageUrl.startsWith('/uploads/')) {
+      try {
+        const imagePath = path.join(process.cwd(), 'public', category.imageUrl);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+          console.log('Cleaned up image file:', category.imageUrl);
+        }
+      } catch (cleanupError) {
+        console.error('Failed to cleanup image file:', cleanupError);
+      }
     }
     
     revalidatePath('/admin/categories');
