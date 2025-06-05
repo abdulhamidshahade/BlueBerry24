@@ -32,7 +32,7 @@ export default function ProductCard({
         {product.imageUrl && (
           <div
             className="card-img-container"
-            style={{ height: "200px", overflow: "hidden" }}
+            style={{ height: "200px", overflow: "hidden", backgroundColor: "#f8f9fa" }}
           >
             <img
               src={product.imageUrl}
@@ -41,7 +41,9 @@ export default function ProductCard({
               style={{
                 width: "100%",
                 height: "100%",
-                objectFit: "cover",
+                objectFit: "contain",
+                objectPosition: "center",
+                maxWidth: "none",
               }}
             />
           </div>
