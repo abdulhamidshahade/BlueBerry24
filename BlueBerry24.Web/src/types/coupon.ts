@@ -2,7 +2,7 @@ export interface CouponDto {
   id: number;
   code: string;
   discountAmount: number;
-  minimumAmount: number;
+  minimumOrderAmount: number;
   description: string;
   isActive: boolean;
   type: CouponType;
@@ -25,7 +25,7 @@ export interface UpdateCouponDto {
   id: number;
   code: string;
   discountAmount: number;
-  minimumAmount: number;
+  minimumOrderAmount: number;
   description: string;
   isActive: boolean;
   type: CouponType;
