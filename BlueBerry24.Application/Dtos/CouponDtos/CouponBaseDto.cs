@@ -6,7 +6,7 @@ namespace BlueBerry24.Application.Dtos.CouponDtos
     {
         public string Code { get; set; }
         public decimal DiscountAmount { get; set; }
-        public decimal MinimumAmount { get; set; }
+        public decimal MinimumOrderAmount { get; set; }
         public string Description { get; set; } = string.Empty;
         public bool IsActive { get; set; }
 
