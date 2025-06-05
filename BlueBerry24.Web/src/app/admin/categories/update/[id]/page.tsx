@@ -32,6 +32,12 @@ export default async function EditCategoryPage({ params, searchParams }: Props) 
     notFound();
   }
 
+  async function handleUpdateCategory(data: FormData){
+    'use server'
+    var category = await categoryService.getById(parseInt(data.get('id') as string));
+    await updateCategory(data, category!.imageUrl);
+  }
+
   return (
     <div className="container-fluid">
       <div className="row mb-4">
@@ -69,7 +75,7 @@ export default async function EditCategoryPage({ params, searchParams }: Props) 
             <div className="card-body p-4">
               <CategoryForm
                 category={category}
-                action={updateCategory}
+                action={handleUpdateCategory}
                 isEdit={true}
                 submitText='Update Category'
                 searchParams={searchParams}
