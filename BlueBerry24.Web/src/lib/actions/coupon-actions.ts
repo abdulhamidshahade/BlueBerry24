@@ -6,7 +6,7 @@ import { CouponService } from '../services/coupon/service';
 import { ICouponService } from '../services/coupon/interface';
 import { CreateCouponDto, UpdateCouponDto, CouponType, CouponDto } from '@/types/coupon';
 import { getCurrentUser } from './auth-actions';
-import { User } from '@/types/auth';
+import { User } from '@/types/user';
 import { IUserService } from '../services/user/interface';
 import { UserService } from '../services/user/service';
 
@@ -317,7 +317,7 @@ export async function addCouponToUserAction(formData: FormData) {
     await addCouponToUser(userId, couponId);
     
     revalidatePath('/admin/coupons');
-    redirect('/admin/coupons?success=coupon_added');
+    redirect(`/admin/coupons/${couponId}/users?success=coupon_added`);
   } catch (error) {
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
       throw error;
