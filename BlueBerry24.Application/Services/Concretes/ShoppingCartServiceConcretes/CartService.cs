@@ -26,6 +26,7 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
         private readonly IProductService _productService;
         private readonly IInventoryService _inventoryService;
         private readonly ICouponService _couponService;
+        private readonly IUserCouponService _userCouponService;
 
         public CartService(
                            IMapper mapper,
@@ -35,7 +36,8 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                            IConfiguration configuration,
                            IInventoryService inventoryService,
                            IProductService productService,
-                           ICouponService couponService
+                           ICouponService couponService,
+                           IUserCouponService userCouponService
                            )
         {
             _mapper = mapper;
@@ -45,6 +47,7 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
             _inventoryService = inventoryService;
             _productService = productService;
             _couponService = couponService;
+            _userCouponService = userCouponService;
         }
 
 
@@ -650,20 +653,12 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
         }
 
 
-        public async Task<CartDto> ApplyCouponAsync(int cartId, int? userId, string? sessionId, string couponCode)
+        public async Task<CartDto> ApplyCouponAsync(int cartId, int? userId, string couponCode)
         {
             try
             {
-                Cart? cart = null;
 
-                if (userId.HasValue)
-                {
-                    cart = await _cartRepository.GetCartByUserIdAsync(userId, CartStatus.Active);
-                }
-                else if (!string.IsNullOrEmpty(sessionId))
-                {
-                    cart = await _cartRepository.GetCartBySessionIdAsync(sessionId, CartStatus.Active);
-                }
+                var cart = await _cartRepository.GetCartByUserIdAsync(userId);
 
                 if (cart == null)
                 {
@@ -681,7 +676,8 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                 }
 
                 var coupon = await _couponService.GetByCodeAsync(couponCode);
-                if (coupon == null || !coupon.IsActive)
+
+                if (coupon == null || !coupon.IsActive || !await _userCouponService.IsCouponUsedByUser(userId.Value ,couponCode))
                 {
                     return null;
                 }
@@ -691,7 +687,7 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                     return null;
                 }
 
-                decimal cartSubTotal = cart.CartItems.Sum(item => item.UnitPrice * item.Quantity);
+                decimal cartSubTotal = cart.SubTotal;
 
 
                 if (coupon.MinimumOrderAmount > 0 && cartSubTotal < coupon.MinimumOrderAmount)
@@ -700,33 +696,48 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                 }
 
                 decimal discountAmount = 0;
-                switch (coupon.Type)
+
+                if(coupon.MinimumOrderAmount == 0)
                 {
-                    case CouponType.Percentage:
-                        discountAmount = cartSubTotal * (coupon.Value / 100);
-                        break;
-                    case CouponType.FixedAmount:
-                        discountAmount = Math.Min(coupon.Value, cartSubTotal);
-                        break;
-                    case CouponType.FreeShipping:
-                        discountAmount = 0;
-                        break;
-                    default:
-                        discountAmount = 0;
-                        break;
+                    switch (coupon.Type)
+                    {
+                        case CouponType.Percentage:
+                            discountAmount = cartSubTotal * (coupon.Value / 100);
+                            break;
+                        case CouponType.FixedAmount:
+                            discountAmount = Math.Min(coupon.DiscountAmount, cartSubTotal);
+                            break;
+                    }
+                }
+                else
+                {
+                    if(coupon.MinimumOrderAmount <= cartSubTotal)
+                        switch (coupon.Type)
+                        {
+                            case CouponType.Percentage:
+                                discountAmount = cartSubTotal * (coupon.Value / 100);
+                                break;
+                            case CouponType.FixedAmount:
+                                discountAmount = coupon.DiscountAmount;
+                                break;
+                        }
+                    else
+                    {
+                        return null;
+                    }
                 }
 
-                var cartCoupon = new CartCoupon
-                {
-                    CartId = cart.Id,
-                    CouponId = coupon.Id,
-                    UserId = userId,
-                    SessionId = sessionId,
-                    DiscountAmount = discountAmount,
-                    AppliedAt = DateTime.UtcNow,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
+
+                    var cartCoupon = new CartCoupon
+                    {
+                        CartId = cart.Id,
+                        CouponId = coupon.Id,
+                        UserId = userId,
+                        DiscountAmount = discountAmount,
+                        AppliedAt = DateTime.UtcNow,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
 
                 cart.CartCoupons.Add(cartCoupon);
 
