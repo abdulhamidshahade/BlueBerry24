@@ -89,6 +89,11 @@ namespace BlueBerry24.Infrastructure.Repositories.CouponConcretes
             var coupon = await _context.UserCoupons.Where(i => i.UserId == userId && i.Coupon.Code == couponCode)
                 .FirstOrDefaultAsync();
 
+            if(coupon == null)
+            {
+                return false;
+            }
+
             return coupon.IsUsed;
         }
     }
