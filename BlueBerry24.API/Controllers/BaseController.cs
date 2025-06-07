@@ -23,29 +23,16 @@ namespace BlueBerry24.API.Controllers
 
         protected string? GetSessionId()
         {
-            string? sessionId = Request.Cookies["cart_session"];
+            string? sessionId = Request.Headers["X-Session-Id"];
 
             if (string.IsNullOrEmpty(sessionId) && !GetCurrentUserId().HasValue)
             {
-                sessionId = Guid.NewGuid().ToString();
-                SetSessionCookie(sessionId);
+                
+
+                return null;
             }
 
             return sessionId;
-        }
-
-        protected void SetSessionCookie(string sessionId)
-        {
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = false,
-                SameSite = SameSiteMode.Lax, // Default for security
-                Expires = DateTimeOffset.UtcNow.AddDays(30),
-                Domain = "localhost"
-            };
-
-            Response.Cookies.Append("cart_session", sessionId, cookieOptions);
         }
     }
 }
