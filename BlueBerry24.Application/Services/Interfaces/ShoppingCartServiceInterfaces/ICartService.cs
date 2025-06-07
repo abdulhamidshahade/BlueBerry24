@@ -23,7 +23,7 @@ namespace BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfa
         Task<bool> HandleAbandonedCartAsync(int cartId);
         Task<int> CleanupExpiredCartsAsync();
         Task<CartDto> RefreshCartAsync(int cartId);
-        Task<CartDto> ApplyCouponAsync(int cartId, int? userId, string? sessionId, string couponCode);
+        Task<CartDto> ApplyCouponAsync(int cartId, int? userId, string couponCode);
         Task<CartDto> RemoveCouponAsync(int cartId, int? userId, string? sessionId, int couponId);
         Task<CartDto> GetCartByIdAsync(int cartId, CartStatus status);
 
