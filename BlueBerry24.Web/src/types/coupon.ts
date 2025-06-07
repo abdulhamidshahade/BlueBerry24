@@ -47,6 +47,4 @@ export interface AddCouponToUserDto{
 export enum CouponType {
   Percentage = 0,
   FixedAmount = 1,
-  FreeShipping = 2,
-  BuyXGetY = 3
 }
