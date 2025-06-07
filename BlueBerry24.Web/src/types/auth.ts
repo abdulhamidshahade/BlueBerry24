@@ -1,11 +1,4 @@
-export interface User {
-    id: number;
-    email: string;
-    userName: string;
-    firstName?: string;
-    lastName?: string;
-    roles: string[]; 
-}
+import { User } from "./user";
 
 export interface LoginRequest {
     email: string;
