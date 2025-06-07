@@ -694,7 +694,7 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                 decimal cartSubTotal = cart.CartItems.Sum(item => item.UnitPrice * item.Quantity);
 
 
-                if (coupon.MinimumAmount > 0 && cartSubTotal < coupon.MinimumAmount)
+                if (coupon.MinimumOrderAmount > 0 && cartSubTotal < coupon.MinimumOrderAmount)
                 {
                     return null;
                 }
