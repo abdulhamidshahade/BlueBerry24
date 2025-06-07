@@ -13,7 +13,7 @@ export class CategoryService implements ICategoryService {
         headers:{
         'Content-Type': 'application/json',
       },
-        cache: 'no-cache',
+        cache: 'no-store',
         isPublic: true,
       });
       
@@ -33,7 +33,7 @@ export class CategoryService implements ICategoryService {
         headers:{
         'Content-Type': 'application/json',
         },
-        cache: 'no-cache',
+        cache: 'no-store',
         isPublic: true
       });
       
@@ -53,7 +53,7 @@ export class CategoryService implements ICategoryService {
         headers:{
         'Content-Type': 'application/json',
         },
-        cache: 'no-cache',
+        cache: 'no-store',
         isPublic: true
       });
       
