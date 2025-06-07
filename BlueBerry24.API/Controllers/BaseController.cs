@@ -23,7 +23,7 @@ namespace BlueBerry24.API.Controllers
 
         protected string? GetSessionId()
         {
-            string? sessionId = Request.Cookies["ShoppingCartSession"];
+            string? sessionId = Request.Cookies["cart_session"];
 
             if (string.IsNullOrEmpty(sessionId) && !GetCurrentUserId().HasValue)
             {
@@ -45,7 +45,7 @@ namespace BlueBerry24.API.Controllers
                 Domain = "localhost"
             };
 
-            Response.Cookies.Append("ShoppingCartSession", sessionId, cookieOptions);
+            Response.Cookies.Append("cart_session", sessionId, cookieOptions);
         }
     }
 }
