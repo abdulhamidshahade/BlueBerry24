@@ -282,5 +282,12 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
                 return false;
             }
         }
+
+        public async Task<ApplicationUserDto> GetUserByEmail(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            return _mapper.Map<ApplicationUserDto>(user);
+        }
     }
 }
