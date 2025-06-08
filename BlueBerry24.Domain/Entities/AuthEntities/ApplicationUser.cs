@@ -18,7 +18,7 @@ namespace BlueBerry24.Domain.Entities.AuthEntities
 
         public List<UserCoupon> UserCoupons { get; set; }
 
-        public Cart Cart { get; set; }
+        public List<Cart> Cart { get; set; }
 
         public List<Order> Orders { get; set; }
 

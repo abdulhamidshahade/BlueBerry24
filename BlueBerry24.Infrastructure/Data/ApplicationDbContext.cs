@@ -42,9 +42,9 @@ namespace BlueBerry24.Infrastructure.Data
             base.OnModelCreating(builder);
 
             builder.Entity<ApplicationUser>()
-                .HasOne(c => c.Cart)
+                .HasMany(c => c.Cart)
                 .WithOne(u => u.User)
-                .HasForeignKey<Cart>(fk => fk.UserId);
+                .HasForeignKey(fk => fk.UserId);
 
             builder.Entity<ApplicationUser>()
                 .HasMany(o => o.Orders)
