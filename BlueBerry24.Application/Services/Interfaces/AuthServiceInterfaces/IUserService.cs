@@ -8,6 +8,7 @@ namespace BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces
         Task<bool> IsUserExistsByEmailAsync(string emailAddress);
         Task<List<ApplicationUserDto>> GetAllUsers();
         Task<ApplicationUserDto> GetUserById(int id);
+        Task<ApplicationUserDto> GetUserByEmail(string email);
         Task<bool> LockUserAccountAsync(int userId, DateTime? lockoutEnd = null);
         Task<bool> UnlockUserAccountAsync(int userId);
         Task<bool> ResetUserPasswordAsync(int userId, string newPassword);
