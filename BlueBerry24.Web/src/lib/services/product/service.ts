@@ -2,6 +2,7 @@ import { ProductDto, CreateProductDto, UpdateProductDto } from "@/types/product"
 import { IProductService } from "./interface";
 import { ResponseDto } from "@/types/responseDto";
 import { apiRequest } from "@/lib/utils/api";
+import { cookies } from 'next/headers';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const API_BASE = process.env.API_BASE_PRODUCT;
@@ -11,7 +12,7 @@ export class ProductService implements IProductService{
         try {
             const json: ResponseDto<ProductDto> = await apiRequest(`${API_BASE}/${id}`, {
                 isPublic: true,
-                cache: 'no-cache',
+                cache: 'no-store',
             });
             if(!json.isSuccess || !json.data) throw new Error(json.statusMessage);
             return json.data;
@@ -25,7 +26,7 @@ export class ProductService implements IProductService{
         try {
             const json: ResponseDto<ProductDto> = await apiRequest(`${API_BASE}/name/${name}`, {
                 isPublic: true,
-                cache: 'no-cache'
+                cache: 'no-store'
             });
             if(!json.isSuccess || !json.data) throw new Error(json.statusMessage);
             return json.data;
@@ -36,10 +37,16 @@ export class ProductService implements IProductService{
     }
     
     async getAll(): Promise<ProductDto[]> {
+        const cookieStore = await cookies();
+    const token = cookieStore.get('cart_session')?.value;
         try {
             const json: ResponseDto<ProductDto[]> = await apiRequest(`${API_BASE}`, {
                 isPublic: true,
-                cache: 'no-cache'
+                cache: 'no-store',
+                headers: {
+                    'X-Session-Id': token ?? ''
+                }
+                
             });
             if(!json.isSuccess || !json.data) {
                 console.warn('Products API returned no data, returning empty array');
