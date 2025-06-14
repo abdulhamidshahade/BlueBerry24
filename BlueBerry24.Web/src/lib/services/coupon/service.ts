@@ -2,7 +2,7 @@ import { CouponDto, CreateCouponDto, UpdateCouponDto, UserCouponDto } from "@/ty
 import { ICouponService } from "./interface";
 import { ResponseDto } from "@/types/responseDto";
 import { apiRequest } from "@/lib/utils/api";
-import { User } from "@/types/auth";
+import { User } from "@/types/user";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const API_BASE = process.env.API_BASE_COUPON;
