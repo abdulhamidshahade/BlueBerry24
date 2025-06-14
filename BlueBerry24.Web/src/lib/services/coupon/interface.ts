@@ -1,4 +1,4 @@
-import { User } from "@/types/auth";
+import { User } from "@/types/user";
 import { CouponDto, CreateCouponDto, UpdateCouponDto, UserCouponDto } from "@/types/coupon";
 
 export interface ICouponService {
