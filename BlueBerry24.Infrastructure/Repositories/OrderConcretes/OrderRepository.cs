@@ -19,21 +19,22 @@ namespace BlueBerry24.Infrastructure.Repositories.OrderConcretes
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Order?> GetOrderByIdAsync(int orderId)
+        public async Task<Order?> GetOrderByIdAsync(int orderId, OrderStatus? orderStatus = OrderStatus.Pending)
         {
             return await _context.Orders
+                .Where(o => o.Status == orderStatus)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 
         //TODO to fix
-        public async Task<List<Order>> GetUserOrdersAsync(string sessionId, int page = 1, int pageSize = 10)
+        public async Task<List<Order>> GetUserOrdersAsync(int userId, int page = 1, int pageSize = 10)
         {
             return await _context.Orders
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)
-                .Where(o => o.SessionId == sessionId)
+                .Where(o => o.UserId == userId)
                 .OrderByDescending(o => o.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -52,20 +53,6 @@ namespace BlueBerry24.Infrastructure.Repositories.OrderConcretes
                 .ToListAsync();
         }
 
-        public async Task<bool> MarkOrderAsPaidAsync(int orderId, int paymentTransactionId, string paymentProvider)
-        {
-            var order = await _context.Orders.FindAsync(orderId);
-
-            if (order == null) return false;
-
-            order.IsPaid = true;
-            order.PaidAt = DateTime.UtcNow;
-            order.PaymentTransactionId = paymentTransactionId;
-            order.PaymentProvider = paymentProvider;
-
-            _context.Orders.Update(order);
-            return await _context.SaveChangesAsync() > 0;
-        }
 
         public async Task<bool> UpdateOrderStatusAsync(int orderId, OrderStatus newStatus)
         {
