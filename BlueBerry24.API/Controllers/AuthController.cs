@@ -2,6 +2,7 @@
 using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.AuthDtos;
 using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
+using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,13 +15,16 @@ namespace BlueBerry24.API.Controllers
         private readonly IAuthService _authService;
         private readonly ILogger<AuthController> _logger;
         private readonly IUserService _userService;
+        private readonly ICartService _cartService;
         public AuthController(IAuthService authService,
                               ILogger<AuthController> logger,
-                              IUserService userService) : base(logger)
+                              IUserService userService,
+                              ICartService cartService) : base(logger)
         {
             _authService = authService;
             _logger = logger;
             _userService = userService;
+            _cartService = cartService;
         }
 
         [HttpPost]
@@ -30,19 +34,20 @@ namespace BlueBerry24.API.Controllers
         {
             if (requestDto == null || !ModelState.IsValid)
             {
-                return StatusCode(400, new ResponseDto
+                return StatusCode(400, new ResponseDto<RegisterResponseDto>
                 {
                     IsSuccess = false,
                     StatusCode = 400,
                     StatusMessage = "Invalid request data.",
-                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList()
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList(),
+                    Data = null
                 });
             }
             var registerResult = await _authService.Register(requestDto);
 
             if (registerResult.IsSuccess)
             {
-                return StatusCode(201, new ResponseDto
+                return StatusCode(201, new ResponseDto<object>
                 {
                     IsSuccess = true,
                     StatusCode = 201,
@@ -51,7 +56,7 @@ namespace BlueBerry24.API.Controllers
                 });
             }
 
-            return StatusCode(400, new ResponseDto
+            return StatusCode(400, new ResponseDto<object>
             {
                 IsSuccess = false,
                 StatusCode = 400,
@@ -69,7 +74,7 @@ namespace BlueBerry24.API.Controllers
         {
             if (requestDto == null || !ModelState.IsValid)
             {
-                return StatusCode(400, new ResponseDto
+                return StatusCode(400, new ResponseDto<LoginResponseDto>
                 {
                     IsSuccess = false,
                     StatusCode = 400,
@@ -82,7 +87,10 @@ namespace BlueBerry24.API.Controllers
 
             if (loginResult.Token != string.Empty)
             {
-                return StatusCode(200, new ResponseDto
+                var user = await _userService.GetUserByEmail(requestDto.Email);
+                await _cartService.MergeCartAsync(user.Id, GetSessionId());
+
+                return StatusCode(200, new ResponseDto<LoginResponseDto>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -91,7 +99,17 @@ namespace BlueBerry24.API.Controllers
                 });
             }
 
-            return Unauthorized(new ResponseDto
+            if (!string.IsNullOrEmpty(loginResult.ErrorMessage))
+            {
+                return StatusCode(403, new ResponseDto<LoginResponseDto>
+                {
+                    IsSuccess = false,
+                    StatusCode = 403,
+                    StatusMessage = loginResult.ErrorMessage,
+                });
+            }
+
+            return Unauthorized(new ResponseDto<LoginResponseDto>
             {
                 IsSuccess = false,
                 StatusCode = 401,
@@ -99,18 +117,212 @@ namespace BlueBerry24.API.Controllers
             });
         }
 
+        [HttpPost]
+        [Route("forgot-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto requestDto)
+        {
+            if (requestDto == null || !ModelState.IsValid)
+            {
+                return StatusCode(400, new ResponseDto<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = 400,
+                    StatusMessage = "Invalid request data.",
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList()
+                });
+            }
 
+            try
+            {
+                var result = await _authService.ForgotPasswordAsync(requestDto);
+
+                if (result)
+                {
+                    return Ok(new ResponseDto<object>
+                    {
+                        IsSuccess = true,
+                        StatusCode = 200,
+                        StatusMessage = "If the email address exists in our system, you will receive a password reset link."
+                    });
+                }
+
+                return StatusCode(500, new ResponseDto<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "An error occurred while processing your request."
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing forgot password request");
+                return StatusCode(500, new ResponseDto<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "An error occurred while processing your request."
+                });
+            }
+        }
+
+        [HttpPost]
+        [Route("confirm-email")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmEmail([FromBody] EmailConfirmationDto requestDto)
+        {
+            if (requestDto == null || !ModelState.IsValid)
+            {
+                return StatusCode(400, new ResponseDto<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = 400,
+                    StatusMessage = "Invalid request data.",
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList()
+                });
+            }
+
+            try
+            {
+                var result = await _authService.ConfirmEmailAsync(requestDto);
+
+                if (result)
+                {
+                    return Ok(new ResponseDto<object>
+                    {
+                        IsSuccess = true,
+                        StatusCode = 200,
+                        StatusMessage = "Email confirmed successfully. You can now sign in to your account."
+                    });
+                }
+
+                return BadRequest(new ResponseDto<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = 400,
+                    StatusMessage = "Failed to confirm email. The confirmation link may be invalid or expired."
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error confirming email");
+                return StatusCode(500, new ResponseDto<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "An error occurred while confirming your email."
+                });
+            }
+        }
+
+        [HttpPost]
+        [Route("resend-confirmation")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResendConfirmation([FromBody] ForgotPasswordRequestDto requestDto)
+        {
+            if (requestDto == null || !ModelState.IsValid)
+            {
+                return StatusCode(400, new ResponseDto<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = 400,
+                    StatusMessage = "Invalid request data.",
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList()
+                });
+            }
+
+            try
+            {
+                var result = await _authService.ResendConfirmationEmailAsync(requestDto.Email);
+
+                if (result)
+                {
+                    return Ok(new ResponseDto<object>
+                    {
+                        IsSuccess = true,
+                        StatusCode = 200,
+                        StatusMessage = "If the email address exists in our system, a new confirmation link has been sent."
+                    });
+                }
+
+                return StatusCode(500, new ResponseDto<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "An error occurred while sending the confirmation email."
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error resending confirmation email");
+                return StatusCode(500, new ResponseDto<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "An error occurred while sending the confirmation email."
+                });
+            }
+        }
+
+        [HttpPost]
+        [Route("reset-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto requestDto)
+        {
+            if (requestDto == null || !ModelState.IsValid)
+            {
+                return StatusCode(400, new ResponseDto<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = 400,
+                    StatusMessage = "Invalid request data.",
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList()
+                });
+            }
+
+            try
+            {
+                var result = await _authService.ResetPasswordAsync(requestDto);
+
+                if (result)
+                {
+                    return Ok(new ResponseDto<object>
+                    {
+                        IsSuccess = true,
+                        StatusCode = 200,
+                        StatusMessage = "Password has been reset successfully."
+                    });
+                }
+
+                return BadRequest(new ResponseDto<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = 400,
+                    StatusMessage = "Failed to reset password. Please check your email and reset token."
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing password reset");
+                return StatusCode(500, new ResponseDto<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "An error occurred while processing your request."
+                });
+            }
+        }
 
         [HttpGet]
         [AdminAndAbove]
         [Route("exists/{id}")]
-        public async Task<ActionResult<ResponseDto>> IsUserExistsById(int id)
+        public async Task<ActionResult<ResponseDto<object>>> IsUserExistsById(int id)
         {
             var exists = await _userService.IsUserExistsByIdAsync(id);
 
             if (!exists)
             {
-                return NotFound(new ResponseDto
+                return NotFound(new ResponseDto<object>
                 {
                     IsSuccess = false,
                     StatusCode = 404,
@@ -118,7 +330,7 @@ namespace BlueBerry24.API.Controllers
                 });
             }
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<object>
             {
                 IsSuccess = true,
                 StatusCode = 200,
@@ -136,7 +348,7 @@ namespace BlueBerry24.API.Controllers
 
             if (!exists)
             {
-                return NotFound(new ResponseDto
+                return NotFound(new ResponseDto<object>
                 {
                     IsSuccess = false,
                     StatusCode = 404,
@@ -144,7 +356,7 @@ namespace BlueBerry24.API.Controllers
                 });
             }
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<object>
             {
                 IsSuccess = true,
                 StatusCode = 200,
@@ -159,7 +371,7 @@ namespace BlueBerry24.API.Controllers
         {
             if (requestDto == null || string.IsNullOrWhiteSpace(requestDto.Token))
             {
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<object>
                 {
                     IsSuccess = false,
                     StatusCode = 400,
@@ -170,7 +382,7 @@ namespace BlueBerry24.API.Controllers
             try
             {
                 //TODO: Token refresh functionality to be implemented
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<object>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -180,7 +392,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error refreshing token");
-                return StatusCode(500, new ResponseDto
+                return StatusCode(500, new ResponseDto<object>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -195,7 +407,7 @@ namespace BlueBerry24.API.Controllers
         public async Task<IActionResult> Logout()
         {
             //TODO: implement token blacklisting or session management
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<object>
             {
                 IsSuccess = true,
                 StatusCode = 200,
@@ -211,7 +423,7 @@ namespace BlueBerry24.API.Controllers
             try
             {
                 var users = await _userService.GetAllUsers();
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<List<ApplicationUserDto>>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -222,7 +434,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving users");
-                return StatusCode(500, new ResponseDto
+                return StatusCode(500, new ResponseDto<List<ApplicationUserDto>>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -241,7 +453,7 @@ namespace BlueBerry24.API.Controllers
                 var user = await _userService.GetUserById(id);
                 if (user == null)
                 {
-                    return NotFound(new ResponseDto
+                    return NotFound(new ResponseDto<ApplicationUserDto>
                     {
                         IsSuccess = false,
                         StatusCode = 404,
@@ -249,7 +461,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<ApplicationUserDto>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -260,7 +472,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error retrieving user with ID {id}");
-                return StatusCode(500, new ResponseDto
+                return StatusCode(500, new ResponseDto<ApplicationUserDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -278,7 +490,7 @@ namespace BlueBerry24.API.Controllers
 
             if (string.IsNullOrEmpty(userId))
             {
-                return Unauthorized(new ResponseDto
+                return Unauthorized(new ResponseDto<object>
                 {
                     IsSuccess = false,
                     StatusCode = 401,
@@ -290,7 +502,7 @@ namespace BlueBerry24.API.Controllers
 
             if (!userExists)
             {
-                return NotFound(new ResponseDto
+                return NotFound(new ResponseDto<object>
                 {
                     IsSuccess = false,
                     StatusCode = 404,
@@ -302,7 +514,7 @@ namespace BlueBerry24.API.Controllers
             var userName = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
             var userRoles = User.FindAll(System.Security.Claims.ClaimTypes.Role).Select(c => c.Value).ToList();
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<object>
             {
                 IsSuccess = true,
                 StatusCode = 200,
@@ -329,7 +541,7 @@ namespace BlueBerry24.API.Controllers
 
                 if (result)
                 {
-                    return Ok(new ResponseDto
+                    return Ok(new ResponseDto<bool>
                     {
                         IsSuccess = true,
                         StatusCode = 200,
@@ -337,7 +549,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 400,
@@ -347,7 +559,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error locking user account for user ID {userId}");
-                return StatusCode(500, new ResponseDto
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -367,7 +579,7 @@ namespace BlueBerry24.API.Controllers
 
                 if (result)
                 {
-                    return Ok(new ResponseDto
+                    return Ok(new ResponseDto<bool>
                     {
                         IsSuccess = true,
                         StatusCode = 200,
@@ -375,7 +587,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 400,
@@ -385,7 +597,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error unlocking user account for user ID {userId}");
-                return StatusCode(500, new ResponseDto
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -401,7 +613,7 @@ namespace BlueBerry24.API.Controllers
         {
             if (requestDto == null || string.IsNullOrWhiteSpace(requestDto.NewPassword))
             {
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 400,
@@ -415,7 +627,7 @@ namespace BlueBerry24.API.Controllers
 
                 if (result)
                 {
-                    return Ok(new ResponseDto
+                    return Ok(new ResponseDto<bool>
                     {
                         IsSuccess = true,
                         StatusCode = 200,
@@ -423,7 +635,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 400,
@@ -433,7 +645,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error resetting password for user ID {userId}");
-                return StatusCode(500, new ResponseDto
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -453,7 +665,7 @@ namespace BlueBerry24.API.Controllers
 
                 if (result)
                 {
-                    return Ok(new ResponseDto
+                    return Ok(new ResponseDto<bool>
                     {
                         IsSuccess = true,
                         StatusCode = 200,
@@ -461,7 +673,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 400,
@@ -471,7 +683,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error verifying email for user ID {userId}");
-                return StatusCode(500, new ResponseDto
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -487,7 +699,7 @@ namespace BlueBerry24.API.Controllers
         {
             if (updateUserDto == null || !ModelState.IsValid)
             {
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 400,
@@ -502,7 +714,7 @@ namespace BlueBerry24.API.Controllers
 
                 if (result)
                 {
-                    return Ok(new ResponseDto
+                    return Ok(new ResponseDto<bool>
                     {
                         IsSuccess = true,
                         StatusCode = 200,
@@ -510,7 +722,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 400,
@@ -520,7 +732,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error updating user with ID {userId}");
-                return StatusCode(500, new ResponseDto
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -536,7 +748,7 @@ namespace BlueBerry24.API.Controllers
         {
             if (createUserDto == null || !ModelState.IsValid)
             {
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<ApplicationUserDto>
                 {
                     IsSuccess = false,
                     StatusCode = 400,
@@ -551,7 +763,7 @@ namespace BlueBerry24.API.Controllers
 
                 if (user != null)
                 {
-                    return StatusCode(201, new ResponseDto
+                    return StatusCode(201, new ResponseDto<ApplicationUserDto>
                     {
                         IsSuccess = true,
                         StatusCode = 201,
@@ -560,7 +772,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<ApplicationUserDto>
                 {
                     IsSuccess = false,
                     StatusCode = 400,
@@ -570,7 +782,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating user");
-                return StatusCode(500, new ResponseDto
+                return StatusCode(500, new ResponseDto<ApplicationUserDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -590,7 +802,7 @@ namespace BlueBerry24.API.Controllers
 
                 if (result)
                 {
-                    return Ok(new ResponseDto
+                    return Ok(new ResponseDto<bool>
                     {
                         IsSuccess = true,
                         StatusCode = 200,
@@ -598,7 +810,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 400,
@@ -608,7 +820,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error deleting user with ID {userId}");
-                return StatusCode(500, new ResponseDto
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -616,20 +828,5 @@ namespace BlueBerry24.API.Controllers
                 });
             }
         }
-    }
-
-    public class RefreshTokenRequestDto
-    {
-        public string Token { get; set; } = string.Empty;
-    }
-
-    public class LockUserRequestDto
-    {
-        public DateTime? LockoutEnd { get; set; }
-    }
-
-    public class ResetPasswordRequestDto
-    {
-        public string NewPassword { get; set; } = string.Empty;
     }
 }
