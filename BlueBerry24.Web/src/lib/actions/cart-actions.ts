@@ -24,7 +24,7 @@ export async function getOrCreateCart() {
   }
 
   if(!cart){
-    cart = cartService.create();
+    cart = await cartService.getByUserId();
   }
   return cart;
 }
@@ -53,6 +53,7 @@ export async function addToCart(formData: FormData) {
     }
 
     const cart = await getOrCreateCart();
+
 
     const itemToAdd: AddToCartDto = {
       quantity: quantity,
