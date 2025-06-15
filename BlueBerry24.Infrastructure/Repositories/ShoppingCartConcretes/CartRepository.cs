@@ -102,19 +102,19 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
             return shoppingCarts;
         }
 
-        public async Task<Cart> UpdateCartStatusAsync(int? userId, string? sessionId, CartStatus status = CartStatus.Converted)
+        public async Task<Cart> UpdateCartStatusAsync(int? userId, CartStatus status = CartStatus.Converted)
         {
             Cart? shoppingCart = null;
 
             if (userId.HasValue)
             {
                 shoppingCart = await _context.ShoppingCarts
-                    .Where(i => i.Id == 132).FirstOrDefaultAsync();
+                    .Where(i => i.UserId == userId).FirstOrDefaultAsync();
             }
             else
             {
                 shoppingCart = await _context.ShoppingCarts
-                    .Where(i => i.Id == 132).FirstOrDefaultAsync();
+                    .Where(i => i.UserId == userId).FirstOrDefaultAsync();
             }
 
             shoppingCart.Status = status;
@@ -271,6 +271,13 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
                 .FirstOrDefaultAsync();
 
             return shoppingCart;
+        }
+
+        public async Task<bool> UpdateItemsAsync(List<CartItem> items)
+        {
+            _context.CartItems.UpdateRange(items);
+
+            return await _unitOfWork.SaveDbChangesAsync();
         }
     }
 }
