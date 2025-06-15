@@ -5,6 +5,26 @@ export interface LoginRequest {
     password: string;
 }
 
+export interface ForgotPasswordRequest {
+    email: string;
+}
+
+export interface ResetPasswordRequest {
+    email: string;
+    token: string;
+    newPassword: string;
+    confirmPassword: string;
+}
+
+export interface EmailConfirmationRequest {
+    email: string;
+    token: string;
+}
+
+export interface ResendConfirmationRequest {
+    email: string;
+}
+
 export interface RegisterRequest {
     firstName: string;
     lastName: string;
@@ -35,5 +55,6 @@ export interface ApiResponse<T> {
 
 export interface AuthLog{
     user: User,
-    token: string
+    token: string,
+
 }
