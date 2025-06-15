@@ -3,6 +3,7 @@ using BlueBerry24.Domain.Entities.Base;
 using BlueBerry24.Domain.Entities.CouponEntities;
 using BlueBerry24.Domain.Entities.InventoryEntities;
 using BlueBerry24.Domain.Entities.OrderEntities;
+using BlueBerry24.Domain.Entities.PaymentEntities;
 using BlueBerry24.Domain.Entities.ProductEntities;
 using BlueBerry24.Domain.Entities.ShopEntities;
 using BlueBerry24.Domain.Entities.ShoppingCartEntities;
@@ -30,7 +31,7 @@ namespace BlueBerry24.Infrastructure.Data
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
 
-
+        public DbSet<Payment> Payments { get; set; }
         public DbSet<InventoryLog> InventoryLogs { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -116,6 +117,16 @@ namespace BlueBerry24.Infrastructure.Data
                 .HasOne(u => u.User)
                 .WithMany(w => w.Wishlists)
                 .HasForeignKey(fk => fk.UserId);
+
+            builder.Entity<Payment>()
+                .HasOne(u => u.User)
+                .WithMany(p => p.Payments)
+                .HasForeignKey(u => u.UserId);
+
+            builder.Entity<Payment>()
+                .HasOne(o => o.Order)
+                .WithMany(p => p.Payments)
+                .HasForeignKey(o => o.OrderId);
 
         }
 
