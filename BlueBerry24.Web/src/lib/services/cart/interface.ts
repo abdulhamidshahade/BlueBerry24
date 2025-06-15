@@ -14,7 +14,7 @@ export interface ICartService {
   completeCart(cartId: number): Promise<boolean>;
   applyCoupon(cartId: number, data: ApplyCouponDto): Promise<CartDto>;
   removeCoupon(cartId: number, couponId: number): Promise<CartDto>;
-  getByUserId(): Promise<CartDto | null>;
+  getByUserId(): Promise<CartDto>;
   getBySessionId(sessionId: string): Promise<CartDto | null>;
   getById(id: number): Promise<CartDto>;
   checkout(cartId: number, data: CheckoutRequest): Promise<CheckoutResponse>;
