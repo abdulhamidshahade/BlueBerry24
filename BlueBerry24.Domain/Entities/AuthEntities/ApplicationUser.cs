@@ -1,6 +1,7 @@
 ﻿
 using BlueBerry24.Domain.Entities.CouponEntities;
 using BlueBerry24.Domain.Entities.OrderEntities;
+using BlueBerry24.Domain.Entities.PaymentEntities;
 using BlueBerry24.Domain.Entities.ShopEntities;
 using BlueBerry24.Domain.Entities.ShoppingCartEntities;
 using BlueBerry24.Domain.Entities.WishlistEntities;
@@ -26,5 +27,7 @@ namespace BlueBerry24.Domain.Entities.AuthEntities
         public IList<string> roles { get; set; }
 
         public List<Wishlist> Wishlists { get; set; }
+
+        public List<Payment> Payments { get; set; }
     }
 }
