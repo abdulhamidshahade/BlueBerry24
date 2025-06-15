@@ -3,6 +3,7 @@ using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.CouponInterfaces;
 using BlueBerry24.Domain.Repositories.InventoryInterfaces;
 using BlueBerry24.Domain.Repositories.OrderInterfaces;
+using BlueBerry24.Domain.Repositories.PaymentInterfaces;
 using BlueBerry24.Domain.Repositories.ProductInterfaces;
 using BlueBerry24.Domain.Repositories.ShopInterfaces;
 using BlueBerry24.Domain.Repositories.ShoppingCartInterfaces;
@@ -11,6 +12,7 @@ using BlueBerry24.Infrastructure.Data;
 using BlueBerry24.Infrastructure.Repositories.CouponConcretes;
 using BlueBerry24.Infrastructure.Repositories.InventoryConcretes;
 using BlueBerry24.Infrastructure.Repositories.OrderConcretes;
+using BlueBerry24.Infrastructure.Repositories.PaymentConcretes;
 using BlueBerry24.Infrastructure.Repositories.ProductConcretes;
 using BlueBerry24.Infrastructure.Repositories.ShopConcretes;
 using BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes;
@@ -54,6 +56,7 @@ namespace BlueBerry24.Infrastructure.DI
 
             serviceDescriptors.AddScoped<IWishlistRepository, WishlistRepository>();
 
+            serviceDescriptors.AddScoped<IPaymentRepository, PaymentRepository>();
 
             return serviceDescriptors;
         }
