@@ -15,7 +15,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const API_BASE = process.env.API_BASE_SHOPPING_CART;
 
 export class CartService implements ICartService {
-  async getByUserId(): Promise<CartDto | null> {
+  async getByUserId(): Promise<CartDto> {
     console.log("CartService.getBySessionId called with sessionId:");
 
     const url = `${API_BASE}/user-id`;
@@ -32,9 +32,9 @@ export class CartService implements ICartService {
       if (!json.isSuccess || !json.data) {
         console.error("Cart API returned unsuccessful response:", json);
 
-        if (json.statusCode === 404) {
-          return null;
-        }
+        // if (json.statusCode === 404) {
+        //   return null;
+        // }
         return json.data;
       }
 
@@ -344,20 +344,11 @@ export class CartService implements ICartService {
     const url = `${API_BASE}/${cartId}/checkout`;
 
     try {
-      const res: ResponseDto<any>  = await apiRequest(url, {
+      const json: ResponseDto<any>  = await apiRequest(url, {
         method: "POST",
         requireAuth: true,
         body: JSON.stringify(data),
       });
-
-      if (!res.statusCode) {
-        const errorJson = await res.data.json().catch(() => null);
-        throw new Error(
-          errorJson?.statusMessage || `Failed to checkout: ${res.statusMessage}`
-        );
-      }
-
-      const json: ResponseDto<any> = await res.data.json();
 
       if (!json.isSuccess || !json.data) {
         throw new Error(json.statusMessage || "Failed to checkout");
