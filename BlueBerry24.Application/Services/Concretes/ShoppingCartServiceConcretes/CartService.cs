@@ -51,7 +51,7 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
         }
 
 
-        public async Task<CartDto> GetCartByUserIdAsync(int? userId, CartStatus? status = CartStatus.Active)
+        public async Task<CartDto> GetCartByUserIdAsync(int userId, CartStatus? status = CartStatus.Active)
         {
             if (userId <= 0)
             {
@@ -79,12 +79,44 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
 
             if (dbCart == null)
             {
-                return null;
+                await CreateCartAsync(null, sessionId);
             }
 
             var mappedCart = _mapper.Map<CartDto>(dbCart);
 
             return mappedCart;
+        }
+
+        public async Task<CartDto> MergeCartAsync(int userId, string sessionId)
+        {
+
+            var cartById = await _cartRepository.GetCartByUserIdAsync(userId, CartStatus.Active);
+
+            if(cartById != null)
+            {
+                return null;
+            }
+
+
+            var cart = await _cartRepository.GetCartBySessionIdAsync(sessionId);
+
+            cart.SessionId = null;
+            cart.UserId = userId;
+
+            var cartItems = cart.CartItems.Where(i => i.ShoppingCartId == cart.Id).ToList();
+
+            foreach(var item in cartItems)
+            {
+                item.SessionId = null;
+                item.UserId = userId;
+            }
+
+            //var updatedItems = await _cartRepository.UpdateItemsAsync(cartItems);
+
+            //TODO here the shopping cart's items will update successfully because the cart has navigation property for items List<CartItem>
+            var updatedCart = await _cartRepository.UpdateCartAsync(cart);
+            
+            return _mapper.Map<CartDto>(updatedCart);
         }
 
         public async Task<CartDto> GetCartByIdAsync(int cartId, CartStatus status)
@@ -173,7 +205,7 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                     return null;
                 }
 
-                var existingItem = await GetItemAsync(sessionId, productId);
+                var existingItem = await GetItemAsync( cartId, productId);
                 int totalQuantityNeeded = quantity;
 
                 if (existingItem != null)
@@ -494,9 +526,9 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
             }
         }
 
-        public async Task<bool> CompleteCartAsync(int cartId, int? userId, string? sessionId)
+        public async Task<bool> CompleteCartAsync(int cartId, int? userId)
         {
-            var updatedCart = await _cartRepository.UpdateCartStatusAsync(userId, sessionId, CartStatus.Converted);
+            var updatedCart = await _cartRepository.UpdateCartStatusAsync(userId, CartStatus.Converted);
             return updatedCart != null;
         }
 
@@ -519,7 +551,9 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                     return false;
                 }
 
-                var stockConversionTasks = cart.CartItems.Select(async item =>
+                var processedItems = new List<CartItem>();
+
+                foreach (var item in cart.CartItems)
                 {
                     try
                     {
@@ -528,6 +562,11 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                         {
                             _logger.LogError("Insufficient stock for product {ProductId} in cart {CartId}. Quantity needed: {Quantity}",
                                 item.ProductId, cartId, item.Quantity);
+
+                            if (processedItems.Any())
+                            {
+                                await RollbackStockConversions(processedItems, cartId);
+                            }
                             return false;
                         }
 
@@ -541,30 +580,31 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                         {
                             _logger.LogError("Failed to confirm stock deduction for product {ProductId} in cart {CartId}",
                                 item.ProductId, cartId);
+
+
+                            if (processedItems.Any())
+                            {
+                                await RollbackStockConversions(processedItems, cartId);
+                            }
                             return false;
                         }
 
                         _logger.LogDebug("Stock deduction confirmed for product {ProductId}, quantity {Quantity} in cart {CartId}",
                             item.ProductId, item.Quantity, cartId);
 
-                        return true;
+                        processedItems.Add(item);
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "Error converting stock for product {ProductId} in cart {CartId}",
                             item.ProductId, cartId);
+
+                        if (processedItems.Any())
+                        {
+                            await RollbackStockConversions(processedItems, cartId);
+                        }
                         return false;
                     }
-                });
-
-                var stockResults = await Task.WhenAll(stockConversionTasks);
-
-                if (stockResults.Any(result => !result))
-                {
-                    _logger.LogError("One or more stock conversions failed for cart {CartId}. Rolling back...", cartId);
-
-                    await RollbackStockConversions(cart, cartId);
-                    return false;
                 }
 
                 cart.Status = CartStatus.Converted;
@@ -575,7 +615,7 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                 {
                     _logger.LogError("Failed to update cart status to Converted for cart {CartId}. Rolling back stock...", cartId);
 
-                    await RollbackStockConversions(cart, cartId);
+                    await RollbackStockConversions(processedItems, cartId);
                     return false;
                 }
 
@@ -591,13 +631,20 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
             }
         }
 
-        private async Task RollbackStockConversions(Cart cart, int cartId)
+        private async Task RollbackStockConversions(IList<CartItem> processedItems, int cartId)
         {
+            if (processedItems == null || !processedItems.Any())
+            {
+                _logger.LogDebug("No items to rollback for cart {CartId}", cartId);
+                return;
+            }
+
             try
             {
-                _logger.LogWarning("Rolling back stock conversions for cart {CartId}", cartId);
+                _logger.LogWarning("Rolling back stock conversions for {ItemCount} processed items in cart {CartId}",
+                    processedItems.Count, cartId);
 
-                var rollbackTasks = cart.CartItems.Select(async item =>
+                foreach (var item in processedItems)
                 {
                     try
                     {
@@ -612,17 +659,18 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Failed to rollback stock for product {ProductId} in cart {CartId}",
+                        _logger.LogError(ex, "Failed to rollback stock for product {ProductId} in cart {CartId}. " +
+                            "Manual inventory adjustment may be required.",
                             item.ProductId, cartId);
                     }
-                });
+                }
 
-                await Task.WhenAll(rollbackTasks);
-                _logger.LogInformation("Completed rollback attempts for cart {CartId}", cartId);
+                _logger.LogInformation("Completed rollback attempts for {ItemCount} items in cart {CartId}",
+                    processedItems.Count, cartId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during rollback for cart {CartId}", cartId);
+                _logger.LogError(ex, "Error during rollback for cart {CartId}. Manual inventory review recommended.", cartId);
             }
         }
 
@@ -636,11 +684,11 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
         }
 
 
-        public async Task<CartItemDto> GetItemAsync(string sessionId, int productId)
+        public async Task<CartItemDto> GetItemAsync(int cartId, int productId)
         {
             CartDto? cart = null;
 
-            cart = await GetCartBySessionIdAsync(sessionId, CartStatus.Active);
+            cart = await GetCartByIdAsync(cartId, CartStatus.Active);
 
             var item = cart.CartItems.Where(i => i.ProductId == productId).FirstOrDefault();
 
@@ -677,7 +725,7 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
 
                 var coupon = await _couponService.GetByCodeAsync(couponCode);
 
-                if (coupon == null || !coupon.IsActive || !await _userCouponService.IsCouponUsedByUser(userId.Value ,couponCode))
+                if (coupon == null || !coupon.IsActive || await _userCouponService.IsCouponUsedByUser(userId.Value ,couponCode))
                 {
                     return null;
                 }
