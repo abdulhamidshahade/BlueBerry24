@@ -1,6 +1,7 @@
 ﻿using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Entities.AuthEntities;
 using BlueBerry24.Domain.Entities.Base;
+using BlueBerry24.Domain.Entities.PaymentEntities;
 using BlueBerry24.Domain.Entities.ShoppingCartEntities;
 using System;
 using System.Collections.Generic;
@@ -18,12 +19,7 @@ namespace BlueBerry24.Domain.Entities.OrderEntities
         public int UserId { get; set; }
         public int CartId { get; set; }
 
-        public string? SessionId { get; set; }
-
-
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
-
-
         public decimal SubTotal { get; set; }
         public decimal TaxAmount { get; set; }
         public decimal ShippingAmount { get; set; }
@@ -33,12 +29,6 @@ namespace BlueBerry24.Domain.Entities.OrderEntities
 
         public string CustomerEmail { get; set; }
         public string CustomerPhone { get; set; }
-
-
-        public string PaymentProvider { get; set; }
-        public int PaymentTransactionId { get; set; }
-        public bool IsPaid { get; set; }
-        public DateTime PaidAt { get; set; }
 
 
         public string? ReferenceNumber { get; set; }
@@ -69,5 +59,7 @@ namespace BlueBerry24.Domain.Entities.OrderEntities
 
         public ApplicationUser User { get; set; }
         public Cart Cart { get; set; }
+
+        public List<Payment> Payments { get; set; }
     }
 }
