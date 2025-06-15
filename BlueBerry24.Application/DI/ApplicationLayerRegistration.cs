@@ -1,5 +1,6 @@
 ﻿using BlueBerry24.Application.Services.Concretes.AuthServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.CouponServiceConcretes;
+using BlueBerry24.Application.Services.Concretes.EmailServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.OrderServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.ProductServiceConcretes;
@@ -8,6 +9,7 @@ using BlueBerry24.Application.Services.Concretes.ShopServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.WishlistServiceConcretes;
 using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.CouponServiceInterfaces;
+using BlueBerry24.Application.Services.Interfaces.EmailServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.InventoryServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
@@ -45,6 +47,7 @@ namespace BlueBerry24.Application.DI
 
             serviceDescriptors.AddScoped<IWishlistService, WishlistService>();
 
+            serviceDescriptors.AddScoped<IMailService, GmailService>();
 
             return serviceDescriptors;
         }
