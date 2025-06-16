@@ -107,9 +107,8 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
 
             var order = new Order
             {
-                UserId = 1,
+                UserId = orderDto.UserId,
                 CartId = cartId,
-                SessionId = cart.SessionId,
                 ReferenceNumber = referenceNumber,
                 Status = OrderStatus.Pending,
                 SubTotal = subTotal,
@@ -126,10 +125,6 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
                 ShippingState = orderDto.ShippingState,
                 ShippingPostalCode = orderDto.ShippingPostalCode,
                 ShippingCountry = orderDto.ShippingCountry,
-                PaymentProvider = orderDto.PaymentProvider,
-                PaymentTransactionId = orderDto.PaymentTransactionId,
-                IsPaid = orderDto.IsPaid,
-                PaidAt = orderDto.IsPaid ? DateTime.UtcNow : new DateTime(),
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -175,7 +170,7 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
                 return false;
             }
 
-            if ((order.Status != OrderStatus.Completed && order.Status != OrderStatus.Delivered) || !order.IsPaid)
+            if (order.Status != OrderStatus.Completed && order.Status != OrderStatus.Delivered)
             {
                 return false;
             }
@@ -256,9 +251,9 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
             return referenceNumber;
         }
 
-        public async Task<OrderDto?> GetOrderByIdAsync(int orderId)
+        public async Task<OrderDto?> GetOrderByIdAsync(int orderId, OrderStatus? orderStatus = OrderStatus.Pending)
         {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var order = await _orderRepository.GetOrderByIdAsync(orderId, orderStatus);
 
             return _mapper.Map<OrderDto>(order);
         }
@@ -275,9 +270,9 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
             return orders;
         }
 
-        public async Task<List<OrderDto>> GetUserOrdersAsync(string sessionId, int page = 1, int pageSize = 10)
+        public async Task<List<OrderDto>> GetUserOrdersAsync(int userId, int page = 1, int pageSize = 10)
         {
-            var orders = await _orderRepository.GetUserOrdersAsync(sessionId, page, pageSize);
+            var orders = await _orderRepository.GetUserOrdersAsync(userId, page, pageSize);
 
             var mappedOrder = _mapper.Map<List<OrderDto>>(orders);
             return mappedOrder;
@@ -291,25 +286,6 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
             return mappedOrders;
         }
 
-        public async Task<bool> MarkOrderAsPaidAsync(int orderId, int paymentTransactionId, string paymentProvider)
-        {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
-
-            if (order == null)
-            {
-                return false;
-            }
-
-            order.IsPaid = true;
-            order.PaidAt = DateTime.UtcNow;
-            order.PaymentTransactionId = paymentTransactionId;
-            order.PaymentProvider = paymentProvider;
-
-            var orderMarkedAsPaid = await _orderRepository.MarkOrderAsPaidAsync(orderId, paymentTransactionId, paymentProvider);
-
-            return orderMarkedAsPaid;
-
-        }
 
         public async Task<bool> ProcessOrderAsync(int orderId)
         {
