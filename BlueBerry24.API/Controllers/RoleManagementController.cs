@@ -31,7 +31,7 @@ namespace BlueBerry24.API.Controllers
 
             if (result)
             {
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<bool>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -39,7 +39,7 @@ namespace BlueBerry24.API.Controllers
                 });
             }
 
-            return BadRequest(new ResponseDto
+            return BadRequest(new ResponseDto<bool>
             {
                 IsSuccess = false,
                 StatusCode = 400,
@@ -54,7 +54,7 @@ namespace BlueBerry24.API.Controllers
 
             if (result)
             {
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<bool>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -62,7 +62,7 @@ namespace BlueBerry24.API.Controllers
                 });
             }
 
-            return BadRequest(new ResponseDto
+            return BadRequest(new ResponseDto<bool>
             {
                 IsSuccess = false,
                 StatusCode = 400,
@@ -77,7 +77,7 @@ namespace BlueBerry24.API.Controllers
 
             if (result)
             {
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<bool>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -85,7 +85,7 @@ namespace BlueBerry24.API.Controllers
                 });
             }
 
-            return BadRequest(new ResponseDto
+            return BadRequest(new ResponseDto<bool>
             {
                 IsSuccess = false,
                 StatusCode = 400,
@@ -100,7 +100,7 @@ namespace BlueBerry24.API.Controllers
 
             if (result)
             {
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<bool>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -108,7 +108,7 @@ namespace BlueBerry24.API.Controllers
                 });
             }
 
-            return BadRequest(new ResponseDto
+            return BadRequest(new ResponseDto<bool>
             {
                 IsSuccess = false,
                 StatusCode = 400,
@@ -121,7 +121,7 @@ namespace BlueBerry24.API.Controllers
         {
             var roles = await _roleManagementService.GetUserRolesAsync(userId);
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<List<string>>
             {
                 IsSuccess = true,
                 StatusCode = 200,
@@ -136,7 +136,7 @@ namespace BlueBerry24.API.Controllers
         {
             var roles = await _roleManagementService.GetAllRolesAsync();
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<List<ApplicationRoleDto>>
             {
                 IsSuccess = true,
                 StatusCode = 200,
@@ -150,7 +150,7 @@ namespace BlueBerry24.API.Controllers
         {
             var users = await _roleManagementService.GetUsersInRoleAsync(roleName);
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<List<ApplicationUserDto>>
             {
                 IsSuccess = true,
                 StatusCode = 200,
@@ -164,7 +164,7 @@ namespace BlueBerry24.API.Controllers
         {
             var isInRole = await _roleManagementService.IsUserInRoleAsync(userId, roleName);
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<object>
             {
                 IsSuccess = true,
                 StatusCode = 200,
@@ -178,7 +178,7 @@ namespace BlueBerry24.API.Controllers
         {
             await _roleManagementService.InitializeDefaultRolesAsync();
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<object>
             {
                 IsSuccess = true,
                 StatusCode = 200,
@@ -191,7 +191,7 @@ namespace BlueBerry24.API.Controllers
         {
             var users = await _roleManagementService.GetAllUsersAsync();
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<List<ApplicationUserWithRolesDto>>
             {
                 IsSuccess = true,
                 StatusCode = 200,
@@ -207,7 +207,7 @@ namespace BlueBerry24.API.Controllers
 
             if (user == null)
             {
-                return NotFound(new ResponseDto
+                return NotFound(new ResponseDto<ApplicationUserWithRolesDto>
                 {
                     IsSuccess = false,
                     StatusCode = 404,
@@ -215,7 +215,7 @@ namespace BlueBerry24.API.Controllers
                 });
             }
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<ApplicationUserWithRolesDto>
             {
                 IsSuccess = true,
                 StatusCode = 200,
@@ -229,7 +229,7 @@ namespace BlueBerry24.API.Controllers
         {
             var stats = await _roleManagementService.GetRoleStatsAsync();
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<RoleStatsDto>
             {
                 IsSuccess = true,
                 StatusCode = 200,
@@ -245,7 +245,7 @@ namespace BlueBerry24.API.Controllers
 
             if (result)
             {
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<bool>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -253,7 +253,7 @@ namespace BlueBerry24.API.Controllers
                 });
             }
 
-            return BadRequest(new ResponseDto
+            return BadRequest(new ResponseDto<bool>
             {
                 IsSuccess = false,
                 StatusCode = 400,
@@ -266,7 +266,7 @@ namespace BlueBerry24.API.Controllers
         {
             if (request == null || request.UserIds == null || !request.UserIds.Any() || string.IsNullOrWhiteSpace(request.RoleName))
             {
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<BulkAssignmentResultDto>
                 {
                     IsSuccess = false,
                     StatusCode = 400,
@@ -278,7 +278,7 @@ namespace BlueBerry24.API.Controllers
 
             if (result.IsSuccess)
             {
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<BulkAssignmentResultDto>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -287,7 +287,7 @@ namespace BlueBerry24.API.Controllers
                 });
             }
 
-            return BadRequest(new ResponseDto
+            return BadRequest(new ResponseDto<BulkAssignmentResultDto>
             {
                 IsSuccess = false,
                 StatusCode = 400,
