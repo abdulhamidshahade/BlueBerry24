@@ -19,8 +19,5 @@ namespace BlueBerry24.Application.Dtos.OrderDtos
         public string? ShippingState { get; set; }
         public string? ShippingPostalCode { get; set; }
         public string? ShippingCountry { get; set; }
-        public string? PaymentProvider { get; set; }
-        public int PaymentTransactionId { get; set; }
-        public bool IsPaid { get; set; }
     }
 }
