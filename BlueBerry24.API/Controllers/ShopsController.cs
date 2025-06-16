@@ -1,6 +1,7 @@
 ﻿using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.ShopDtos;
 using BlueBerry24.Application.Services.Interfaces.ShopServiceInterfaces;
+using BlueBerry24.Domain.Entities.ShopEntities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlueBerry24.API.Controllers
@@ -21,7 +22,7 @@ namespace BlueBerry24.API.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ActionResult<ResponseDto>> GetById(int id)
+        public async Task<ActionResult<ResponseDto<Shop>>> GetById(int id)
         {
 
             _logger.LogInformation($"Getting shop with ID: {id}");
@@ -30,7 +31,7 @@ namespace BlueBerry24.API.Controllers
             if (shop == null)
             {
                 _logger.LogError($"Error retrieving shop with ID {id}");
-                return new ResponseDto
+                return new ResponseDto<Shop>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -38,7 +39,7 @@ namespace BlueBerry24.API.Controllers
                     Errors = new List<string> { "An unexpected error occurred" }
                 };
             }
-            var response = new ResponseDto
+            var response = new ResponseDto<Shop>
             {
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
@@ -52,7 +53,7 @@ namespace BlueBerry24.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<ActionResult<ResponseDto>> Update(int id, [FromBody] UpdateShopDto shopDto)
+        public async Task<ActionResult<ResponseDto<ShopDto>>> Update(int id, [FromBody] UpdateShopDto shopDto)
         {
 
             _logger.LogInformation($"Updating shop with ID: {id}");
@@ -61,7 +62,7 @@ namespace BlueBerry24.API.Controllers
             if (updatedShop == null)
             {
                 _logger.LogError($"Error updating shop with ID {id}");
-                return new ResponseDto
+                return new ResponseDto<ShopDto>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -70,7 +71,7 @@ namespace BlueBerry24.API.Controllers
                 };
 
             }
-            var response = new ResponseDto
+            var response = new ResponseDto<ShopDto>
             {
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
