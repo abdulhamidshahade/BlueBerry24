@@ -3,6 +3,7 @@ using BlueBerry24.Application.Services.Concretes.CouponServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.EmailServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.OrderServiceConcretes;
+using BlueBerry24.Application.Services.Concretes.PaymentConcretes;
 using BlueBerry24.Application.Services.Concretes.ProductServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.ShopServiceConcretes;
@@ -12,6 +13,7 @@ using BlueBerry24.Application.Services.Interfaces.CouponServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.EmailServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.InventoryServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces;
+using BlueBerry24.Application.Services.Interfaces.PaymentServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ShopServiceInterfaces;
@@ -46,6 +48,8 @@ namespace BlueBerry24.Application.DI
             serviceDescriptors.AddScoped<IRoleManagementService, RoleManagementService>();
 
             serviceDescriptors.AddScoped<IWishlistService, WishlistService>();
+
+            serviceDescriptors.AddScoped<IPaymentService, PaymentService>();
 
             serviceDescriptors.AddScoped<IMailService, GmailService>();
 
