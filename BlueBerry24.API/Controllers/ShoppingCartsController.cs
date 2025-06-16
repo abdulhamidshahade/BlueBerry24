@@ -1,4 +1,5 @@
-﻿using BlueBerry24.Application.Dtos;
+﻿using BlueBerry24.Application.Authorization.Attributes;
+using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.ShoppingCartDtos;
 using BlueBerry24.Application.Services.Interfaces.CouponServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.InventoryServiceInterfaces;
@@ -40,22 +41,29 @@ namespace BlueBerry24.API.Controllers
         }
 
         [HttpGet("user-id")]
-        public async Task<ActionResult<ResponseDto>> GetCartByUserId()
+        public async Task<ActionResult<ResponseDto<CartDto>>> GetCartByUserId()
         {
             try
             {
-                var cart = await _cartService.GetCartByUserIdAsync(GetCurrentUserId());
+                //TODO to fix
+                var cart = await _cartService.GetCartByUserIdAsync(GetCurrentUserId().Value);
                 if (cart == null)
                 {
-                    return NotFound(new ResponseDto
+                    cart = await _cartService.CreateCartAsync(GetCurrentUserId(), null);
+
+                    if(cart == null)
                     {
-                        IsSuccess = false,
-                        StatusCode = 404,
-                        StatusMessage = "Cart not found"
-                    });
+                        return NotFound(new ResponseDto<CartDto>
+                        {
+                            IsSuccess = false,
+                            StatusCode = 404,
+                            StatusMessage = "Cart not found"
+                        });
+                    }
+                    
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<CartDto>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -66,7 +74,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving cart {UserId}", GetCurrentUserId());
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -76,14 +84,15 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        [HttpGet("session/{sessionId}")]
-        public async Task<ActionResult<ResponseDto>> GetCartBySessionId(string sessionId)
+        [HttpGet("session-id")]
+
+        public async Task<ActionResult<ResponseDto<CartDto>>> GetCartBySessionId()
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(GetSessionId()))
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -91,18 +100,27 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                var cart = await _cartService.GetCartBySessionIdAsync(sessionId, CartStatus.Active);
+                int? userId = GetCurrentUserId();
+                string? sessionIdd = GetSessionId();
+
+                var cart = await _cartService.GetCartBySessionIdAsync(GetSessionId(), CartStatus.Active);
                 if (cart == null)
                 {
-                    return NotFound(new ResponseDto
+                    cart = await _cartService.CreateCartAsync(null, GetSessionId());
+
+                    if(cart == null)
                     {
-                        IsSuccess = false,
-                        StatusCode = 404,
-                        StatusMessage = "Cart not found for session"
-                    });
+                        return NotFound(new ResponseDto<CartDto>
+                        {
+                            IsSuccess = false,
+                            StatusCode = 404,
+                            StatusMessage = "Cart not found for session"
+                        });
+                    }
+                    
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<CartDto>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -113,7 +131,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving cart for session {SessionId}", GetSessionId());
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -124,8 +142,8 @@ namespace BlueBerry24.API.Controllers
         }
 
 
-        [HttpGet("{cartId:int}")]
-        public async Task<ActionResult<ResponseDto>> GetCartByCartId(int cartId)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ResponseDto<CartDto>>> GetCartByCartId(int id)
         {
             try
             {
@@ -139,10 +157,10 @@ namespace BlueBerry24.API.Controllers
                 //    });
                 //}
 
-                var cart = await _cartService.GetCartByIdAsync(cartId, CartStatus.Active);
+                var cart = await _cartService.GetCartByIdAsync(id, CartStatus.Active);
                 if (cart == null)
                 {
-                    return NotFound(new ResponseDto
+                    return NotFound(new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
                         StatusCode = 404,
@@ -150,7 +168,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<CartDto>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -160,8 +178,8 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving cart for id {cartId}", cartId);
-                return BadRequest(new ResponseDto
+                _logger.LogError(ex, "Error retrieving cart for id {cartId}", id);
+                return BadRequest(new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -171,14 +189,15 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        [HttpPost("create/{sessionId}")]
-        public async Task<ActionResult<ResponseDto>> CreateCart(string sessionId)
+        [HttpPost("create")]
+
+        public async Task<ActionResult<ResponseDto<CartDto>>> CreateCart()
         {
             try
             {
                 if (_userId == null && string.IsNullOrWhiteSpace(GetSessionId()))
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -186,10 +205,10 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                var cart = await _cartService.CreateCartAsync(GetCurrentUserId(), sessionId);
+                var cart = await _cartService.CreateCartAsync(GetCurrentUserId(), GetSessionId());
                 if (cart == null)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -197,7 +216,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<CartDto>
                 {
                     IsSuccess = true,
                     StatusCode = 201,
@@ -208,7 +227,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating cart for user {UserId} or session {SessionId}", _userId, GetSessionId());
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -219,13 +238,13 @@ namespace BlueBerry24.API.Controllers
         }
 
         [HttpPost("add-item")]
-        public async Task<ActionResult<ResponseDto>> AddItemToCart(int cartId, [FromBody] AddItemRequest itemRequest)
+        public async Task<ActionResult<ResponseDto<CartDto>>> AddItemToCart(int cartId, [FromBody] AddItemRequest itemRequest)
         {
             try
             {
                 if (itemRequest.Quantity <= 0)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -236,7 +255,7 @@ namespace BlueBerry24.API.Controllers
                 var isInStock = await _inventoryService.IsInStockAsync(itemRequest.ProductId, itemRequest.Quantity);
                 if (!isInStock)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -248,7 +267,7 @@ namespace BlueBerry24.API.Controllers
                 var updatedCart = await _cartService.AddItemAsync(itemRequest.CartId, GetCurrentUserId(), itemRequest.SessionId, itemRequest.ProductId, itemRequest.Quantity);
                 if (updatedCart == null)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -257,7 +276,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<CartDto>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -268,7 +287,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error adding item {ProductId} to cart {CartId}", itemRequest.ProductId, itemRequest.CartId);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -279,13 +298,13 @@ namespace BlueBerry24.API.Controllers
         }
 
         [HttpPut("{cartId}/update")]
-        public async Task<ActionResult<ResponseDto>> UpdateItemQuantity([FromBody] AddItemRequest itemRequest)
+        public async Task<ActionResult<ResponseDto<CartDto>>> UpdateItemQuantity([FromBody] AddItemRequest itemRequest)
         {
             try
             {
                 if (itemRequest.Quantity < 0)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -296,13 +315,19 @@ namespace BlueBerry24.API.Controllers
                 if (itemRequest.Quantity == 0)
                 {
                     var removeResult = await RemoveItemFromCart(itemRequest.CartId, itemRequest.ProductId);
-                    return removeResult;
+                    return  Ok(new ResponseDto<CartDto>
+                    {
+                        IsSuccess = true,
+                        StatusCode = 200,
+                        StatusMessage = "Item quantity updated successfully",
+                        Data = new CartDto()
+                    }); 
                 }
 
                 var isInStock = await _inventoryService.IsInStockAsync(itemRequest.ProductId, itemRequest.Quantity);
                 if (!isInStock)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -314,7 +339,7 @@ namespace BlueBerry24.API.Controllers
                 var updatedCart = await _cartService.UpdateItemQuantityAsync(itemRequest.CartId, itemRequest.UserId, itemRequest.SessionId, itemRequest.ProductId, itemRequest.Quantity);
                 if (updatedCart == null)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -323,7 +348,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<CartDto>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -334,7 +359,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating quantity for item {ProductId} in cart {CartId}", itemRequest.ProductId, itemRequest.CartId);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -345,14 +370,14 @@ namespace BlueBerry24.API.Controllers
         }
 
         [HttpDelete("{cartId}/remove/{productId}")]
-        public async Task<ActionResult<ResponseDto>> RemoveItemFromCart(int cartId, int productId)
+        public async Task<ActionResult<ResponseDto<bool>>> RemoveItemFromCart(int cartId, int productId)
         {
             try
             {
                 var success = await _cartService.RemoveItemAsync(cartId, GetCurrentUserId(), GetSessionId(), productId);
                 if (!success)
                 {
-                    return NotFound(new ResponseDto
+                    return NotFound(new ResponseDto<bool>
                     {
                         IsSuccess = false,
                         StatusCode = 404,
@@ -360,7 +385,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<bool>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -370,7 +395,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error removing item {ProductId} from cart {CartId}", productId, cartId);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -381,14 +406,14 @@ namespace BlueBerry24.API.Controllers
         }
 
         [HttpDelete("{cartId}/clear")]
-        public async Task<ActionResult<ResponseDto>> ClearCart(int cartId)
+        public async Task<ActionResult<ResponseDto<bool>>> ClearCart(int cartId)
         {
             try
             {
                 var success = await _cartService.ClearCartAsync(cartId, GetCurrentUserId(), GetSessionId());
                 if (!success)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<bool>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -397,7 +422,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<bool>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -407,7 +432,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error clearing cart {CartId}", cartId);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -418,14 +443,14 @@ namespace BlueBerry24.API.Controllers
         }
 
         [HttpPost("{cartId}/complete")]
-        public async Task<ActionResult<ResponseDto>> CompleteCart(int cartId)
+        public async Task<ActionResult<ResponseDto<bool>>> CompleteCart(int cartId)
         {
             try
             {
-                var success = await _cartService.CompleteCartAsync(cartId, GetCurrentUserId(), GetSessionId());
+                var success = await _cartService.CompleteCartAsync(cartId, GetCurrentUserId());
                 if (!success)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<bool>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -434,7 +459,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<bool>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -444,7 +469,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error completing cart {CartId}", cartId);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -457,14 +482,14 @@ namespace BlueBerry24.API.Controllers
 
 
         [HttpGet("{cartId}/item/{productId}")]
-        public async Task<ActionResult<ResponseDto>> GetCartItem(int cartId, int productId)
+        public async Task<ActionResult<ResponseDto<CartItemDto>>> GetCartItem(int cartId, int productId)
         {
             try
             {
-                var item = await _cartService.GetItemAsync("", productId);
+                var item = await _cartService.GetItemAsync(cartId, productId);
                 if (item == null)
                 {
-                    return NotFound(new ResponseDto
+                    return NotFound(new ResponseDto<CartItemDto>
                     {
                         IsSuccess = false,
                         StatusCode = 404,
@@ -472,7 +497,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<CartItemDto>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -483,7 +508,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving item {ProductId} from cart {CartId}", productId, cartId);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<CartItemDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -494,13 +519,14 @@ namespace BlueBerry24.API.Controllers
         }
 
         [HttpPost("{cartId}/apply-coupon")]
-        public async Task<ActionResult<ResponseDto>> ApplyCoupon(int cartId, [FromBody] ApplyCouponRequest request)
+        [UserAndAbove]
+        public async Task<ActionResult<ResponseDto<CartDto>>> ApplyCoupon(int cartId, [FromBody] ApplyCouponRequest request)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(request?.CouponCode))
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -508,10 +534,10 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                var cart = await _cartService.ApplyCouponAsync(cartId, GetCurrentUserId(), GetSessionId(), request.CouponCode);
+                var cart = await _cartService.ApplyCouponAsync(cartId, GetCurrentUserId(), request.CouponCode);
                 if (cart == null)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -520,7 +546,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<CartDto>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -531,7 +557,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error applying coupon {CouponCode} to cart {CartId}", request?.CouponCode, cartId);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
                     StatusCode = 400,
@@ -542,14 +568,14 @@ namespace BlueBerry24.API.Controllers
         }
 
         [HttpDelete("{cartId}/remove-coupon/{couponId}")]
-        public async Task<ActionResult<ResponseDto>> RemoveCoupon(int cartId, int couponId)
+        public async Task<ActionResult<ResponseDto<CartDto>>> RemoveCoupon(int cartId, int couponId)
         {
             try
             {
                 var cart = await _cartService.RemoveCouponAsync(cartId, GetCurrentUserId(), GetSessionId(), couponId);
                 if (cart == null)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -558,7 +584,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<CartDto>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -569,7 +595,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error removing coupon {CouponId} from cart {CartId}", couponId, cartId);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
                     StatusCode = 400,
@@ -580,13 +606,13 @@ namespace BlueBerry24.API.Controllers
         }
 
         [HttpPost("{cartId}/checkout")]
-        public async Task<ActionResult<ResponseDto>> CheckoutCart(int cartId, [FromBody] CheckoutRequest request)
+        public async Task<ActionResult<ResponseDto<object>>> CheckoutCart(int cartId, [FromBody] CheckoutRequest request)
         {
             try
             {
                 if (request == null)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<object>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -597,7 +623,7 @@ namespace BlueBerry24.API.Controllers
                 var cart = await _cartService.GetCartByIdAsync(cartId, CartStatus.Active);
                 if (cart == null)
                 {
-                    return NotFound(new ResponseDto
+                    return NotFound(new ResponseDto<object>
                     {
                         IsSuccess = false,
                         StatusCode = 404,
@@ -607,7 +633,7 @@ namespace BlueBerry24.API.Controllers
 
                 if (cart.CartItems == null || cart.CartItems.Count == 0)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<object>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -621,7 +647,7 @@ namespace BlueBerry24.API.Controllers
                     var isInStock = await _inventoryService.IsInStockAsync(item.ProductId, item.Quantity);
                     if (!isInStock)
                     {
-                        return BadRequest(new ResponseDto
+                        return BadRequest(new ResponseDto<object>
                         {
                             IsSuccess = false,
                             StatusCode = 400,
@@ -634,25 +660,22 @@ namespace BlueBerry24.API.Controllers
                 {
                     UserId = GetCurrentUserId() ?? 0,
                     CartId = cartId,
-                    CustomerEmail = request.Email,
-                    CustomerPhone = request.Phone,
-                    ShippingName = $"{request.FirstName} {request.LastName}",
-                    ShippingAddressLine1 = request.Address,
-                    ShippingAddressLine2 = request.Address2,
-                    ShippingCity = request.City,
-                    ShippingState = request.State,
-                    ShippingPostalCode = request.ZipCode,
-                    ShippingCountry = request.Country ?? "US",
-                    PaymentProvider = "Manual", 
-                    PaymentTransactionId = 0,
-                    IsPaid = false
+                    CustomerEmail = request.CustomerEmail,
+                    CustomerPhone = request.CustomerPhone,
+                    ShippingName = $"{request.ShippingName}",
+                    ShippingAddressLine1 = request.ShippingAddressLine1,
+                    ShippingAddressLine2 = request.ShippingAddressLine2,
+                    ShippingCity = request.ShippingCity,
+                    ShippingState = request.ShippingState,
+                    ShippingPostalCode = request.ShippingPostalCode,
+                    ShippingCountry = request.ShippingCity ?? "US",
                 };
 
                 var order = await _orderService.CreateOrderFromCartAsync(cartId, createOrderDto);
 
                 if (order == null)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<object>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -660,9 +683,9 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                await _cartService.CompleteCartAsync(cartId, GetCurrentUserId(), GetSessionId());
+                await _cartService.CompleteCartAsync(cartId, GetCurrentUserId());
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<object>
                 {
                     IsSuccess = true,
                     StatusCode = 201,
@@ -679,7 +702,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during checkout for cart {CartId}", cartId);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<object>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -693,21 +716,18 @@ namespace BlueBerry24.API.Controllers
 
     public class CheckoutRequest
     {
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string? Phone { get; set; }
-        public string Address { get; set; } = string.Empty;
-        public string? Address2 { get; set; }
-        public string City { get; set; } = string.Empty;
-        public string State { get; set; } = string.Empty;
-        public string ZipCode { get; set; } = string.Empty;
-        public string? Country { get; set; }
-        public string CardNumber { get; set; } = string.Empty;
-        public string ExpiryDate { get; set; } = string.Empty;
-        public string CVV { get; set; } = string.Empty;
-        public string CardName { get; set; } = string.Empty;
-        public int? userId { get; set; }
+        public int CartId { get; set; }
+        public string CustomerEmail { get; set; }
+        public string CustomerPhone { get; set; }
+        public string ShippingName { get; set; }
+        public string ShippingAddressLine1 { get; set; }
+        public string ShippingAddressLine2 { get; set; }
+        public string ShippingCity { get; set; }
+        public string ShippingState { get; set; }
+        public string ShippingPostalCode { get; set; }
+        public string PaymentProvider { get; set; }
+        public int PaymentTransactionId { get; set; }
+        public bool IsPaid { get; set; }
     }
 
     public class ApplyCouponRequest
