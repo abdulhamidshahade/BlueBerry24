@@ -5,7 +5,6 @@ using BlueBerry24.Application.Dtos.OrderDtos;
 using BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces;
 using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Entities.OrderEntities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -35,13 +34,13 @@ namespace BlueBerry24.API.Controllers
 
         [HttpPost]
         [UserAndAbove]
-        public async Task<ActionResult<ResponseDto>> CreateOrder([FromBody] CreateOrderDto request)
+        public async Task<ActionResult<ResponseDto<Order>>> CreateOrder([FromBody] CreateOrderDto request)
         {
             try
             {
                 if (request == null)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<Order>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -54,7 +53,7 @@ namespace BlueBerry24.API.Controllers
 
                 if (order == null)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<Order>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -63,7 +62,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<Order>
                 {
                     Data = order,
                     IsSuccess = true,
@@ -74,7 +73,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating order for cart {CartId}", request?.CartId);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<Order>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -86,24 +85,25 @@ namespace BlueBerry24.API.Controllers
 
         [HttpGet("{id}")]
         [UserAndAbove]
-        public async Task<ActionResult<ResponseDto>> GetOrderById(int id)
+        public async Task<ActionResult<ResponseDto<object>>> GetOrderById(int id)
         {
             try
             {
-                var order = await _orderService.GetOrderByIdAsync(id);
+                var order = await _orderService.GetOrderByIdAsync(id, OrderStatus.Pending);
                 if (order == null)
                 {
-                    return NotFound(new ResponseDto
+                    return NotFound(new ResponseDto<object>
                     {
                         IsSuccess = false,
                         StatusCode = 404,
-                        StatusMessage = "Order not found"
+                        StatusMessage = "Order not found",
+                        Data = null
                     });
                 }
 
 
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<OrderDto>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -114,7 +114,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving order {OrderId}", id);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<object>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -124,15 +124,15 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        [HttpGet("user/{sessionId}")]
+        [HttpGet("user/{userId:int}")]
         [UserAndAbove]
-        public async Task<ActionResult<ResponseDto>> GetUserOrders(string sessionId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<ActionResult<ResponseDto<List<OrderDto>>>> GetUserOrders(int userId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             try
             {
-                var orders = await _orderService.GetUserOrdersAsync(sessionId, page, pageSize);
+                var orders = await _orderService.GetUserOrdersAsync(userId, page, pageSize);
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<List<OrderDto>>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -142,8 +142,8 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving orders for user {UserId}", sessionId);
-                return BadRequest(new ResponseDto
+                _logger.LogError(ex, "Error retrieving orders for user {UserId}", userId);
+                return BadRequest(new ResponseDto<List<OrderDto>>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -155,13 +155,13 @@ namespace BlueBerry24.API.Controllers
 
         [HttpPut("{orderId}/cancel")]
         [AdminAndAbove]
-        public async Task<ActionResult<ResponseDto>> CancelOrder(int orderId, [FromBody] CancelOrderRequest request)
+        public async Task<ActionResult<ResponseDto<bool>>> CancelOrder(int orderId, [FromBody] CancelOrderRequest request)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(request?.Reason))
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<bool>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -172,7 +172,7 @@ namespace BlueBerry24.API.Controllers
                 var result = await _orderService.CancelOrderAsync(orderId, request.Reason);
                 if (!result)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<bool>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -181,7 +181,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<bool>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -191,7 +191,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error cancelling order {OrderId}", orderId);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -203,13 +203,13 @@ namespace BlueBerry24.API.Controllers
 
         [HttpPut("{orderId}/refund")]
         [AdminAndAbove]
-        public async Task<ActionResult<ResponseDto>> RefundOrder(int orderId, [FromBody] RefundOrderRequest request)
+        public async Task<ActionResult<ResponseDto<bool>>> RefundOrder(int orderId, [FromBody] RefundOrderRequest request)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(request?.Reason))
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<bool>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -220,7 +220,7 @@ namespace BlueBerry24.API.Controllers
                 var result = await _orderService.RefundOrderAsync(orderId, request.Reason);
                 if (!result)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<bool>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -229,7 +229,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<bool>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -239,7 +239,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error refunding order {OrderId}", orderId);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -249,64 +249,18 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        [HttpPut("{orderId}/mark-paid")]
-        [AdminAndAbove]
-        public async Task<ActionResult<ResponseDto>> MarkOrderAsPaid(int orderId, [FromBody] MarkOrderPaidRequest request)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(request?.PaymentProvider))
-                {
-                    return BadRequest(new ResponseDto
-                    {
-                        IsSuccess = false,
-                        StatusCode = 400,
-                        StatusMessage = "Payment provider is required"
-                    });
-                }
-
-                var success = await _orderService.MarkOrderAsPaidAsync(orderId, request.PaymentTransactionId, request.PaymentProvider);
-                if (!success)
-                {
-                    return BadRequest(new ResponseDto
-                    {
-                        IsSuccess = false,
-                        StatusCode = 400,
-                        StatusMessage = "Failed to mark order as paid",
-                        Errors = new List<string> { "Order may not exist or payment information is invalid" }
-                    });
-                }
-
-                return Ok(new ResponseDto
-                {
-                    IsSuccess = true,
-                    StatusCode = 200,
-                    StatusMessage = "Order marked as paid successfully"
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error marking order {OrderId} as paid", orderId);
-                return BadRequest(new ResponseDto
-                {
-                    IsSuccess = false,
-                    StatusCode = 500,
-                    StatusMessage = "Error marking order as paid",
-                    Errors = new List<string> { ex.Message }
-                });
-            }
-        }
+        
 
         [HttpGet("calculate-totals")]
         [UserAndAbove]
-        public async Task<ActionResult<ResponseDto>> CalculateOrderTotals([FromQuery] int cartId)
+        public async Task<ActionResult<ResponseDto<OrderTotal>>> CalculateOrderTotals([FromQuery] int cartId)
         {
             try
             {
                 var totals = await _orderService.CalculateOrderTotalsAsync(cartId);
                 if (totals == null)
                 {
-                    return NotFound(new ResponseDto
+                    return NotFound(new ResponseDto<OrderTotal>
                     {
                         IsSuccess = false,
                         StatusCode = 404,
@@ -314,7 +268,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<OrderTotal>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -325,7 +279,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error calculating order totals for cart {CartId}", cartId);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<OrderTotal>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -337,14 +291,14 @@ namespace BlueBerry24.API.Controllers
 
         [HttpPut("{orderId}/update-status")]
         [AdminAndAbove]
-        public async Task<ActionResult<ResponseDto>> UpdateOrderStatus(int orderId, [FromBody] UpdateOrderStatusRequest request)
+        public async Task<ActionResult<ResponseDto<OrderDto>>> UpdateOrderStatus(int orderId, [FromBody] UpdateOrderStatusRequest request)
         {
             try
             {
                 var order = await _orderService.GetOrderByIdAsync(orderId);
                 if (order == null)
                 {
-                    return NotFound(new ResponseDto
+                    return NotFound(new ResponseDto<OrderDto>
                     {
                         IsSuccess = false,
                         StatusCode = 404,
@@ -357,7 +311,7 @@ namespace BlueBerry24.API.Controllers
                 var result = await _orderService.UpdateOrderStatusAsync(mappedOrder, request.NewStatus);
                 if (!result)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<OrderDto>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -366,7 +320,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<OrderDto>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -376,7 +330,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating status for order {OrderId}", orderId);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<OrderDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -388,13 +342,13 @@ namespace BlueBerry24.API.Controllers
 
         [HttpGet("reference/{referenceNumber}")]
         [AdminAndAbove]
-        public async Task<ActionResult<ResponseDto>> GetOrderByReference(string referenceNumber)
+        public async Task<ActionResult<ResponseDto<Order>>> GetOrderByReference(string referenceNumber)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(referenceNumber))
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<Order>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -405,7 +359,7 @@ namespace BlueBerry24.API.Controllers
                 var order = await _orderService.GetOrderByReferenceNumberAsync(referenceNumber);
                 if (order == null)
                 {
-                    return NotFound(new ResponseDto
+                    return NotFound(new ResponseDto<Order>
                     {
                         IsSuccess = false,
                         StatusCode = 404,
@@ -413,7 +367,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<Order>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -424,7 +378,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving order by reference {ReferenceNumber}", referenceNumber);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<Order>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -436,13 +390,13 @@ namespace BlueBerry24.API.Controllers
 
         [HttpGet("status/{status}")]
         [AdminAndAbove]
-        public async Task<ActionResult<ResponseDto>> GetOrdersByStatus(OrderStatus status, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<ActionResult<ResponseDto<List<Order>>>> GetOrdersByStatus(OrderStatus status, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             try
             {
                 var orders = await _orderService.GetOrdersByStatusAsync(status, page, pageSize);
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<List<Order>>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -453,7 +407,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving orders by status {Status}", status);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<List<Order>>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -465,13 +419,13 @@ namespace BlueBerry24.API.Controllers
 
         [HttpGet("admin/all")]
         [AdminAndAbove]
-        public async Task<ActionResult<ResponseDto>> GetAllOrdersForAdmin([FromQuery] int page = 1, [FromQuery] int pageSize = 50)
+        public async Task<ActionResult<ResponseDto<List<OrderDto>>>> GetAllOrdersForAdmin([FromQuery] int page = 1, [FromQuery] int pageSize = 50)
         {
             try
             {
                 var orders = await _orderService.GetAllOrdersAsync(page, pageSize);
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<List<OrderDto>>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -482,7 +436,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving all orders for admin");
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<List<OrderDto>>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -494,14 +448,14 @@ namespace BlueBerry24.API.Controllers
 
         [HttpPut("{orderId}/process")]
         [AdminAndAbove]
-        public async Task<ActionResult<ResponseDto>> ProcessOrder(int orderId)
+        public async Task<ActionResult<ResponseDto<bool>>> ProcessOrder(int orderId)
         {
             try
             {
                 var result = await _orderService.ProcessOrderAsync(orderId);
                 if (!result)
                 {
-                    return BadRequest(new ResponseDto
+                    return BadRequest(new ResponseDto<bool>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -510,7 +464,7 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<bool>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
@@ -520,7 +474,7 @@ namespace BlueBerry24.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing order {OrderId}", orderId);
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
