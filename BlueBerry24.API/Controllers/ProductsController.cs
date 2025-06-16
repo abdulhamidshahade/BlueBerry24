@@ -2,6 +2,7 @@
 using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.ProductDtos;
 using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
+using BlueBerry24.Domain.Entities.ProductEntities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +26,7 @@ namespace BlueBerry24.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<ResponseDto>> GetAll()
+        public async Task<ActionResult<ResponseDto<IEnumerable<ProductDto>>>> GetAll()
         {
             _logger.LogInformation("Getting all products");
 
@@ -34,7 +35,7 @@ namespace BlueBerry24.API.Controllers
             if (products == null)
             {
                 _logger.LogError("Error retrieving all products");
-                return new ResponseDto
+                return new ResponseDto<IEnumerable<ProductDto>>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -43,7 +44,7 @@ namespace BlueBerry24.API.Controllers
                 };
 
             }
-            var response = new ResponseDto
+            var response = new ResponseDto<IEnumerable<ProductDto>>
             {
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
@@ -57,7 +58,7 @@ namespace BlueBerry24.API.Controllers
         [HttpGet]
         [Route("{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult<ResponseDto>> GetById(int id)
+        public async Task<ActionResult<ResponseDto<ProductDto>>> GetById(int id)
         {
             _logger.LogInformation($"Getting product with ID: {id}");
             var product = await _productService.GetByIdAsync(id);
@@ -65,7 +66,7 @@ namespace BlueBerry24.API.Controllers
             if (product == null)
             {
                 _logger.LogError($"Error retrieving product with ID {id}");
-                return new ResponseDto
+                return new ResponseDto<ProductDto>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -74,7 +75,7 @@ namespace BlueBerry24.API.Controllers
                 };
 
             }
-            var response = new ResponseDto
+            var response = new ResponseDto<ProductDto>
             {
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
@@ -89,7 +90,7 @@ namespace BlueBerry24.API.Controllers
         [HttpGet]
         [Route("name/{name}")]
         [AllowAnonymous]
-        public async Task<ActionResult<ResponseDto>> GetByName(string name)
+        public async Task<ActionResult<ResponseDto<ProductDto>>> GetByName(string name)
         {
             _logger.LogInformation($"Getting product with name: {name}");
             var product = await _productService.GetByNameAsync(name);
@@ -97,7 +98,7 @@ namespace BlueBerry24.API.Controllers
             if (product == null)
             {
                 _logger.LogError($"Error retrieving product with name {name}");
-                return new ResponseDto
+                return new ResponseDto<ProductDto>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -106,7 +107,7 @@ namespace BlueBerry24.API.Controllers
                 };
 
             }
-            var response = new ResponseDto
+            var response = new ResponseDto<ProductDto>
             {
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
@@ -118,7 +119,7 @@ namespace BlueBerry24.API.Controllers
 
         [HttpPost]
         [AdminAndAbove]
-        public async Task<ActionResult<ResponseDto>> Create([FromBody] CreateProductDto productDto,
+        public async Task<ActionResult<ResponseDto<ProductDto>>> Create([FromBody] CreateProductDto productDto,
             [FromQuery] List<int> categories)
         {
             _logger.LogInformation($"Creating new product with name: {productDto.Name}");
@@ -127,7 +128,7 @@ namespace BlueBerry24.API.Controllers
             if (createdProduct == null)
             {
                 _logger.LogError("Error creating product");
-                return new ResponseDto
+                return new ResponseDto<ProductDto>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -137,7 +138,7 @@ namespace BlueBerry24.API.Controllers
 
             }
 
-            var response = new ResponseDto
+            var response = new ResponseDto<ProductDto>
             {
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status201Created,
@@ -151,7 +152,7 @@ namespace BlueBerry24.API.Controllers
         [HttpPut]
         [Route("{id}")]
         [AdminAndAbove]
-        public async Task<ActionResult<ResponseDto>> Update(int id, [FromBody] UpdateProductDto productDto,
+        public async Task<ActionResult<ResponseDto<ProductDto>>> Update(int id, [FromBody] UpdateProductDto productDto,
             [FromQuery] List<int> categories)
         {
             _logger.LogInformation($"Updating product with Id: {id}");
@@ -160,7 +161,7 @@ namespace BlueBerry24.API.Controllers
             if (updatedProduct == null)
             {
                 _logger.LogError($"Error updating product with ID {id}");
-                return new ResponseDto
+                return new ResponseDto<ProductDto>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status500InternalServerError,
@@ -170,7 +171,7 @@ namespace BlueBerry24.API.Controllers
 
             }
 
-            var response = new ResponseDto
+            var response = new ResponseDto<ProductDto>
             {
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
@@ -184,7 +185,7 @@ namespace BlueBerry24.API.Controllers
         [HttpDelete]
         [Route("{id}")]
         [AdminAndAbove]
-        public async Task<ActionResult<ResponseDto>> Delete(int id)
+        public async Task<ActionResult<ResponseDto<bool>>> Delete(int id)
         {
             _logger.LogInformation($"Deleting product with ID: {id}");
             var deleted = await _productService.DeleteAsync(id);
@@ -192,7 +193,7 @@ namespace BlueBerry24.API.Controllers
             if (!deleted)
             {
                 _logger.LogWarning($"Product with ID {id} not found for deletion");
-                var notFoundResponse = new ResponseDto
+                var notFoundResponse = new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
@@ -203,7 +204,7 @@ namespace BlueBerry24.API.Controllers
                 return NotFound(notFoundResponse);
             }
 
-            var response = new ResponseDto
+            var response = new ResponseDto<bool>
             {
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
@@ -216,14 +217,14 @@ namespace BlueBerry24.API.Controllers
         [HttpGet]
         [Route("exists-by-id/{id}")]
         [AdminAndAbove]
-        public async Task<ActionResult<ResponseDto>> ExistsById(int id)
+        public async Task<ActionResult<ResponseDto<bool>>> ExistsById(int id)
         {
 
             var exists = await _productService.ExistsByIdAsync(id);
 
             if (exists)
             {
-                var response = new ResponseDto
+                var response = new ResponseDto<bool>
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
@@ -233,7 +234,7 @@ namespace BlueBerry24.API.Controllers
                 return Ok(response);
             }
 
-            var notFoundResponse = new ResponseDto
+            var notFoundResponse = new ResponseDto<bool>
             {
                 IsSuccess = false,
                 StatusCode = StatusCodes.Status404NotFound,
@@ -246,13 +247,13 @@ namespace BlueBerry24.API.Controllers
         [HttpGet]
         [Route("exists-by-name/{name}")]
         [AdminAndAbove]
-        public async Task<ActionResult<ResponseDto>> ExistsByName(string name)
+        public async Task<ActionResult<ResponseDto<bool>>> ExistsByName(string name)
         {
             var exists = await _productService.ExistsByNameAsync(name);
 
             if (exists)
             {
-                var response = new ResponseDto
+                var response = new ResponseDto<bool>
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
@@ -262,7 +263,7 @@ namespace BlueBerry24.API.Controllers
                 return Ok(response);
             }
 
-            var notFoundResponse = new ResponseDto
+            var notFoundResponse = new ResponseDto<bool>
             {
                 IsSuccess = false,
                 StatusCode = StatusCodes.Status404NotFound,
