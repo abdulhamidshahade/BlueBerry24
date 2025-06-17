@@ -45,7 +45,30 @@ export async function apiRequest<T>(
         } as T;
       }
       
-      throw new Error(`HTTP error! status: ${response.status}`);
+      let errorDetails = '';
+      try {
+        const errorText = await response.text();
+        if (errorText) {
+          try {
+            const errorJson = JSON.parse(errorText);
+            errorDetails = errorJson.message || errorJson.statusMessage || errorJson.title || errorText;
+          } catch {
+            errorDetails = errorText;
+          }
+        }
+      } catch {
+      }
+      
+      const errorMessage = `HTTP error! status: ${response.status}${errorDetails ? ` - ${errorDetails}` : ''}`;
+      console.error('API Request Error:', {
+        url,
+        status: response.status,
+        statusText: response.statusText,
+        errorDetails,
+        requestOptions: fetchOptions
+      });
+      
+      throw new Error(errorMessage);
     }
 
     const contentType = response.headers.get('content-type');
