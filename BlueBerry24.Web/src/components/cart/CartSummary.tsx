@@ -1,6 +1,6 @@
 import { CartDto, CartStatus } from "@/types/cart";
 import { proceedToCheckout } from "@/lib/actions/cart-actions";
-import ClearCartButton from "./ClearCardButton";
+import ClearCartButton from "./ClearCartButton";
 
 interface CartSummaryProps {
   cart: CartDto;
