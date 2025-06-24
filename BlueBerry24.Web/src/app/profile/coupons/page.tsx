@@ -107,7 +107,10 @@ async function CouponCard({ coupon, userId }: { coupon: CouponDto; userId: numbe
             </div>
           ) : (
             <div className="d-grid">
-              <Link href="/cart" className="btn btn-outline-primary">
+              <Link href={{
+                pathname: '/cart',
+  query: { code: coupon.code }
+              }} className="btn btn-outline-primary">
                 <i className="bi bi-cart me-1"></i>
                 Use in Cart
               </Link>
