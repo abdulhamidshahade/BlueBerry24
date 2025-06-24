@@ -3,7 +3,7 @@ import { getProducts } from '@/lib/actions/product-actions';
 import CartItem from '@/components/cart/CartItem';
 import CartSummary from '@/components/cart/CartSummary';
 import CouponSection from '@/components/cart/CouponSection';
-import ClearCartButton from '@/components/cart/ClearCardButton';
+import ClearCartButton from '@/components/cart/ClearCartButton';
 import CartStatusIndicator, { CartStatusMessage } from '@/components/cart/CartStatus';
 import { ProductDto } from '@/types/product';
 import { CartStatus } from '@/types/cart';
