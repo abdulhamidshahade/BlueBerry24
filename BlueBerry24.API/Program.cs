@@ -1,4 +1,5 @@
 using BlueBerry24.Application.Authorization.Handlers;
+using BlueBerry24.Application.Config;
 using BlueBerry24.Application.Config.Settings;
 using BlueBerry24.Application.DI;
 using BlueBerry24.Domain.Constants;
@@ -69,8 +70,9 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.Configure<GmailOption>(builder.Configuration.GetSection("GmailSettings"));
 
-
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("App"));
 
 builder.Services.AddCors(options =>
 {
