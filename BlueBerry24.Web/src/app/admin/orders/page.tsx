@@ -103,7 +103,6 @@ export default async function AdminOrdersPage({
       {success && <SuccessAlert message={success} />}
       {error && <ErrorAlert message={error} />}
 
-      {/* Order Statistics Cards */}
       <div className="row mb-4">
         <div className="col-md-3">
           <div className="card border-0 shadow-sm">
@@ -378,7 +377,6 @@ export default async function AdminOrdersPage({
         </div>
       )}
 
-      {/* Modals for each order */}
       {orders.map((order) => (
         <div key={`modals-${order.id}`}>
           <StatusUpdateModal orderId={order.id} currentStatus={order.status} />
@@ -388,7 +386,6 @@ export default async function AdminOrdersPage({
         </div>
       ))}
 
-      {/* Export Modal */}
       <ExportOrdersModal />
     </div>
   );
