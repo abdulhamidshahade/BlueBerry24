@@ -363,138 +363,17 @@ MigrationBackup/
 FodyWeavers.xsd
 
 
-# Ignore appsettings.json in AuthAPI
-src/BlueBerry24.Services/BlueBerry24.Services.AuthAPI/appsettings.json
+#Ignore appsettings.json in BlueBerry24.API Layer
+BlueBerry24.API/appsettings.json
 
-# Ignore appsettings.Development.json in AuthAPI
-src/BlueBerry24.Services/BlueBerry24.Services.AuthAPI/appsettings.Development.json
+#Ignore appsettings.Development.json in BlueBerry24.API Layer
+BlueBerry24.API/appsettings.Development.json
 
-# Ignore launchSettings.json in AuthAPI
-src/BlueBerry24.Services/BlueBerry24.Services.AuthAPI/Properties/launchSettings.json
+# Ignore launchSettings.json in BlueBerry24.API Layer
+BlueBerry24.API/Properties/launchSettings.json
 
-# Ignore BlueBerry24.Services.AuthAPI.http in AuthAPI
-src/BlueBerry24.Services/BlueBerry24.Services.AuthAPI/BlueBerry24.Services.AuthAPI.http
+# Ignore BlueBerry24.API.http in BlueBerry24.API Layer
+BlueBerry24.API/BlueBerry24.API.http
 
-#Ignore Migrations folder in AuthAPI
-src/BlueBerry24.Services/BlueBerry24.Services.AuthAPI/Migrations
-
-
-
-# Ignore appsettings.json in CouponAPI
-src/BlueBerry24.Services/BlueBerry24.Services.CouponAPI/appsettings.json
-
-# Ignore appsettings.Development.json in CouponAPI
-src/BlueBerry24.Services/BlueBerry24.Services.CouponAPI/appsettings.Development.json
-
-# Ignore launchSettings.json in CouponAPI
-src/BlueBerry24.Services/BlueBerry24.Services.CouponAPI/Properties/launchSettings.json
-
-# Ignore BlueBerry24.Services.AuthAPI.http in CouponAPI
-src/BlueBerry24.Services/BlueBerry24.Services.CouponAPI/BlueBerry24.Services.CouponAPI.http
-
-#Ignore Migrations folder in CouponAPI
-src/BlueBerry24.Services/BlueBerry24.Services.CouponAPI/Migrations
-
-
-# Ignore appsettings.json in ProductAPI
-src/BlueBerry24.Services/BlueBerry24.Services.ProductAPI/appsettings.json
-
-# Ignore appsettings.Development.json in ProductAPI
-src/BlueBerry24.Services/BlueBerry24.Services.ProductAPI/appsettings.Development.json
-
-# Ignore launchSettings.json in ProductAPI
-src/BlueBerry24.Services/BlueBerry24.Services.ProductAPI/Properties/launchSettings.json
-
-# Ignore BlueBerry24.Services.AuthAPI.http in ProductAPI
-src/BlueBerry24.Services/BlueBerry24.Services.ProductAPI/BlueBerry24.Services.ProductAPI.http
-
-#Ignore Migrations folder in ProductAPI
-src/BlueBerry24.Services/BlueBerry24.Services.ProductAPI/Migrations
-
-
-
-# Ignore appsettings.json in ShopAPI
-src/BlueBerry24.Services/BlueBerry24.Services.ShopAPI/appsettings.json
-
-# Ignore appsettings.Development.json in ShopAPI
-src/BlueBerry24.Services/BlueBerry24.Services.ShopAPI/appsettings.Development.json
-
-# Ignore launchSettings.json in ShopAPI
-src/BlueBerry24.Services/BlueBerry24.Services.ShopAPI/Properties/launchSettings.json
-
-# Ignore BlueBerry24.Services.AuthAPI.http in ShopAPI
-src/BlueBerry24.Services/BlueBerry24.Services.ShopAPI/BlueBerry24.Services.ShopAPI.http
-
-#Ignore Migrations folder in ShopAPI
-src/BlueBerry24.Services/BlueBerry24.Services.ShopAPI/Migrations
-
-
-
-# Ignore appsettings.json in ShoppingCartAPI
-src/BlueBerry24.Services/BlueBerry24.Services.ShoppingCartAPI/appsettings.json
-
-# Ignore appsettings.Development.json in ShoppingCartAPI
-src/BlueBerry24.Services/BlueBerry24.Services.ShoppingCartAPI/appsettings.Development.json
-
-# Ignore launchSettings.json in ShoppingCartAPI
-src/BlueBerry24.Services/BlueBerry24.Services.ShoppingCartAPI/Properties/launchSettings.json
-
-# Ignore BlueBerry24.Services.AuthAPI.http in ShoppingCartAPI
-src/BlueBerry24.Services/BlueBerry24.Services.ShoppingCartAPI/BlueBerry24.Services.ShoppingCartAPI.http
-
-
-#Ignore Migrations folder in ShoppingCartAPI
-src/BlueBerry24.Services/BlueBerry24.Services.ShoppingCartAPI/Migrations
-
-
-
-# Ignore appsettings.json in UserCouponAPI
-src/BlueBerry24.Services/BlueBerry24.Services.UserCouponAPI/appsettings.json
-
-# Ignore appsettings.Development.json in UserCouponAPI
-src/BlueBerry24.Services/BlueBerry24.Services.UserCouponAPI/appsettings.Development.json
-
-# Ignore launchSettings.json in UserCouponAPI
-src/BlueBerry24.Services/BlueBerry24.Services.UserCouponAPI/Properties/launchSettings.json
-
-# Ignore BlueBerry24.Services.UserCouponAPI.http in UserCouponAPI
-src/BlueBerry24.Services/BlueBerry24.Services.UserCouponAPI/BlueBerry24.Services.UserCouponAPI.http
-
-
-#Ignore Migrations folder in UserCouponAPI
-src/BlueBerry24.Services/BlueBerry24.Services.UserCouponAPI/Migrations
-
-
-
-
-
-# Ignore appsettings.json in StockAPI
-src/BlueBerry24.Services/BlueBerry24.Services.StockAPI/appsettings.json
-
-# Ignore appsettings.Development.json in StockAPI
-src/BlueBerry24.Services/BlueBerry24.Services.StockAPI/appsettings.Development.json
-
-# Ignore launchSettings.json in StockAPI
-src/BlueBerry24.Services/BlueBerry24.Services.StockAPI/Properties/launchSettings.json
-
-# Ignore BlueBerry24.Services.StockAPI.http in StockAPI
-src/BlueBerry24.Services/BlueBerry24.Services.StockAPI/BlueBerry24.Services.StockAPI.http
-
-#Ignore Migrations folder in StockAPI
-src/BlueBerry24.Services/BlueBerry24.Services.StockAPI/Migrations
-
-
-
-
-
-# Ignore appsettings.json in NotificationAPI
-src/BlueBerry24.Services/BlueBerry24.Services.NotificationAPI/appsettings.json
-
-# Ignore appsettings.Development.json in NotificationAPI
-src/BlueBerry24.Services/BlueBerry24.Services.NotificationAPI/appsettings.Development.json
-
-# Ignore launchSettings.json in NotificationAPI
-src/BlueBerry24.Services/BlueBerry24.Services.NotificationAPI/Properties/launchSettings.json
-
-# Ignore BlueBerry24.Services.StockAPI.http in NotificationAPI
-src/BlueBerry24.Services/BlueBerry24.Services.NotificationAPI/BlueBerry24.Services.NotificationAPI.http
+# Ignore Migrattions in BlueBerry24.Infrastructure Layer
+BlueBerry24.Infrastructure/Migrations
