@@ -1,6 +1,5 @@
 using BlueBerry24.Application.Authorization.Handlers;
 using BlueBerry24.Application.Config;
-using BlueBerry24.Application.Config.Settings;
 using BlueBerry24.Application.DI;
 using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Entities.AuthEntities;
@@ -126,10 +125,6 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddScoped<IAuthorizationHandler, RoleAuthorizationHandler>();
 
 JwtOptions jwtOptions = new JwtOptions();
-
-//later
-builder.Configuration.AddJsonFile("cartsettings.json", optional: true, reloadOnChange: true);
-builder.Services.Configure<CartSettings>(builder.Configuration.GetSection("CartSettings"));
 
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("ApiSettings:JwtOptions"));

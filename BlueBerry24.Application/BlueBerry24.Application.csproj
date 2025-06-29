@@ -6,16 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Config\cartsettings.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Config\cartsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
   
 
   <ItemGroup>
