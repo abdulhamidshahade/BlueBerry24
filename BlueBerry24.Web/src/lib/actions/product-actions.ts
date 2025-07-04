@@ -90,8 +90,8 @@ export async function createProduct(formData: FormData): Promise<void> {
     const categories = formData.getAll("categories");
     const categoryIds = categories
       ? categories
-          .map((id) => parseInt(id as string))
-          .filter((id) => !isNaN(id))
+        .map((id) => parseInt(id as string))
+        .filter((id) => !isNaN(id))
       : [];
     const imageFile = formData.get("imageFile") as File;
 
@@ -145,8 +145,8 @@ export async function updateProduct(
     const categories = formData.getAll("categories");
     const categoryIds = categories
       ? categories
-          .map((id) => parseInt(id as string))
-          .filter((id) => !isNaN(id))
+        .map((id) => parseInt(id as string))
+        .filter((id) => !isNaN(id))
       : [];
 
     const imageFile = formData.get("imageFile") as File;
@@ -189,19 +189,19 @@ export async function deleteProduct(formData: FormData) {
 
     await productService.delete(id);
 
-    
+
 
     if (product && product.imageUrl.startsWith('/uploads/')) {
-          try {
-            const imagePath = path.join(process.cwd(), 'public', product.imageUrl);
-            if (fs.existsSync(imagePath)) {
-              fs.unlinkSync(imagePath);
-              console.log('Cleaned up image file:', product.imageUrl);
-            }
-          } catch (cleanupError) {
-            console.error('Failed to cleanup image file:', cleanupError);
-          }
+      try {
+        const imagePath = path.join(process.cwd(), 'public', product.imageUrl);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+          console.log('Cleaned up image file:', product.imageUrl);
         }
+      } catch (cleanupError) {
+        console.error('Failed to cleanup image file:', cleanupError);
+      }
+    }
 
     revalidatePath("/admin/products");
     revalidatePath("/products");
