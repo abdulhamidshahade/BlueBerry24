@@ -10,6 +10,11 @@ interface PageProps {
   };
 }
 
+async function handleUpdateProduct(formData: FormData) {
+  'use server';
+  await updateProduct(formData, formData.get('imageUrl') as string);
+}
+
 export default async function InventoryEditProductPage({ params }: PageProps) {
   const productId = parseInt(params.id);
   
@@ -55,7 +60,7 @@ export default async function InventoryEditProductPage({ params }: PageProps) {
                   </h4>
                 </div>
                 <div className="card-body">
-                  <form action={updateProduct}>
+                  <form action={handleUpdateProduct}>
                     <input type="hidden" name="id" value={product.id} />
 
                     <div className="card mb-4">
