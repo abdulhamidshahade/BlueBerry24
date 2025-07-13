@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
-import CategoryForm from "@/components/category/CategoryForm";
-import { CategoryService } from "@/lib/services/category/service";
-import { ICategoryService } from "@/lib/services/category/interface";
-import { updateCategory } from '@/lib/actions/category-actions';
+import CategoryForm from '../../../../../components/category/CategoryForm';
+import { CategoryService } from "../../../../../lib/services/category/service";
+import { ICategoryService } from "../../../../../lib/services/category/interface";
+import { updateCategory } from '../../../../../lib/actions/category-actions';
 
 const categoryService: ICategoryService = new CategoryService();
 
@@ -10,12 +10,12 @@ interface Props {
   params: Promise<{
     id: string;
   }>;
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function EditCategoryPage({ params, searchParams }: Props) {
-  const resolvedParams = await params;
-  const categoryId = parseInt(resolvedParams.id);
+  const resolvedSearchParams = await params;
+  const categoryId = parseInt(resolvedSearchParams.id);
 
   if (isNaN(categoryId)) {
     notFound();
@@ -78,7 +78,7 @@ export default async function EditCategoryPage({ params, searchParams }: Props) 
                 action={handleUpdateCategory}
                 isEdit={true}
                 submitText='Update Category'
-                searchParams={searchParams}
+                searchParams={resolvedSearchParams}
               />
             </div>
           </div>

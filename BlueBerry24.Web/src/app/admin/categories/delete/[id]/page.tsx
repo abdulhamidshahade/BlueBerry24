@@ -1,18 +1,19 @@
 import { notFound } from 'next/navigation';
-import DeleteCategoryForm from '@/components/category/DeleteCategoryForm';
-import { CategoryService } from "@/lib/services/category/service";
-import { ICategoryService } from "@/lib/services/category/interface";
+import DeleteCategoryForm from '../../../../../components/category/DeleteCategoryForm';
+import { CategoryService } from '../../../../../lib/services/category/service';
+import { ICategoryService } from "../../../../../lib/services/category/interface";
 
 const categoryService: ICategoryService = new CategoryService();
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string;
-  };
-  searchParams?: { [key: string]: string | string[] | undefined };
+  }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function DeleteCategoryPage({ params, searchParams }: Props) {
+  const resolvedSearchParams = await searchParams;
   const { id } = await params;
   const categoryId = parseInt(id);
 
@@ -96,7 +97,7 @@ export default async function DeleteCategoryPage({ params, searchParams }: Props
 
               <hr className="my-4" />
 
-              <DeleteCategoryForm category={category} searchParams={searchParams} />
+              <DeleteCategoryForm category={category} searchParams={resolvedSearchParams} />
             </div>
           </div>
         </div>

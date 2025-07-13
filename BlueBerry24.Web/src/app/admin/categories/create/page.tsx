@@ -1,11 +1,12 @@
-import CategoryForm from "@/components/category/CategoryForm";
-import { createCategory } from '@/lib/actions/category-actions';
+import CategoryForm from '../../../../components/category/CategoryForm';
+import { createCategory } from '../../../../lib/actions/category-actions';
 
 interface Props {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default function CreateCategoryPage({ searchParams }: Props) {
+export default async function CreateCategoryPage({ searchParams }: Props) {
+  const resolvedSearchParams = await searchParams;
   return (
     <div className="container-fluid">
       <div className="row mb-4">
@@ -35,7 +36,7 @@ export default function CreateCategoryPage({ searchParams }: Props) {
         action={createCategory}
         isEdit={false}
         submitText='Create Category'
-        searchParams={searchParams}
+        searchParams={resolvedSearchParams}
 
       />
     </div>

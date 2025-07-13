@@ -1,21 +1,23 @@
 import Link from 'next/link';
-import { CategoryService } from "@/lib/services/category/service";
-import { ICategoryService } from "@/lib/services/category/interface";
-import { CategoryDto } from "@/types/category";
-import CategoryActionButtons from '@/components/category/CategoryActionButtons';
+import { CategoryService } from '../../../lib/services/category/service';
+import { ICategoryService } from "../../../lib/services/category/interface";
+import { CategoryDto } from "../../../types/category";
+import CategoryActionButtons from '../../../components/category/CategoryActionButtons';
 
 const categoryService: ICategoryService = new CategoryService();
 
 interface Props {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function AdminCategoriesPage({ searchParams }: Props) {
   let categories: CategoryDto[] = [];
   let hasError = false;
 
-  const successMessage = searchParams?.success as string;
-  const errorMessage = searchParams?.error as string;
+  const resolvedSearchParams = await searchParams;
+
+  const successMessage = resolvedSearchParams?.success as string;
+  const errorMessage = resolvedSearchParams?.error as string;
 
   try {
     categories = await categoryService.getAll();
