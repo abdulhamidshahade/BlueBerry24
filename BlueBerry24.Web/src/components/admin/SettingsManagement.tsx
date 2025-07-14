@@ -10,7 +10,7 @@ import {
   resetToDefaults,
   exportSettings,
   importSettings
-} from '@/lib/actions/settings-action'
+} from '../../lib/actions/settings-action'
 
 interface SystemSettings {
   siteName: string;

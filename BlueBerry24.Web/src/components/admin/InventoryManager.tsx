@@ -1,6 +1,6 @@
-import { ProductDto } from "@/types/product";
-import { InventoryChangeType, InventoryLogDto } from "@/types/inventory";
-import { addStock, quickRestock, updateLowStockThreshold, releaseReservedStock } from "@/lib/actions/inventory-actions";
+import { ProductDto } from "../../types/product";
+import { InventoryChangeType, InventoryLogDto } from "../../types/inventory";
+import { addStock, quickRestock, updateLowStockThreshold, releaseReservedStock } from "../../lib/actions/inventory-actions";
 import Link from 'next/link';
 
 interface InventoryManagerProps {

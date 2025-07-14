@@ -1,4 +1,4 @@
-import { UserWithRoles } from '@/types/roleManagement';
+import { UserWithRoles } from '../../types/roleManagement';
 import {
   lockCustomerAccount,
   unlockCustomerAccount,
@@ -7,7 +7,7 @@ import {
   updateCustomer,
   createCustomer,
   deleteCustomer
-} from '@/lib/actions/customer-actions';
+} from '../../lib/actions/customer-actions';
 
 interface CustomerManagementProps {
   customers: UserWithRoles[];

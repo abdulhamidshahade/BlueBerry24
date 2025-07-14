@@ -1,4 +1,4 @@
-import { exportOrders } from '@/lib/actions/order-actions';
+import { exportOrders } from '../../lib/actions/order-actions';
 
 export function ExportOrdersModal() {
   return (

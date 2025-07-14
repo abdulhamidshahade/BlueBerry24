@@ -3,8 +3,8 @@ import {
   adminClearWishlist, 
   adminToggleWishlistVisibility, 
   exportWishlistData 
-} from '@/lib/actions/admin-wishlist-actions';
-import { WishlistDto, WishlistPriority, WishlistPriorityLabels, GlobalWishlistStatsDto } from '@/types/wishlist';
+} from '../../lib/actions/admin-wishlist-actions';
+import { WishlistDto, WishlistPriority, WishlistPriorityLabels, GlobalWishlistStatsDto } from '../../types/wishlist';
 
 interface AdminWishlistManagementProps {
   wishlists: WishlistDto[];

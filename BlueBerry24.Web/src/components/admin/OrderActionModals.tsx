@@ -1,11 +1,11 @@
-import { OrderStatus } from '@/types/order';
+import { OrderStatus } from '../../types/order';
 import { 
   updateOrderStatus, 
   cancelOrder, 
   refundOrder, 
   markOrderAsPaid, 
   processOrder 
-} from '@/lib/actions/order-actions';
+} from '../../lib/actions/order-actions';
 
 interface OrderActionModalProps {
   orderId: number;

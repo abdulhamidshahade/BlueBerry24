@@ -1,4 +1,4 @@
-import { UserWithRoles, Role } from '@/types/roleManagement';
+import { UserWithRoles, Role } from '../../types/roleManagement';
 import {
   promoteUserToAdmin,
   demoteAdminUser,
@@ -10,7 +10,7 @@ import {
   updateUser,
   createAdminUser,
   deleteUser
-} from '@/lib/actions/user-actions';
+} from '../../lib/actions/user-actions';
 
 interface UserManagementProps {
   users: UserWithRoles[];
