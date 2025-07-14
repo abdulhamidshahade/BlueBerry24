@@ -1,4 +1,4 @@
-import { loginAction } from '@/lib/actions/auth-actions';
+import { loginAction } from '../../lib/actions/auth-actions';
 import { redirect } from 'next/navigation';
 
 interface LoginFormProps {

@@ -1,5 +1,5 @@
-import { User } from '@/types/user';
-import { logoutAction } from '@/lib/actions/auth-actions';
+import { User } from '../../types/user';
+import { logoutAction } from '../../lib/actions/auth-actions';
 
 interface UserMenuProps {
   user: User;

@@ -1,4 +1,4 @@
-import { confirmEmailAction } from '@/lib/actions/auth-actions';
+import { confirmEmailAction } from '../../lib/actions/auth-actions';
 import { redirect } from 'next/navigation';
 
 interface EmailConfirmationFormProps {

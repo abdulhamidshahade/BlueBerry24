@@ -1,4 +1,4 @@
-import { forgotPasswordAction } from '@/lib/actions/auth-actions';
+import { forgotPasswordAction } from '../../lib/actions/auth-actions';
 import { redirect } from 'next/navigation';
 
 export default function ForgotPasswordForm() {

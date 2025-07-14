@@ -1,4 +1,4 @@
-import { resendConfirmationAction } from '@/lib/actions/auth-actions';
+import { resendConfirmationAction } from '../../lib/actions/auth-actions';
 import { redirect } from 'next/navigation';
 
 interface ResendConfirmationFormProps {
