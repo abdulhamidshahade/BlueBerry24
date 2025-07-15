@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
-import { getSystemSettings } from '@/lib/actions/settings-action'
+import { getCurrentUser } from '../../../../lib/actions/auth-actions';
+import { getSystemSettings } from '../../../../lib/actions/settings-action'
 
 export async function GET(request: NextRequest) {
   try {

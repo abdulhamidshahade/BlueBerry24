@@ -1,19 +1,19 @@
 import { redirect } from 'next/navigation';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
-import { getSystemSettings } from '@/lib/actions/settings-action'
-import SettingsManagement from '@/components/admin/SettingsManagement';
+import { getCurrentUser } from '../../../lib/actions/auth-actions';
+import { getSystemSettings } from '../../../lib/actions/settings-action'
+import SettingsManagement from '../../../components/admin/SettingsManagement';
 
 interface SettingsPageProps {
-  searchParams: {
+  searchParams: Promise<{
     modal?: string;
     success?: string;
     error?: string;
-  };
+  }>;
 }
 
 export default async function SettingsPage({ searchParams }: SettingsPageProps) {
   const user = await getCurrentUser();
-  
+  var resolvedSearchParams = await searchParams;
   if (!user) {
     redirect('/auth/login?redirectTo=/admin/settings');
   }
@@ -37,9 +37,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
           <SettingsManagement 
             settings={settings}
             currentUser={user}
-            showModal={searchParams.modal}
-            success={searchParams.success}
-            error={searchParams.error}
+            showModal={resolvedSearchParams.modal}
+            success={resolvedSearchParams.success}
+            error={resolvedSearchParams.error}
           />
         </div>
       </div>
