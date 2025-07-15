@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
-import { RoleManagementService } from '@/lib/services/roleManagement/service';
-import { UserWithRoles } from '@/types/roleManagement';
+import { getCurrentUser } from '../../../../lib/actions/auth-actions';
+import { RoleManagementService } from '../../../../lib/services/roleManagement/service';
+import { UserWithRoles } from '../../../../types/roleManagement';
 
 export async function GET(request: NextRequest) {
   try {

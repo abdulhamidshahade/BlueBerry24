@@ -1,21 +1,22 @@
 import { redirect } from 'next/navigation';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
-import { RoleManagementService } from '@/lib/services/roleManagement/service';
-import { UserWithRoles } from '@/types/roleManagement';
-import CustomerManagement from '@/components/admin/CustomerManagement'
+import { getCurrentUser } from '../../../lib/actions/auth-actions';
+import { RoleManagementService } from '../../../lib/services/roleManagement/service';
+import { UserWithRoles } from '../../../types/roleManagement';
+import CustomerManagement from '../../../components/admin/CustomerManagement'
 
 interface CustomersPageProps {
-  searchParams: {
+  searchParams: Promise<{
     search?: string;
     status?: string;
     modal?: string;
     id?: string;
-  };
+  }>;
 }
 
 export default async function CustomersPage({ searchParams }: CustomersPageProps) {
   const user = await getCurrentUser();
-  
+
+  var resolvedSearchParams = await searchParams;  
   if (!user) {
     redirect('/auth/login?redirectTo=/admin/customers');
   }
@@ -52,10 +53,10 @@ export default async function CustomersPage({ searchParams }: CustomersPageProps
         <div className="col-12">
           <CustomerManagement 
             customers={customers}
-            searchQuery={searchParams.search}
-            statusFilter={searchParams.status}
-            showModal={searchParams.modal}
-            selectedCustomerId={searchParams.id}
+            searchQuery={resolvedSearchParams.search}
+            statusFilter={resolvedSearchParams.status}
+            showModal={resolvedSearchParams.modal}
+            selectedCustomerId={resolvedSearchParams.id}
           />
         </div>
       </div>
