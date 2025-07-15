@@ -1,15 +1,15 @@
-import { getCoupon, updateCoupon } from '@/lib/actions/coupon-actions';
-import { CouponTypeSelect } from '@/components/coupon/CouponDisplayComponents';
+import { getCoupon, updateCoupon } from '../../../../../lib/actions/coupon-actions';
+import { CouponTypeSelect } from '../../../../../components/coupon/CouponDisplayComponents';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 interface UpdateCouponPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     error?: string;
-  };
+  }>;
 }
 
 function ErrorAlert({ message }: { message: string }) {
@@ -23,8 +23,9 @@ function ErrorAlert({ message }: { message: string }) {
 }
 
 export default async function UpdateCouponPage({ params, searchParams }: UpdateCouponPageProps) {
-  const couponId = parseInt(params.id);
-  const { error } = searchParams;
+  const { id } = await params;
+  const couponId = parseInt(id as string);
+  const { error } = await searchParams;
   
   if (isNaN(couponId)) {
     notFound();

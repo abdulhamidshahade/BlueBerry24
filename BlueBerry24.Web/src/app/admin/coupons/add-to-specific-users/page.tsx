@@ -1,13 +1,13 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { AddCouponToSpecificUsersForm } from '@/components/coupon/AddCouponToSpecificUsersForm';
+import { AddCouponToSpecificUsersForm } from '../../../../components/coupon/AddCouponToSpecificUsersForm';
 
 interface SearchParams {
   error?: string;
 }
 
 interface PageProps {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }
 
 function ErrorAlert({ message }: { message: string }) {
@@ -22,7 +22,7 @@ function ErrorAlert({ message }: { message: string }) {
 
 
 export default async function AddCouponToSpecificUsersPage({ searchParams }: PageProps) {
-  const { error } = searchParams;
+  const { error } = await searchParams;
 
   return (
     <div className="container-fluid">

@@ -1,13 +1,13 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { getCoupons, toggleCouponStatus } from '@/lib/actions/coupon-actions';
+import { getCoupons, toggleCouponStatus } from '../../../lib/actions/coupon-actions';
 import { 
   CouponTypeDisplay, 
   CouponValueDisplay, 
   CouponStatusDisplay, 
   CouponNewUserDisplay, 
   CouponMinimumAmountDisplay 
-} from '@/components/coupon/CouponDisplayComponents';
+} from '../../../components/coupon/CouponDisplayComponents';
 
 interface SearchParams {
   success?: string;
@@ -230,9 +230,9 @@ async function CouponsList() {
 export default async function AdminCouponsPage({
   searchParams,
 }: {
-  searchParams: SearchParams
+  searchParams: Promise<SearchParams>
 }) {
-  const { success, error } = searchParams;
+  const { success, error } = await searchParams;
 
   return (
     <div className="container-fluid">

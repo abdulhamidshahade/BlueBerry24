@@ -1,21 +1,21 @@
-import { getCoupon, deleteCoupon } from '@/lib/actions/coupon-actions';
+import { getCoupon, deleteCoupon } from '../../../../../lib/actions/coupon-actions';
 import { 
   CouponTypeDisplay, 
   CouponValueDisplay, 
   CouponStatusDisplay, 
   CouponNewUserDisplay, 
   CouponMinimumAmountDisplay 
-} from '@/components/coupon/CouponDisplayComponents';
+} from '../../../../../components/coupon/CouponDisplayComponents';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 interface DeleteCouponPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     error?: string;
-  };
+  }>;
 }
 
 function ErrorAlert({ message }: { message: string }) {
@@ -29,8 +29,9 @@ function ErrorAlert({ message }: { message: string }) {
 }
 
 export default async function DeleteCouponPage({ params, searchParams }: DeleteCouponPageProps) {
-  const couponId = parseInt(params.id);
-  const { error } = searchParams;
+  const {id} = await params;
+  const couponId = parseInt(id as string);
+  const { error } = await searchParams;
   
   if (isNaN(couponId)) {
     notFound();

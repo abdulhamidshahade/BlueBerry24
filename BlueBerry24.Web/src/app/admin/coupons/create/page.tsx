@@ -1,5 +1,5 @@
-import { createCoupon } from '@/lib/actions/coupon-actions';
-import { CouponTypeSelect } from '@/components/coupon/CouponDisplayComponents';
+import { createCoupon } from '../../../../lib/actions/coupon-actions';
+import { CouponTypeSelect } from '../../../../components/coupon/CouponDisplayComponents';
 import Link from 'next/link';
 
 interface SearchParams {
@@ -19,9 +19,9 @@ function ErrorAlert({ message }: { message: string }) {
 export default async function CreateCouponPage({
   searchParams,
 }: {
-  searchParams: SearchParams
+  searchParams: Promise<SearchParams>
 }) {
-  const { error } = searchParams;
+  const { error } = await searchParams;
 
   return (
     <div className="container-fluid">

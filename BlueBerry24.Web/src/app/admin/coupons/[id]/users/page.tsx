@@ -1,15 +1,15 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getCoupon} from '@/lib/actions/coupon-actions';
+import { getCoupon} from '../../../../../lib/actions/coupon-actions';
 import { 
   CouponTypeDisplay, 
   CouponValueDisplay, 
   CouponMinimumAmountDisplay,
   CouponStatusDisplay,
   CouponNewUserDisplay
-} from '@/components/coupon/CouponDisplayComponents';
-import { UsersList } from '@/components/coupon/UserList';
+} from '../../../../../components/coupon/CouponDisplayComponents';
+import { UsersList } from '../../../../../components/coupon/UserList';
 
 interface SearchParams {
   success?: string;
@@ -17,10 +17,10 @@ interface SearchParams {
 }
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
-  searchParams: SearchParams;
+  }>;
+  searchParams: Promise<SearchParams>;
 }
 
 function SuccessAlert({ message }: { message: string }) {
@@ -76,8 +76,11 @@ function UsersLoadingSkeleton() {
 
 
 export default async function CouponUsersPage({ params, searchParams }: PageProps) {
-  const couponId = parseInt(params.id);
-  const { success, error } = searchParams;
+
+  var resolvedSearchParams = await searchParams;
+  const {id} = await params;
+  const couponId = (id as string) ? parseInt(id) : NaN;
+  const { success, error } = resolvedSearchParams;
 
   if (isNaN(couponId)) {
     notFound();

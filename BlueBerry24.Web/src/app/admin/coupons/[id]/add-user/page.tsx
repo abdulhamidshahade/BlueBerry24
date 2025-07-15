@@ -1,25 +1,25 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getCoupon} from '@/lib/actions/coupon-actions';
+import { getCoupon} from '../../../../../lib/actions/coupon-actions';
 import {
   CouponTypeDisplay,
   CouponValueDisplay,
   CouponMinimumAmountDisplay,
   CouponStatusDisplay,
   CouponNewUserDisplay
-} from '@/components/coupon/CouponDisplayComponents';
-import { AddUserForm } from '@/components/coupon/AddUserForm';
+} from '../../../../../components/coupon/CouponDisplayComponents';
+import { AddUserForm } from '../../../../../components/coupon/AddUserForm';
 
 interface SearchParams {
   error?: string;
 }
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
-  searchParams: SearchParams;
+  }>;
+  searchParams: Promise<SearchParams>;
 }
 
 function ErrorAlert({ message }: { message: string }) {
@@ -33,8 +33,10 @@ function ErrorAlert({ message }: { message: string }) {
 }
 
 export default async function AddUserToCouponPage({ params, searchParams }: PageProps) {
-  const couponId = parseInt(params.id);
-  const { error } = searchParams;
+  const { id } = await params;
+  const { error } = await searchParams;
+  
+  const couponId = parseInt(id);
 
   if (isNaN(couponId)) {
     notFound();

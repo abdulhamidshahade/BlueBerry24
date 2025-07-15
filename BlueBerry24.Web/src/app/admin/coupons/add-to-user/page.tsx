@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { AddCouponToUserForm } from '@/components/coupon/AddCouponToUserForm';
+import { AddCouponToUserForm } from '../../../../components/coupon/AddCouponToUserForm';
 
 
 interface SearchParams {
@@ -8,7 +8,7 @@ interface SearchParams {
 }
 
 interface PageProps {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }
 
 function ErrorAlert({ message }: { message: string }) {
@@ -23,7 +23,7 @@ function ErrorAlert({ message }: { message: string }) {
 
 
 export default async function AddCouponToUserPage({ searchParams }: PageProps) {
-  const { error } = searchParams;
+  const { error } = await searchParams;
 
   return (
     <div className="container-fluid">

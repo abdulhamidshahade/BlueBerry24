@@ -1,13 +1,13 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { AddCouponToAllUsersForm } from '@/components/coupon/AddCouponToAllUsersForm';
+import { AddCouponToAllUsersForm } from '../../../../components/coupon/AddCouponToAllUsersForm';
 
 interface SearchParams {
   error?: string;
 }
 
 interface PageProps {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }
 
 function ErrorAlert({ message }: { message: string }) {
@@ -23,7 +23,7 @@ function ErrorAlert({ message }: { message: string }) {
 
 
 export default async function AddCouponToAllUsersPage({ searchParams }: PageProps) {
-  const { error } = searchParams;
+  const { error } = await searchParams;
 
   return (
     <div className="container-fluid">
