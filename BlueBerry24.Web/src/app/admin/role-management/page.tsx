@@ -1,14 +1,14 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
-import RoleManagementHeader from '@/components/roleManagement/RoleManagementHeader';
-import RoleManagementStats from '@/components/roleManagement/RoleManagementStats';
-import RoleManagementTabs from '@/components/roleManagement/RoleManagementTabs';
-import RolesTable from '@/components/roleManagement/RolesTable';
-import UsersTable from '@/components/roleManagement/UsersTable';
-import CreateRoleForm from '@/components/roleManagement/CreateRoleForm';
-import BulkAssignmentForm from '@/components/roleManagement/BulkAssignmentForm';
-import { getRoleManagementData } from '@/lib/actions/roleManagement';
+import { getCurrentUser } from '../../../lib/actions/auth-actions';
+import RoleManagementHeader from '../../../components/roleManagement/RoleManagementHeader';
+import RoleManagementStats from '../../../components/roleManagement/RoleManagementStats';
+import RoleManagementTabs from '../../../components/roleManagement/RoleManagementTabs';
+import RolesTable from '../../../components/roleManagement/RolesTable';
+import UsersTable from '../../../components/roleManagement/UsersTable';
+import CreateRoleForm from '../../../components/roleManagement/CreateRoleForm';
+import BulkAssignmentForm from '../../../components/roleManagement/BulkAssignmentForm';
+import { getRoleManagementData } from '../../../lib/actions/roleManagement';
 
 interface RoleManagementPageProps {
   searchParams: Promise<{
