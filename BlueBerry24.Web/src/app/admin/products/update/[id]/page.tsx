@@ -1,15 +1,16 @@
 import { notFound } from 'next/navigation';
-import { updateProduct, getProduct } from '@/lib/actions/product-actions';
-import ProductForm from '@/components/product/ProductForm';
-import { ICategoryService } from '@/lib/services/category/interface'
-import { CategoryService } from '@/lib/services/category/service'
+import { updateProduct, getProduct } from '../../../../../lib/actions/product-actions';
+import ProductForm from '../../../../../components/product/ProductForm';
+import { ICategoryService } from '../../../../../lib/services/category/interface'
+import { CategoryService } from '../../../../../lib/services/category/service'
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function EditProductPage({ params }: PageProps) {
-  const productId = parseInt(params.id);
+  var {id} = await params;
+  const productId = parseInt(id as string);
   
   if (isNaN(productId)) {
     notFound();

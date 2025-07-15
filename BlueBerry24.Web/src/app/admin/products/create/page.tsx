@@ -1,7 +1,9 @@
-import { createProduct } from '@/lib/actions/product-actions';
-import ProductForm from '@/components/product/ProductForm';
-import { CategoryService } from '@/lib/services/category/service';
-import { ICategoryService } from '@/lib/services/category/interface';
+import { createProduct } from '../../../../lib/actions/product-actions';
+import ProductForm from '../../../../components/product/ProductForm';
+import { CategoryService } from '../../../../lib/services/category/service';
+import { ICategoryService } from '../../../../lib/services/category/interface';
+
+export const dynamic = 'force-dynamic';
 
 export default async function CreateProductPage() {
 

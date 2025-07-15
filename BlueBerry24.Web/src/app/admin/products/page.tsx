@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { getProducts } from '@/lib/actions/product-actions';
-import ProductCard from '@/components/product/ProductCard';
+import { getProducts } from '../../../lib/actions/product-actions';
+import ProductCard from '../../../components/product/ProductCard';
 
+export const dynamic = 'force-dynamic';
 interface SearchParams {
   success?: string;
   error?: string;
@@ -96,9 +97,9 @@ async function ProductsList() {
 export default async function AdminProductsPage({
   searchParams,
 }: {
-  searchParams: SearchParams
+  searchParams: Promise<SearchParams>
 }) {
-  const { success, error } = searchParams;
+  const { success, error } = await searchParams;
 
   return (
     <div className="container-fluid">

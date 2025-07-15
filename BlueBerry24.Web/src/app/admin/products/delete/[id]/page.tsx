@@ -1,13 +1,14 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { deleteProduct, getProduct } from '@/lib/actions/product-actions';
+import { deleteProduct, getProduct } from '../../../../../lib/actions/product-actions';
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function DeleteProductPage({ params }: PageProps) {
-  const productId = parseInt(params.id);
+  var {id} = await params;
+  const productId = parseInt(id as string);
   
   if (isNaN(productId)) {
     notFound();
