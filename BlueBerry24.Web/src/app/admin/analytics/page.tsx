@@ -1,4 +1,4 @@
-import UnderDevelopment from '@/components/shared/UnderDevelopment';
+import UnderDevelopment from '../../../components/shared/UnderDevelopment';
 
 export default function AnalyticsPage() {
   return(
