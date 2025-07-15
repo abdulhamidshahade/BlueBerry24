@@ -1,16 +1,16 @@
-import { OrderService } from '@/lib/services/order/service';
-import { formatCurrency } from '@/lib/utils/formatCurrency';
+import { OrderService } from '../../../lib/services/order/service';
+import { formatCurrency } from '../../../lib/utils/formatCurrency';
 import { format } from 'date-fns';
 import Link from 'next/link';
-import { OrderStatus } from '@/types/order';
+import { OrderStatus } from '../../../types/order';
 import { 
   StatusUpdateModal, 
   CancelOrderModal, 
   RefundOrderModal, 
   MarkPaidModal,
   ProcessOrderModal 
-} from '@/components/admin/OrderActionModals';
-import { ExportOrdersModal } from '@/components/admin/ExportOrdersModal';
+} from '../../../components/admin/OrderActionModals';
+import { ExportOrdersModal } from '../../../components/admin/ExportOrdersModal';
 
 interface SearchParams {
   success?: string;

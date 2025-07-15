@@ -1,15 +1,15 @@
-import { OrderService } from '@/lib/services/order/service';
-import { formatCurrency } from '@/lib/utils/formatCurrency';
+import { OrderService } from '../../../../lib/services/order/service';
+import { formatCurrency } from '../../../../lib/utils/formatCurrency';
 import { format } from 'date-fns';
 import Link from 'next/link';
-import { OrderStatus } from '@/types/order';
+import { OrderStatus } from '../../../../types/order';
 import { notFound } from 'next/navigation';
 import { 
   StatusUpdateModal, 
   CancelOrderModal, 
   RefundOrderModal, 
   MarkPaidModal 
-} from '@/components/admin/OrderActionModals';
+} from '../../../../components/admin/OrderActionModals';
 
 interface SearchParams {
   success?: string;
@@ -17,8 +17,8 @@ interface SearchParams {
 }
 
 interface Props {
-  params: { id: string };
-  searchParams: SearchParams;
+  params: Promise<{ id: string }>;
+  searchParams: Promise<SearchParams>;
 }
 
 function SuccessAlert({ message }: { message: string }) {
@@ -58,8 +58,9 @@ function ErrorAlert({ message }: { message: string }) {
 }
 
 export default async function OrderDetailsPage({ params, searchParams }: Props) {
-  const { success, error } = searchParams;
-  const orderId = parseInt(params.id);
+  const { success, error } = await searchParams;
+  var {id} = await params;
+  const orderId = parseInt(id as string);
 
   if (isNaN(orderId)) {
     notFound();
