@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { getProducts } from '@/lib/actions/product-actions';
-import { getInventoryHistory } from '@/lib/actions/inventory-actions';
-import InventoryManager from '@/components/admin/InventoryManager';
-import { InventoryLogDto } from '@/types/inventory';
+import { getProducts } from '../../../lib/actions/product-actions';
+import { getInventoryHistory } from '../../../lib/actions/inventory-actions';
+import InventoryManager from '../../../components/admin/InventoryManager';
+import { InventoryLogDto } from '../../../types/inventory';
 
+export const dynamic = 'force-dynamic';
 interface ProductWithHistory {
   product: any;
   inventoryHistory: InventoryLogDto[];
