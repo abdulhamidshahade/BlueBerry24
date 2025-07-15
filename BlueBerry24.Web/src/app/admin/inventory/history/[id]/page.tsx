@@ -1,13 +1,13 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getProduct } from '@/lib/actions/product-actions';
-import { getInventoryHistory } from '@/lib/actions/inventory-actions';
-import { InventoryChangeType } from '@/types/inventory';
+import { getProduct } from '../../../../../lib/actions/product-actions';
+import { getInventoryHistory } from '../../../../../lib/actions/inventory-actions';
+import { InventoryChangeType } from '../../../../../types/inventory';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 function getChangeTypeIcon(changeType: InventoryChangeType): string {
@@ -76,7 +76,8 @@ function formatQuantityChange(quantity: number): { text: string; className: stri
 }
 
 export default async function InventoryHistoryPage({ params }: PageProps) {
-  const productId = parseInt(params.id);
+  var resolvedSearchParams = await params;
+  const productId = parseInt(resolvedSearchParams.id);
   
   if (isNaN(productId)) {
     notFound();

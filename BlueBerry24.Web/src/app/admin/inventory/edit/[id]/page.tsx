@@ -1,13 +1,13 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getProduct } from '@/lib/actions/product-actions';
-import { updateProduct } from '@/lib/actions/product-actions';
-import { getInventoryHistory } from '@/lib/actions/inventory-actions';
+import { getProduct } from '../../../../../lib/actions/product-actions';
+import { updateProduct } from '../../../../../lib/actions/product-actions';
+import { getInventoryHistory } from '../../../../../lib/actions/inventory-actions';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 async function handleUpdateProduct(formData: FormData) {
@@ -16,8 +16,10 @@ async function handleUpdateProduct(formData: FormData) {
 }
 
 export default async function InventoryEditProductPage({ params }: PageProps) {
-  const productId = parseInt(params.id);
+  var resolvedSearchParams = await params;
   
+  const productId = parseInt(resolvedSearchParams.id);
+
   if (isNaN(productId)) {
     notFound();
   }
