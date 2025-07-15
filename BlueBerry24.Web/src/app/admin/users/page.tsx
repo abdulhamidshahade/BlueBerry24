@@ -1,12 +1,12 @@
 import { redirect } from 'next/navigation';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
-import { RoleManagementService } from '@/lib/services/roleManagement/service';
-import { UserWithRoles, Role } from '@/types/roleManagement';
-import UserManagement from '@/components/admin/UserManagement';
-import { getAllUsers } from '@/lib/actions/coupon-actions';
+import { getCurrentUser } from '../../../lib/actions/auth-actions';
+import { RoleManagementService } from '../../../lib/services/roleManagement/service';
+import { UserWithRoles, Role } from '../../../types/roleManagement';
+import UserManagement from '../../../components/admin/UserManagement';
+import { getAllUsers } from '../../../lib/actions/coupon-actions';
 
 interface UsersPageProps {
-  searchParams: {
+  searchParams: Promise<{
     search?: string;
     status?: string;
     modal?: string;
@@ -14,12 +14,12 @@ interface UsersPageProps {
     showAll?: string;
     success?: string;
     error?: string;
-  };
+  }>;
 }
 
 export default async function UsersPage({ searchParams }: UsersPageProps) {
   const user = await getCurrentUser();
-  
+  var resolvedSearchParams = await searchParams;
   if (!user) {
     redirect('/auth/login?redirectTo=/admin/users');
   }
@@ -51,18 +51,18 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
 
   return (
     <div className="p-4">
-      {searchParams.success && (
+      {resolvedSearchParams.success && (
         <div className="alert alert-success alert-dismissible fade show" role="alert">
           <i className="bi bi-check-circle me-2"></i>
-          {decodeURIComponent(searchParams.success)}
+          {decodeURIComponent(resolvedSearchParams.success)}
           <a href="/admin/users" className="btn-close"></a>
         </div>
       )}
       
-      {searchParams.error && (
+      {resolvedSearchParams.error && (
         <div className="alert alert-danger alert-dismissible fade show" role="alert">
           <i className="bi bi-exclamation-triangle me-2"></i>
-          {decodeURIComponent(searchParams.error)}
+          {decodeURIComponent(resolvedSearchParams.error)}
           <a href="/admin/users" className="btn-close"></a>
         </div>
       )}
@@ -73,11 +73,11 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
             users={users}
             roles={roles}
             currentUser={user}
-            searchQuery={searchParams.search}
-            statusFilter={searchParams.status}
-            showModal={searchParams.modal}
-            selectedUserId={searchParams.id}
-            showAll={searchParams.showAll}
+            searchQuery={resolvedSearchParams.search}
+            statusFilter={resolvedSearchParams.status}
+            showModal={resolvedSearchParams.modal}
+            selectedUserId={resolvedSearchParams.id}
+            showAll={resolvedSearchParams.showAll}
           />
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
-import { RoleManagementService } from '@/lib/services/roleManagement/service';
-import { UserWithRoles } from '@/types/roleManagement';
+import { getCurrentUser } from '../../../../lib/actions/auth-actions';
+import { RoleManagementService } from '../../../../lib/services/roleManagement/service';
+import { UserWithRoles } from '../../../../types/roleManagement';
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     let users: UserWithRoles[] = [];
     try {
       const response = await RoleManagementService.getAllUsers();
-      users = response.data || [];
+      users = response || [];
     } catch (error) {
       console.error('Failed to fetch users:', error);
       return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
