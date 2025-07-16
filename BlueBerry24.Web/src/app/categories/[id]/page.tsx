@@ -1,16 +1,16 @@
 import { Suspense } from 'react';
-import { CategoryService } from "@/lib/services/category/service";
-import { ICategoryService } from "@/lib/services/category/interface";
-import { CategoryDto } from "@/types/category";
-import ProductCard from "@/components/product/ProductCard";
+import { CategoryService } from "../../../lib/services/category/service";
+import { ICategoryService } from "../../../lib/services/category/interface";
+import { CategoryDto } from "../../../types/category";
+import ProductCard from "../../../components/product/ProductCard";
 import { notFound } from 'next/navigation';
 
 const categoryService: ICategoryService = new CategoryService();
 
 interface CategoryDetailsPageProps {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 }
 
 function ProductsLoadingSkeleton() {
@@ -170,9 +170,9 @@ function Breadcrumb({ category }: { category: CategoryDto }) {
 
 export default async function CategoryDetailsPage({ params }: CategoryDetailsPageProps) {
     let category: CategoryDto;
-
+    var resolvedParams = await params;
     try {
-        const categoryId = parseInt(params.id);
+        const categoryId = parseInt(resolvedParams.id);
         if (isNaN(categoryId)) {
             notFound();
         }

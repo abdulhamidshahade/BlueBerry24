@@ -1,7 +1,7 @@
-import CategoryList from "@/components/category/CategoryList";
-import { CategoryService } from "@/lib/services/category/service";
-import { ICategoryService } from "@/lib/services/category/interface";
-import { CategoryDto } from "@/types/category";
+import CategoryList from "../../components/category/CategoryList";
+import { CategoryService } from "../../lib/services/category/service";
+import { ICategoryService } from "../../lib/services/category/interface";
+import { CategoryDto } from "../../types/category";
 
 const categoryService: ICategoryService = new CategoryService();
 
