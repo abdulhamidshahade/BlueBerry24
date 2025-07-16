@@ -1,5 +1,5 @@
-import ResendConfirmationForm from '@/components/auth/ResendConfirmationForm';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
+import ResendConfirmationForm from '../../../components/auth/ResendConfirmationForm';
+import { getCurrentUser } from '../../../lib/actions/auth-actions';
 import { redirect } from 'next/navigation';
 
 interface ResendConfirmationPageProps {

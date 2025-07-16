@@ -1,5 +1,5 @@
-import EmailConfirmationForm from '@/components/auth/EmailConfirmationForm';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
+import EmailConfirmationForm from '../../../components/auth/EmailConfirmationForm';
+import { getCurrentUser } from '../../../lib/actions/auth-actions';
 import { redirect } from 'next/navigation';
 
 interface EmailConfirmationPageProps {

@@ -1,5 +1,5 @@
-import LoginForm from '@/components/auth/LoginForm';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
+import LoginForm from '../../../components/auth/LoginForm';
+import { getCurrentUser } from '../../../lib/actions/auth-actions';
 import { redirect } from 'next/navigation';
 
 interface LoginPageProps {

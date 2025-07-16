@@ -1,5 +1,5 @@
-import ResetPasswordForm from '@/components/auth/ResetPasswordForm';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
+import ResetPasswordForm from '../../../components/auth/ResetPasswordForm';
+import { getCurrentUser } from '../../../lib/actions/auth-actions';
 import { redirect } from 'next/navigation';
 
 interface ResetPasswordPageProps {

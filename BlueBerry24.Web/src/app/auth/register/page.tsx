@@ -1,5 +1,5 @@
-import RegisterForm from '@/components/auth/RegisterForm';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
+import RegisterForm from '../../../components/auth/RegisterForm';
+import { getCurrentUser } from '../../../lib/actions/auth-actions';
 import { redirect } from 'next/navigation';
 
 interface RegisterPageProps {

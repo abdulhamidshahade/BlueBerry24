@@ -1,5 +1,5 @@
-import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
+import ForgotPasswordForm from '../../../components/auth/ForgotPasswordForm';
+import { getCurrentUser } from '../../../lib/actions/auth-actions';
 import { redirect } from 'next/navigation';
 
 interface ForgotPasswordPageProps {
