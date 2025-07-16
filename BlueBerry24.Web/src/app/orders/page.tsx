@@ -1,7 +1,7 @@
-import { getCurrentUser } from '@/lib/actions/auth-actions';
-import { OrderService } from '@/lib/services/order/service';
-import { formatCurrency } from '@/lib/utils/formatCurrency';
-import { OrderStatus } from '@/types/order';
+import { getCurrentUser } from '../../lib/actions/auth-actions';
+import { OrderService } from '../../lib/services/order/service';
+import { formatCurrency } from '../../lib/utils/formatCurrency';
+import { OrderStatus } from '../../types/order';
 import { format } from 'date-fns';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { OrderService } from '@/lib/services/order/service';
-import { OrderStatus } from '@/types/order';
+import { OrderService } from '../../../lib/services/order/service';
+import { OrderStatus } from '../../../types/order';
 
 interface OrderDetailPageProps {
   params: Promise<{
