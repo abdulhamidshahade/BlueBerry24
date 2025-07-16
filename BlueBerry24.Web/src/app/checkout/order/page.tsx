@@ -1,25 +1,26 @@
 import Link from 'next/link';
-import { OrderService } from '@/lib/services/order/service';
+import { OrderService } from '../../../lib/services/order/service';
 import { redirect } from 'next/navigation';
-import { formatCurrency } from '@/lib/utils/formatCurrency';
+import { formatCurrency } from '../../../lib/utils/formatCurrency';
 
 interface OrderReviewPageProps {
-  searchParams: {
+  searchParams: Promise<{
     id?: string;
-  };
+  }>;
 }
-
+export const dynamic = 'force-dynamic';
 export default async function OrderReviewPage({ searchParams }: OrderReviewPageProps) {
-  const orderId = searchParams.id;
 
-  if (!orderId) {
+  const resolvedSearchParams = await searchParams;
+
+  if (!resolvedSearchParams.id) {
     redirect('/cart?error=' + encodeURIComponent('Order ID is required to view order details.'));
   }
 
   let order = null;
   try {
     const orderService = new OrderService();
-    order = await orderService.getById(parseInt(orderId));
+    order = await orderService.getById(parseInt(resolvedSearchParams.id));
   } catch (error) {
     console.error('Error fetching order:', error);
     redirect('/cart?error=' + encodeURIComponent('Unable to find the requested order. Please try again.'));

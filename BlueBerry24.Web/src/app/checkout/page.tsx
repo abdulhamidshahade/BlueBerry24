@@ -1,11 +1,13 @@
-import { getCart } from '@/lib/actions/cart-actions';
-import CheckoutForm from '@/components/checkout/CheckoutForm';
+import { getCart } from '../../lib/actions/cart-actions';
+import CheckoutForm from '../../components/checkout/CheckoutForm';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 interface CheckoutPageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
+
+export const dynamic = 'force-dynamic';
 
 export default async function CheckoutPage({ searchParams }: CheckoutPageProps) {
   const cart = await getCart();
@@ -14,7 +16,9 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
     redirect('/cart');
   }
 
-  const error = searchParams?.error as string;
+  var resolvedSearchParams = await searchParams;
+
+  const error = resolvedSearchParams?.error as string;
 
   return (
     <div className="container py-4">
@@ -66,7 +70,7 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
         </div>
       )}
 
-      <CheckoutForm cart={cart} searchParams={searchParams} />
+      <CheckoutForm cart={cart} searchParams={resolvedSearchParams} />
     </div>
   );
 } 
