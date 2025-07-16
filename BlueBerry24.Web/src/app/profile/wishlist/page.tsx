@@ -1,21 +1,23 @@
 import { redirect } from 'next/navigation';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
-import { getUserWishlists } from '@/lib/actions/wishlist-actions';
-import WishlistManagement from '@/components/layout/WishlistManagement';
+import { getCurrentUser } from '../../../lib/actions/auth-actions';
+import { getUserWishlists } from '../../../lib/actions/wishlist-actions';
+import WishlistManagement from '../../../components/layout/WishlistManagement';
+
+export const dynamic = 'force-dynamic';
 
 interface WishlistPageProps {
-  searchParams: {
+  searchParams: Promise<{
     modal?: string;
     id?: string;
     productId?: string;
     success?: string;
     error?: string;
-  };
+  }>;
 }
 
 export default async function WishlistPage({ searchParams }: WishlistPageProps) {
   const user = await getCurrentUser();
-  
+  const resolvedSearchParams = await searchParams;
   if (!user) {
     redirect('/auth/login?redirectTo=/profile/wishlist');
   }
@@ -35,11 +37,11 @@ export default async function WishlistPage({ searchParams }: WishlistPageProps) 
           <WishlistManagement 
             wishlists={wishlists}
             currentUser={user}
-            showModal={searchParams.modal}
-            selectedWishlistId={searchParams.id}
-            selectedProductId={searchParams.productId}
-            success={searchParams.success}
-            error={searchParams.error}
+            showModal={resolvedSearchParams.modal}
+            selectedWishlistId={resolvedSearchParams.id}
+            selectedProductId={resolvedSearchParams.productId}
+            success={resolvedSearchParams.success}
+            error={resolvedSearchParams.error}
           />
         </div>
       </div>

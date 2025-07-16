@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { getMyPayments } from '@/lib/actions/payment-actions';
-import { PaymentStatus, PaymentMethod, Payment } from '@/types/payment';
+import { getMyPayments } from '../../../lib/actions/payment-actions';
+import { PaymentStatus, PaymentMethod, Payment } from '../../../types/payment';
 
 interface UserPaymentsPageProps {
   searchParams: Promise<{

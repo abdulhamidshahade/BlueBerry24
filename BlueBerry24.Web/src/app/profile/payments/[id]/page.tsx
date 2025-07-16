@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getPaymentById } from '@/lib/actions/payment-actions';
-import { getOrderByPaymentId } from '@/lib/actions/order-actions';
-import { PaymentStatus, PaymentMethod } from '@/types/payment';
-import { OrderStatus } from '@/types/order';
+import { getPaymentById } from '../../../../lib/actions/payment-actions';
+import { getOrderByPaymentId } from '../../../../lib/actions/order-actions';
+import { PaymentStatus, PaymentMethod } from '../../../../types/payment';
+import { OrderStatus } from '../../../../types/order';
 
 interface ReceiptPageProps {
   params: Promise<{

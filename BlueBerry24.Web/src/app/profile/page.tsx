@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/actions/auth-actions";
+import { getCurrentUser } from "../../lib/actions/auth-actions";
 import { redirect } from "next/navigation";
 
 export default async function ProfilePage() {

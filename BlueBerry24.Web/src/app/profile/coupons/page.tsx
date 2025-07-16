@@ -1,13 +1,13 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
-import { getUserCoupons, hasUserUsedCoupon } from '@/lib/actions/coupon-actions';
+import { getCurrentUser } from '../../../lib/actions/auth-actions';
+import { getUserCoupons, hasUserUsedCoupon } from '../../../lib/actions/coupon-actions';
 import { 
   CouponTypeDisplay, 
   CouponValueDisplay, 
   CouponMinimumAmountDisplay 
-} from '@/components/coupon/CouponDisplayComponents';
-import { CouponDto } from '@/types/coupon';
+} from '../../../components/coupon/CouponDisplayComponents';
+import { CouponDto } from '../../../types/coupon';
 import { redirect } from 'next/navigation';
 
 function CouponsLoadingSkeleton() {
