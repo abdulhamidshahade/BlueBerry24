@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { processPayment } from '@/lib/actions/payment-actions';
+import { processPayment } from '../../lib/actions/payment-actions';
 
 interface PaymentPageProps {
   searchParams: Promise<{

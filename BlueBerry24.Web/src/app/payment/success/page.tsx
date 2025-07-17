@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getPaymentByTransactionId } from '@/lib/actions/payment-actions';
+import { getPaymentByTransactionId } from '../../../lib/actions/payment-actions';
 
 interface PaymentSuccessPageProps {
   searchParams: Promise<{
