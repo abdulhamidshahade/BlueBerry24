@@ -1,6 +1,8 @@
 import { Suspense } from 'react';
-import { getProducts } from '@/lib/actions/product-actions';
-import ProductCard from '@/components/product/ProductCard';
+import { getProducts } from '../../lib/actions/product-actions';
+import ProductCard from '../../components/product/ProductCard';
+
+export const dynamic = 'force-dynamic';
 
 function ProductsLoadingSkeleton() {
   return (

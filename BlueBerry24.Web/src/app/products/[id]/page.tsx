@@ -1,11 +1,11 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getProduct } from '@/lib/actions/product-actions';
-import AddToCartForm from '@/components/cart/AddToCartForm';
-import WishlistButton from '@/components/product/WishlistButton';
+import { getProduct } from '../../../lib/actions/product-actions';
+import AddToCartForm from '../../../components/cart/AddToCartForm';
+import WishlistButton from '../../../components/product/WishlistButton';
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function ProductDetailPage({ params }: PageProps) {
