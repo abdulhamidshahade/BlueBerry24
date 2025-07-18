@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
-import { getAllWishlists } from '@/lib/actions/admin-wishlist-actions';
+import { getCurrentUser } from '../../../../lib/actions/auth-actions';
+import { getAllWishlists } from '../../../../lib/actions/admin-wishlist-actions';
 
 export async function GET(request: NextRequest) {
   try {

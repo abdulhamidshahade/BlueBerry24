@@ -1,20 +1,22 @@
 import { redirect } from 'next/navigation';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
-import { getAllWishlists, getGlobalWishlistStats } from '@/lib/actions/admin-wishlist-actions';
-import AdminWishlistManagement from '@/components/admin/AdminWishlistManagement';
+import { getCurrentUser } from '../../../lib/actions/auth-actions';
+import { getAllWishlists, getGlobalWishlistStats } from '../../../lib/actions/admin-wishlist-actions';
+import AdminWishlistManagement from '../../../components/admin/AdminWishlistManagement';
 
 interface AdminWishlistPageProps {
-  searchParams: {
+  searchParams: Promise<{
     modal?: string;
     id?: string;
     filter?: string;
     success?: string;
     error?: string;
-  };
+  }>;
 }
 
 export default async function AdminWishlistPage({ searchParams }: AdminWishlistPageProps) {
   const user = await getCurrentUser();
+
+  var resolvedSearchParams = await searchParams;
   
   if (!user) {
     redirect('/auth/login?redirectTo=/admin/wishlists');
@@ -46,10 +48,10 @@ export default async function AdminWishlistPage({ searchParams }: AdminWishlistP
             wishlists={wishlists}
             stats={stats}
             currentUser={user}
-            showModal={searchParams.modal}
-            selectedWishlistId={searchParams.id}
-            success={searchParams.success}
-            error={searchParams.error}
+            showModal={resolvedSearchParams.modal}
+            selectedWishlistId={resolvedSearchParams.id}
+            success={resolvedSearchParams.success}
+            error={resolvedSearchParams.error}
           />
         </div>
       </div>
