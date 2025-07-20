@@ -3,7 +3,7 @@ import { CartDto,
          UpdateCartItemDto, 
          ApplyCouponDto, 
          CheckoutRequest, 
-         CheckoutResponse } from "@/types/cart";
+         CheckoutResponse } from "../../../types/cart";
 
 export interface ICartService {
   create(): Promise<CartDto>;

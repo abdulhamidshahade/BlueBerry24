@@ -5,10 +5,10 @@ import {
   ApplyCouponDto,
   CheckoutRequest,
   CheckoutResponse,
-} from "@/types/cart";
+} from "../../../types/cart";
 import { ICartService } from "./interface";
-import { ResponseDto } from "@/types/responseDto";
-import { apiRequest } from "@/lib/utils/api";
+import { ResponseDto } from "../../../types/responseDto";
+import { apiRequest } from "../../utils/api";
 import { cookies } from "next/headers";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -23,7 +23,6 @@ export class CartService implements ICartService {
 
     try {
       const json: ResponseDto<CartDto> = await apiRequest(url, {
-        cache: "no-store",
         requireAuth: true,
       });
 
@@ -48,7 +47,6 @@ export class CartService implements ICartService {
   async getById(id: number): Promise<CartDto> {
     try {
       const json: ResponseDto<CartDto> = await apiRequest(`${API_BASE}/${id}`, {
-        cache: "no-store",
       });
 
       if (!json.isSuccess || !json.data) {
@@ -69,7 +67,6 @@ export class CartService implements ICartService {
 
     try {
       const json: ResponseDto<CartDto> = await apiRequest(url, {
-        cache: "no-store",
         headers: {
           "X-Session-Id": sessionId ?? "",
         },
