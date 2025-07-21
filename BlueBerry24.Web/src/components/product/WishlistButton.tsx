@@ -1,5 +1,5 @@
-import { quickAddToWishlist, quickRemoveFromWishlist, isProductInWishlist } from '@/lib/actions/wishlist-actions';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
+import { quickAddToWishlist, quickRemoveFromWishlist, isProductInWishlist } from '../../lib/actions/wishlist-actions';
+import { getCurrentUser } from '../../lib/actions/auth-actions';
 
 interface WishlistButtonProps {
   productId: number;

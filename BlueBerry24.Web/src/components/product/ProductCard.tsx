@@ -1,6 +1,6 @@
-import { ProductDto } from "@/types/product";
+import { ProductDto } from "../../types/product";
 import Link from "next/link";
-import AddToCartForm from "@/components/cart/AddToCartForm";
+import AddToCartForm from "../cart/AddToCartForm";
 
 interface ProductCardProps {
   product: ProductDto;

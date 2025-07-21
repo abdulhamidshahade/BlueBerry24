@@ -1,5 +1,5 @@
-import { CategoryDto } from "@/types/category";
-import { ProductDto } from "@/types/product";
+import { CategoryDto } from "../../types/category";
+import { ProductDto } from "../../types/product";
 
 interface ProductFormProps {
   product?: ProductDto;
