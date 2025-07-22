@@ -1,7 +1,7 @@
-import { CategoryService } from '@/lib/services/category/service';
-import { ICategoryService } from '@/lib/services/category/interface';
-import { CategoryDto } from '@/types/category';
-import { deleteCategory, validateConfirmation } from '@/lib/actions/category-actions';
+import { CategoryService } from '../../lib/services/category/service';
+import { ICategoryService } from '../../lib/services/category/interface';
+import { CategoryDto } from '../../types/category';
+import { deleteCategory, validateConfirmation } from '../../lib/actions/category-actions';
 
 interface Props {
   category: CategoryDto;

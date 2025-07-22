@@ -1,4 +1,4 @@
-import { CategoryDto } from "@/types/category";
+import { CategoryDto } from "../../types/category";
 
 interface Props {
   categories: CategoryDto[];
