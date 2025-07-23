@@ -1,4 +1,4 @@
-import { CouponDto, CouponType } from '@/types/coupon';
+import { CouponDto, CouponType } from '../../types/coupon';
 
 interface CouponTypeDisplayProps {
   type: CouponType;
@@ -15,16 +15,6 @@ export function CouponTypeDisplay({ type }: CouponTypeDisplayProps) {
       label: 'Fixed Amount', 
       icon: 'bi-currency-dollar', 
       class: 'bg-primary' 
-    },
-    [CouponType.FreeShipping]: { 
-      label: 'Free Shipping', 
-      icon: 'bi-truck', 
-      class: 'bg-info' 
-    },
-    [CouponType.BuyXGetY]: { 
-      label: 'Buy X Get Y', 
-      icon: 'bi-gift', 
-      class: 'bg-warning text-dark' 
     },
   };
 
@@ -57,10 +47,6 @@ export function CouponValueDisplay({ coupon }: CouponValueDisplayProps) {
       return `${coupon.value}%`;
     case CouponType.FixedAmount:
       return `$${coupon.value.toFixed(2)}`;
-    case CouponType.FreeShipping:
-      return 'Free';
-    case CouponType.BuyXGetY:
-      return `Buy ${coupon.value} Get 1`;
     default:
       return `$${coupon.value.toFixed(2)}`;
   }
@@ -126,8 +112,6 @@ export function CouponTypeSelect({ name, required = false, defaultValue }: Coupo
       <option value="">Select coupon type</option>
       <option value={CouponType.Percentage}>Percentage Discount</option>
       <option value={CouponType.FixedAmount}>Fixed Amount Discount</option>
-      <option value={CouponType.FreeShipping}>Free Shipping</option>
-      <option value={CouponType.BuyXGetY}>Buy X Get Y</option>
     </select>
   );
 } 

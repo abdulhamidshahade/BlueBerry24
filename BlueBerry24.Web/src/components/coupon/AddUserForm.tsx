@@ -1,8 +1,8 @@
 
-import { User } from '@/types/user';
+import { User } from '../../types/user';
 import Link from 'next/link';
-import {addCouponToUserAction} from '@/lib/actions/coupon-actions';
-import { getAllUsers } from '@/lib/actions/coupon-actions';
+import {addCouponToUserAction} from '../../lib/actions/coupon-actions';
+import { getAllUsers } from '../../lib/actions/coupon-actions';
 
 
 export async function AddUserForm({ couponId }: { couponId: number }) {

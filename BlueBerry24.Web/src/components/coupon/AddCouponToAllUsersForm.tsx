@@ -1,9 +1,9 @@
-import { getCoupons, addCouponToAllUsersAction } from '@/lib/actions/coupon-actions';
+import { getCoupons, addCouponToAllUsersAction } from '../../lib/actions/coupon-actions';
 
-import { User } from '@/types/user';
-import { CouponDto } from '@/types/coupon';
+import { User } from '../../types/user';
+import { CouponDto } from '../../types/coupon';
 import Link from 'next/link';
-import { getAllUsers } from '@/lib/actions/coupon-actions';
+import { getAllUsers } from '../../lib/actions/coupon-actions';
 
 export async function AddCouponToAllUsersForm() {
   let users: User[] = [];

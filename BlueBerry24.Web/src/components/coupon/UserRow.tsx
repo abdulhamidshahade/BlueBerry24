@@ -1,4 +1,4 @@
-import {hasUserUsedCoupon, disableUserCouponAction } from '@/lib/actions/coupon-actions';
+import {hasUserUsedCoupon, disableUserCouponAction } from '../../lib/actions/coupon-actions';
 
 export async function UserRow({ user, couponId, couponCode }: { user: any; couponId: number; couponCode: string }) {
   const hasUsed = await hasUserUsedCoupon(user.id, couponCode);

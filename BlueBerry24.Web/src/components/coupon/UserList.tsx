@@ -1,5 +1,5 @@
-import { UserRow } from '@/components/coupon/UserRow';
-import {getCouponUsers} from '@/lib/actions/coupon-actions';
+import { UserRow } from './UserRow';
+import {getCouponUsers} from '../../lib/actions/coupon-actions';
 import Link from 'next/link';
 
 
