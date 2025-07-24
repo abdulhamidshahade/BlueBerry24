@@ -1,8 +1,8 @@
-import { Order, OrderStatus } from "@/types/order";
+import { Order, OrderStatus } from "../../../types/order";
 import { IOrderService } from "./interface";
-import { ResponseDto } from "@/types/responseDto";
+import { ResponseDto } from "../../../types/responseDto";
 import { cookies } from 'next/headers';
-import { apiRequest } from "@/lib/utils/api";
+import { apiRequest } from "../../utils/api";
 
 const API_BASE_URL = 'https://localhost:7105/api';
 const API_BASE_ORDER = `${API_BASE_URL}/Orders`;
@@ -15,7 +15,6 @@ export class OrderService implements IOrderService {
     const res: ResponseDto<Order> = await apiRequest(`${API_BASE_ORDER}/${orderId}`, {
  
       requireAuth: true,
-      cache: 'no-store'
     });
     
     if (!res.isSuccess) {
@@ -32,7 +31,6 @@ export class OrderService implements IOrderService {
   async getOrderByPaymentId(paymentId: number): Promise<Order> {
     const res: ResponseDto<Order> = await apiRequest(`${API_BASE_ORDER}/payment/${paymentId}`, {
       requireAuth: true,
-      cache: 'no-store'
     });
     
     if (!res.isSuccess) {
@@ -57,7 +55,6 @@ export class OrderService implements IOrderService {
     
     const res: ResponseDto<Order[]> = await apiRequest(`${API_BASE_ORDER}/user/${sessionId}?page=${page}&pageSize=${pageSize}`, {
       requireAuth: true,
-      cache: 'no-store'
     });
     
     if (!res.isSuccess) {
@@ -75,7 +72,6 @@ export class OrderService implements IOrderService {
   async getOrdersByStatus(status: OrderStatus, page: number = 1, pageSize: number = 10): Promise<Order[]> {
     const res: ResponseDto<Order[]> = await apiRequest(`${API_BASE_ORDER}/status/${status}?page=${page}&pageSize=${pageSize}`, {
       requireAuth: true,
-      cache: 'no-store'
     });
     
     if (!res.isSuccess) {
@@ -125,7 +121,6 @@ export class OrderService implements IOrderService {
   async getAllOrders(page: number = 1, pageSize: number = 50): Promise<Order[]> {
     const res: ResponseDto<Order[]> = await apiRequest(`${API_BASE_ORDER}/admin/all?page=${page}&pageSize=${pageSize}`, {
       requireAuth: true,
-      cache: 'no-store'
     });
     
     if (!res.isSuccess) {

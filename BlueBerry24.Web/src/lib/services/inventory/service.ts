@@ -1,9 +1,9 @@
-import { apiRequest } from "@/lib/utils/api";
+import { apiRequest } from "../../utils/api";
 import {
   InventoryLogDto,
-} from "@/types/inventory";
-import { ProductDto } from "@/types/product";
-import { ResponseDto } from "@/types/responseDto";
+} from "../../../types/inventory";
+import { ProductDto } from "../../../types/product";
+import { ResponseDto } from "../../../types/responseDto";
 
 export interface AddStockRequest {
   productId: number;

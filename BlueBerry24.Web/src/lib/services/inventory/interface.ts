@@ -1,6 +1,6 @@
-import { ProductDto } from "@/types/product";
+import { ProductDto } from "../../../types/product";
 import { AddStockRequest, AdjustStockRequest } from "./service";
-import { InventoryLogDto } from "@/types/inventory";
+import { InventoryLogDto } from "../../../types/inventory";
 
 export interface IInventoryService{
 

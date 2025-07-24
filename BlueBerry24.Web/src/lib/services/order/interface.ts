@@ -1,4 +1,4 @@
-import { Order, OrderStatus } from "@/types/order";
+import { Order, OrderStatus } from "../../../types/order";
 
 export interface IOrderService {
   getById(orderId: number): Promise<Order>;

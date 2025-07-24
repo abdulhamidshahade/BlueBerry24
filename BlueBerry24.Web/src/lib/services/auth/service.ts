@@ -1,8 +1,8 @@
-import { LoginRequest, RegisterRequest, AuthResponse, ApiResponse, AuthLog } from '@/types/auth';
-import { ResponseDto } from '@/types/responseDto';
+import { LoginRequest, RegisterRequest, AuthResponse, ApiResponse, AuthLog } from '../../../types/auth';
+import { ResponseDto } from '../../../types/responseDto';
 import { cookies } from 'next/headers';
-import { User } from '@/types/user';
-import { apiRequest } from '@/lib/utils/api';
+import { User } from '../../../types/user';
+import { apiRequest } from '../../utils/api';
 
 const API_BASE_URL = process.env.API_BASE_AUTH;
 
