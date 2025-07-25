@@ -1,5 +1,5 @@
-import { User } from "@/types/user";
-import { CouponDto, CreateCouponDto, UpdateCouponDto, UserCouponDto } from "@/types/coupon";
+import { User } from "../../../types/user";
+import { CouponDto, CreateCouponDto, UpdateCouponDto, UserCouponDto } from "../../../types/coupon";
 
 export interface ICouponService {
   getAll(): Promise<CouponDto[]>;

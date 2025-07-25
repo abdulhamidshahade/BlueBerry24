@@ -1,8 +1,8 @@
-import { CouponDto, CreateCouponDto, UpdateCouponDto, UserCouponDto } from "@/types/coupon";
+import { CouponDto, CreateCouponDto, UpdateCouponDto, UserCouponDto } from "../../../types/coupon";
 import { ICouponService } from "./interface";
-import { ResponseDto } from "@/types/responseDto";
-import { apiRequest } from "@/lib/utils/api";
-import { User } from "@/types/user";
+import { ResponseDto } from "../../../types/responseDto";
+import { apiRequest } from "../../utils/api";
+import { User } from "../../../types/user";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const API_BASE = process.env.API_BASE_COUPON;
@@ -12,7 +12,6 @@ export class CouponService implements ICouponService {
     try {
       const json: ResponseDto<CouponDto[]> = await apiRequest(`${API_BASE}`, {
         requireAuth: true,
-        cache: 'no-store'
       });
       if (!json.isSuccess || !json.data) {
         console.warn('Coupons API returned no data, returning empty array');
@@ -29,7 +28,6 @@ export class CouponService implements ICouponService {
     try {
       const json: ResponseDto<CouponDto> = await apiRequest(`${API_BASE}/${id}`, {
         requireAuth: true,
-        cache: 'no-store'
       });
       if (!json.isSuccess || !json.data) throw new Error(json.statusMessage);
       return json.data;
@@ -43,7 +41,6 @@ export class CouponService implements ICouponService {
     try {
       const json: ResponseDto<CouponDto> = await apiRequest(`${API_BASE}/code/${code}`, {
         requireAuth: true,
-        cache: 'no-store'
       });
       if (!json.isSuccess || !json.data) throw new Error(json.statusMessage);
       return json.data;
@@ -56,7 +53,6 @@ export class CouponService implements ICouponService {
   async getUserCoupons(userId: number): Promise<CouponDto[]> {
     try {
       const res: ResponseDto<CouponDto[]> = await apiRequest(`${API_BASE}/users/${userId}/coupons`, {
-        cache: 'no-store',
         requireAuth: true
       });
 
@@ -75,7 +71,6 @@ export class CouponService implements ICouponService {
     try {
       const res: ResponseDto<User[]> = await apiRequest(`${API_BASE}/${couponId}/users`, {
         requireAuth: true,
-        cache: 'no-store'
       });
 
       if (!res.isSuccess || !res.data) {
