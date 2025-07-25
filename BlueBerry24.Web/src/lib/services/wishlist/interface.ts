@@ -7,7 +7,7 @@ import {
   UpdateWishlistItemDto,
   WishlistSummaryDto,
   GlobalWishlistStatsDto 
-} from '@/types/wishlist';
+} from '../../../types/wishlist';
 
 export interface IWishlistService {
   getUserWishlists(): Promise<WishlistDto[]>;

@@ -7,9 +7,9 @@ import {
   UpdateWishlistItemDto,
   WishlistSummaryDto,
   WishlistResponse 
-} from '@/types/wishlist';
+} from '../../../types/wishlist';
 import { IWishlistService } from './interface';
-import { apiRequest } from '@/lib/utils/api';
+import { apiRequest } from '../../utils/api';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const API_BASE = 'https://localhost:7105/api';
@@ -20,7 +20,6 @@ export class WishlistService implements IWishlistService {
     try {
       const response: WishlistResponse<WishlistDto[]> = await apiRequest(`${API_BASE}/Wishlists`, {
         requireAuth: true,
-        cache: 'no-cache'
       });
       
       if (!response.isSuccess || !response.data) {
@@ -37,7 +36,6 @@ export class WishlistService implements IWishlistService {
     try {
       const response: WishlistResponse<WishlistDto> = await apiRequest(`${API_BASE}/Wishlists/${id}`, {
         requireAuth: true,
-        cache: 'no-cache'
       });
       
       if (!response.isSuccess || !response.data) {
@@ -54,7 +52,6 @@ export class WishlistService implements IWishlistService {
     try {
       const response: WishlistResponse<WishlistDto> = await apiRequest(`${API_BASE}/Wishlists/default`, {
         requireAuth: true,
-        cache: 'no-cache'
       });
       
       if (!response.isSuccess || !response.data) {
@@ -71,7 +68,6 @@ export class WishlistService implements IWishlistService {
     try {
       const response: WishlistResponse<WishlistSummaryDto> = await apiRequest(`${API_BASE}/Wishlists/summary`, {
         requireAuth: true,
-        cache: 'no-cache'
       });
       
       if (!response.isSuccess || !response.data) {
@@ -201,7 +197,6 @@ export class WishlistService implements IWishlistService {
     try {
       const response: WishlistResponse<{ isInWishlist: boolean }> = await apiRequest(`${API_BASE}/Wishlists/check-product/${productId}`, {
         requireAuth: true,
-        cache: 'no-cache'
       });
       
       if (!response.isSuccess || !response.data) {
@@ -307,7 +302,6 @@ export class WishlistService implements IWishlistService {
     try {
       const response: WishlistResponse<WishlistDto[]> = await apiRequest(`${API_BASE}/Wishlists/admin/all`, {
         requireAuth: true,
-        cache: 'no-cache'
       });
       
       if (!response.isSuccess || !response.data) {
@@ -324,7 +318,6 @@ export class WishlistService implements IWishlistService {
     try {
       const response: WishlistResponse<any> = await apiRequest(`${API_BASE}/Wishlists/admin/stats`, {
         requireAuth: true,
-        cache: 'no-cache'
       });
       
       if (!response.isSuccess || !response.data) {
