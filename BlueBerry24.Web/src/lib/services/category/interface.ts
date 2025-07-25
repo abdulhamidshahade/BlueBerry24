@@ -1,4 +1,4 @@
-import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from "@/types/category";
+import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from "../../../types/category";
 
 export interface ICategoryService {
   getAll(): Promise<CategoryDto[]>;
