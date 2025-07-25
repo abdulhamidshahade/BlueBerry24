@@ -2,9 +2,9 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { AuthService } from '@/lib/services/auth/service';
-import { LoginRequest, RegisterRequest } from '@/types/auth';
-import { User } from '@/types/user';
+import { AuthService } from '../services/auth/service';
+import { LoginRequest, RegisterRequest } from '../../types/auth';
+import { User } from '../../types/user';
 
 export async function loginAction(formData: FormData) {
   const email = formData.get('email') as string;
