@@ -1,4 +1,4 @@
-import { clearCart } from "@/lib/actions/cart-actions";
+import { clearCart } from "../../lib/actions/cart-actions";
 import Link from "next/link";
 
 interface ClearCartButtonProps {

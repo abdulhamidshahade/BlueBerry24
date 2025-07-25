@@ -1,4 +1,4 @@
-import { CartStatus } from '@/types/cart';
+import { CartStatus } from '../../types/cart';
 
 interface CartStatusProps {
   status: CartStatus;

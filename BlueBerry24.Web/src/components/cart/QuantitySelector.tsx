@@ -1,4 +1,4 @@
-import { updateCartItem } from "@/lib/actions/cart-actions";
+import { updateCartItem } from "../../lib/actions/cart-actions";
 
 interface QuantitySelectorProps {
   productId: number;

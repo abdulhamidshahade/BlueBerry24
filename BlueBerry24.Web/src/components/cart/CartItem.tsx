@@ -1,6 +1,6 @@
-import { CartItemDto } from "@/types/cart";
-import { ProductDto } from "@/types/product";
-import { removeFromCart } from "@/lib/actions/cart-actions";
+import { CartItemDto } from "../../types/cart";
+import { ProductDto } from "../../types/product";
+import { removeFromCart } from "../../lib/actions/cart-actions";
 import QuantitySelector from "./QuantitySelector";
 
 interface CartItemProps {

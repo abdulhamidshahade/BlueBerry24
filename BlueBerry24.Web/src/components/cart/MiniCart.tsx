@@ -1,4 +1,4 @@
-import { getCart } from '@/lib/actions/cart-actions';
+import { getCart } from '../../lib/actions/cart-actions';
 import Link from 'next/link';
 
 export default async function MiniCart() {

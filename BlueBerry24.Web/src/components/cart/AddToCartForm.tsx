@@ -1,4 +1,4 @@
-import { addToCart } from '@/lib/actions/cart-actions';
+import { addToCart } from '../../lib/actions/cart-actions';
 
 interface AddToCartFormProps {
   productId: number;

@@ -1,5 +1,5 @@
-import { CartCouponDto } from "@/types/cart";
-import { applyCoupon, removeCoupon } from "@/lib/actions/cart-actions";
+import { CartCouponDto } from "../../types/cart";
+import { applyCoupon, removeCoupon } from "../../lib/actions/cart-actions";
 
 interface CouponSectionProps {
   appliedCoupons: CartCouponDto[];

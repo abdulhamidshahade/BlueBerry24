@@ -1,5 +1,5 @@
-import { CartDto, CartStatus } from "@/types/cart";
-import { proceedToCheckout } from "@/lib/actions/cart-actions";
+import { CartDto, CartStatus } from "../../types/cart";
+import { proceedToCheckout } from "../../lib/actions/cart-actions";
 import ClearCartButton from "./ClearCartButton";
 
 interface CartSummaryProps {
