@@ -1,5 +1,5 @@
-import { User } from "@/types/user";
-import { CreateUserData, UpdateUserData } from "@/types/user";
+import { User } from "../../../types/user";
+import { CreateUserData, UpdateUserData } from "../../../types/user";
 
 export interface IUserService {
   getAll(): Promise<User[]>;
