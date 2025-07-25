@@ -1,4 +1,4 @@
-import { CreateProductDto, ProductDto, UpdateProductDto } from "@/types/product";
+import { CreateProductDto, ProductDto, UpdateProductDto } from "../../../types/product";
 
 export interface IProductService{
     getById(id: number): Promise<ProductDto>;

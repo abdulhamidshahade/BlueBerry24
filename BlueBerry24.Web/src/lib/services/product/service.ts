@@ -1,7 +1,7 @@
-import { ProductDto, CreateProductDto, UpdateProductDto } from "@/types/product";
+import { ProductDto, CreateProductDto, UpdateProductDto } from "../../../types/product";
 import { IProductService } from "./interface";
-import { ResponseDto } from "@/types/responseDto";
-import { apiRequest } from "@/lib/utils/api";
+import { ResponseDto } from "../../../types/responseDto";
+import { apiRequest } from "../../utils/api";
 import { cookies } from 'next/headers';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -12,7 +12,6 @@ export class ProductService implements IProductService{
         try {
             const json: ResponseDto<ProductDto> = await apiRequest(`${API_BASE}/${id}`, {
                 isPublic: true,
-                cache: 'no-store',
             });
             if(!json.isSuccess || !json.data) throw new Error(json.statusMessage);
             return json.data;
@@ -26,7 +25,6 @@ export class ProductService implements IProductService{
         try {
             const json: ResponseDto<ProductDto> = await apiRequest(`${API_BASE}/name/${name}`, {
                 isPublic: true,
-                cache: 'no-store'
             });
             if(!json.isSuccess || !json.data) throw new Error(json.statusMessage);
             return json.data;
@@ -42,7 +40,6 @@ export class ProductService implements IProductService{
         try {
             const json: ResponseDto<ProductDto[]> = await apiRequest(`${API_BASE}`, {
                 isPublic: true,
-                cache: 'no-store',
                 headers: {
                     'X-Session-Id': token ?? ''
                 }
