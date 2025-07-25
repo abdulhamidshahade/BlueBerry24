@@ -1,4 +1,4 @@
-import { RoleStats } from '@/types/roleManagement';
+import { RoleStats } from '../../types/roleManagement';
 
 interface RoleManagementStatsProps {
   stats: RoleStats;

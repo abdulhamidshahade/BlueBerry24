@@ -1,4 +1,4 @@
-import { createRoleAction } from '@/lib/actions/roleManagement';
+import { createRoleAction } from '../../lib/actions/roleManagement';
 
 interface CreateRoleFormProps {
   initialExpanded?: boolean;

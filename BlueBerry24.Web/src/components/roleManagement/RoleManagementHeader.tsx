@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { User } from '@/types/user';
+import { User } from '../../types/user';
 
 interface RoleManagementHeaderProps {
   currentUser: User;

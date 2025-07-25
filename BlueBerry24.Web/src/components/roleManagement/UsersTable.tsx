@@ -1,5 +1,5 @@
-import { Role, UserWithRoles } from '@/types/roleManagement';
-import { assignRoleToUserAction, removeRoleFromUserAction } from '@/lib/actions/roleManagement';
+import { Role, UserWithRoles } from '../../types/roleManagement';
+import { assignRoleToUserAction, removeRoleFromUserAction } from '../../lib/actions/roleManagement';
 
 interface UsersTableProps {
   users: UserWithRoles[];

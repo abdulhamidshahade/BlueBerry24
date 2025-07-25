@@ -1,5 +1,5 @@
-import { Role, UserWithRoles } from '@/types/roleManagement';
-import { bulkAssignRolesAction } from '@/lib/actions/roleManagement';
+import { Role, UserWithRoles } from '../../types/roleManagement';
+import { bulkAssignRolesAction } from '../../lib/actions/roleManagement';
 
 interface BulkAssignmentFormProps {
   roles: Role[];
