@@ -1,5 +1,5 @@
-import { apiRequest } from "@/lib/utils/api";
-import { ResponseDto } from "@/types/responseDto";
+import { apiRequest } from "../../utils/api";
+import { ResponseDto } from "../../../types/responseDto";
 import {
     Role,
     UserWithRoles,
@@ -7,7 +7,7 @@ import {
     CreateRoleRequest,
     RoleManagementResponse,
     RoleStats
-} from "@/types/roleManagement"
+} from "../../../types/roleManagement"
 import { User } from "../../../types/user";
 
 const API_BASE_URL = process.env.API_BASE_ROLE_MANAGEMENT;
@@ -17,7 +17,6 @@ export class RoleManagementService{
     static async getAllRoles(): Promise<RoleManagementResponse<Role[]>> {
 
         const response: ResponseDto<Role[]>  = await apiRequest(`${API_BASE_URL}/roles`, {
-            cache: 'no-store',
             requireAuth: true,
         });
 
@@ -76,7 +75,6 @@ export class RoleManagementService{
 
         const response: ResponseDto<UserWithRoles[]> = await apiRequest(`${API_BASE_URL}/users`, {
             requireAuth: true,
-            cache: 'no-store',
         });
 
         if (!response.isSuccess) {
@@ -89,7 +87,6 @@ export class RoleManagementService{
     static async getUserById(userId: number): Promise<RoleManagementResponse<UserWithRoles>> {
 
         const response: ResponseDto<UserWithRoles> = await apiRequest(`${API_BASE_URL}/users/${userId}`, {
-            cache: 'no-store',
             requireAuth: true
         });
 
@@ -106,7 +103,6 @@ export class RoleManagementService{
         const response: ResponseDto<string[]> = await apiRequest(`${API_BASE_URL}/users/${userId}/roles`, {
 
             requireAuth: true,
-            cache: 'no-store',
         });
 
         if (!response.isSuccess) {
@@ -121,7 +117,6 @@ export class RoleManagementService{
 
         const response: ResponseDto<User[]> = await apiRequest(`${API_BASE_URL}/roles/${encodeURIComponent(roleName)}/users`, {
             requireAuth: true,
-            cache: 'no-store',
         });
 
         if (!response.isSuccess) {
@@ -168,7 +163,6 @@ export class RoleManagementService{
         const response: RoleManagementResponse<{ userId: number; roleName: string; isInRole: boolean }> =
             await apiRequest(`${API_BASE_URL}/users/${userId}/roles/${encodeURIComponent(roleName)}/check`, {
             requireAuth: true,
-            cache: 'no-store',
         });
 
         if (!response.isSuccess) {
@@ -183,7 +177,6 @@ export class RoleManagementService{
         const response: RoleManagementResponse<RoleStats> = await apiRequest(`${API_BASE_URL}/stats`, {
 
             requireAuth: true,
-            cache: 'no-store',
         });
 
         if (!response.isSuccess) {
