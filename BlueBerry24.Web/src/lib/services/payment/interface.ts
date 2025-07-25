@@ -1,4 +1,4 @@
-import { Payment, CreatePayment, PaymentResponse, UpdatePaymentStatus, RefundPayment, PaymentStats, PaymentSearchParams, PaymentStatus } from "@/types/payment";
+import { Payment, CreatePayment, PaymentResponse, UpdatePaymentStatus, RefundPayment, PaymentStats, PaymentSearchParams, PaymentStatus } from "../../../types/payment";
 
 export interface IPaymentService {
   processPayment(paymentData: CreatePayment): Promise<PaymentResponse>;

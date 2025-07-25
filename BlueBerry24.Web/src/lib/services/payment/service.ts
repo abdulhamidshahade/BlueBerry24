@@ -1,8 +1,8 @@
-import { Payment, CreatePayment, PaymentResponse, UpdatePaymentStatus, RefundPayment, PaymentSearchParams, PaymentStatus } from "@/types/payment";
+import { Payment, CreatePayment, PaymentResponse, UpdatePaymentStatus, RefundPayment, PaymentSearchParams, PaymentStatus } from "../../../types/payment";
 import { IPaymentService } from "./interface";
-import { ResponseDto } from "@/types/responseDto";
+import { ResponseDto } from "../../../types/responseDto";
 import { cookies } from 'next/headers';
-import { apiRequest } from "@/lib/utils/api";
+import { apiRequest } from "../../utils/api";
 
 const API_BASE_URL = process.env.API_BASE_PAYMENT;
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -53,7 +53,6 @@ export class PaymentService implements IPaymentService {
       const res = await fetch(`${API_BASE_URL}/${id}`, {
       credentials: 'include',
       headers: await getDefaultHeaders(),
-      cache: 'no-store'
     });
     
     if (!res.ok) {
@@ -72,7 +71,6 @@ export class PaymentService implements IPaymentService {
       const res = await fetch(`${API_BASE_URL}/transaction/${transactionId}`, {
       credentials: 'include',
       headers: await getDefaultHeaders(),
-      cache: 'no-store'
     });
     
     if (!res.ok) {
@@ -91,7 +89,6 @@ export class PaymentService implements IPaymentService {
       const res = await fetch(`${API_BASE_URL}/order/${orderId}`, {
       credentials: 'include',
       headers: await getDefaultHeaders(),
-      cache: 'no-store'
     });
     
     if (!res.ok) {
@@ -110,7 +107,6 @@ export class PaymentService implements IPaymentService {
       const res = await fetch(`${API_BASE_URL}`, {
       credentials: 'include',
       headers: await getDefaultHeaders(),
-      cache: 'no-store'
     });
     
     if (!res.ok) {
@@ -129,7 +125,6 @@ export class PaymentService implements IPaymentService {
       const res = await fetch(`${API_BASE_URL}/user/${userId}`, {
       credentials: 'include',
       headers: await getDefaultHeaders(),
-      cache: 'no-store'
     });
     
     if (!res.ok) {
@@ -148,7 +143,6 @@ export class PaymentService implements IPaymentService {
       const res = await fetch(`${API_BASE_URL}/my-payments?page=${page}&pageSize=${pageSize}`, {
       credentials: 'include',
       headers: await getDefaultHeaders(),
-      cache: 'no-store'
     });
     
     if (!res.ok) {
@@ -167,7 +161,6 @@ export class PaymentService implements IPaymentService {
       const res = await fetch(`${API_BASE_URL}/status/${status}`, {
       credentials: 'include',
       headers: await getDefaultHeaders(),
-      cache: 'no-store'
     });
     
     if (!res.ok) {
@@ -186,7 +179,6 @@ export class PaymentService implements IPaymentService {
       const res = await fetch(`${API_BASE_URL}/date-range?startDate=${startDate}&endDate=${endDate}`, {
       credentials: 'include',
       headers: await getDefaultHeaders(),
-      cache: 'no-store'
     });
     
     if (!res.ok) {
@@ -205,7 +197,6 @@ export class PaymentService implements IPaymentService {
       const res = await fetch(`${API_BASE_URL}/paginated?page=${page}&pageSize=${pageSize}`, {
       credentials: 'include',
       headers: await getDefaultHeaders(),
-      cache: 'no-store'
     });
     
     if (!res.ok) {
@@ -280,7 +271,6 @@ export class PaymentService implements IPaymentService {
       const res = await fetch(`${API_BASE_URL}/stats/count`, {
       credentials: 'include',
       headers: await getDefaultHeaders(),
-      cache: 'no-store'
     });
     
     if (!res.ok) {
@@ -299,7 +289,6 @@ export class PaymentService implements IPaymentService {
       const res = await fetch(`${API_BASE_URL}/stats/amount/total?startDate=${startDate}&endDate=${endDate}`, {
       credentials: 'include',
       headers: await getDefaultHeaders(),
-      cache: 'no-store'
     });
     
     if (!res.ok) {
@@ -324,7 +313,6 @@ export class PaymentService implements IPaymentService {
       const res = await fetch(`${API_BASE_URL}/search?${searchParams.toString()}`, {
       credentials: 'include',
       headers: await getDefaultHeaders(),
-      cache: 'no-store'
     });
     
     if (!res.ok) {
