@@ -1,6 +1,6 @@
 'use server';
 
-import { CreateCategoryDto, UpdateCategoryDto } from "@/types/category";
+import { CreateCategoryDto, UpdateCategoryDto } from "../../types/category";
 import { CategoryService } from "../services/category/service";
 import { ICategoryService } from "../services/category/interface";
 import { revalidatePath } from "next/cache";
