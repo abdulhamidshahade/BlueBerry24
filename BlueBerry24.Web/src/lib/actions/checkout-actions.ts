@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { OrderService } from '../services/order/service';
-import { CheckoutRequest } from '@/types/cart';
+import { CheckoutRequest } from '../../types/cart';
 import { getOrCreateCart } from './cart-actions';
 import { CartService } from '../services/cart/service';
 import { ICartService } from '../services/cart/interface';
