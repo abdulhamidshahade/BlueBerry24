@@ -5,8 +5,8 @@ import { redirect } from "next/navigation";
 import { CartService } from "../services/cart/service";
 import { ICartService } from "../services/cart/interface";
 import { cookies } from "next/headers";
-import { ProductService } from "@/lib/services/product/service";
-import { AddToCartDto } from "@/types/cart";
+import { ProductService } from "../services/product/service";
+import { AddToCartDto } from "../../types/cart";
 
 const cartService: ICartService = new CartService();
 const productService = new ProductService();
