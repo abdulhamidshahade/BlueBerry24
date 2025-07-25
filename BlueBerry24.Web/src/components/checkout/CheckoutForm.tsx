@@ -1,5 +1,5 @@
-import { createOrderForPayment } from '@/lib/actions/checkout-actions';
-import { CartDto } from '@/types/cart';
+import { createOrderForPayment } from '../../lib/actions/checkout-actions';
+import { CartDto } from '../../types/cart';
 import Link from 'next/link';
 
 interface CheckoutFormProps {
