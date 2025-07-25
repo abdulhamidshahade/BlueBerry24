@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import MiniCart from '@/components/cart/MiniCart';
-import UserMenu from '@/components/auth/UserMenu';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
+import MiniCart from '../cart/MiniCart';
+import UserMenu from '../auth/UserMenu';
+import { getCurrentUser } from '../../lib/actions/auth-actions';
 import { Suspense } from 'react';
 
 function MiniCartFallback() {
