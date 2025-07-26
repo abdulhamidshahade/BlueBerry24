@@ -1,4 +1,5 @@
-﻿using StackExchange.Redis;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,6 @@ namespace BlueBerry24.Domain.Repositories
         Task<bool> CommitTransactionAsync();
         Task RollbackTransactionAsync();
         Task<bool> SaveDbChangesAsync();
-
-     
+        IExecutionStrategy BeginTransactionAsyncStrategy();
     }
 }
