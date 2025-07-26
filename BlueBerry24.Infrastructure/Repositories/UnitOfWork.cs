@@ -1,4 +1,5 @@
 ﻿using BlueBerry24.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using StackExchange.Redis;
 
@@ -41,6 +42,11 @@ namespace BlueBerry24.Domain.Repositories
         public async Task<bool> SaveDbChangesAsync()
         {
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public IExecutionStrategy BeginTransactionAsyncStrategy()
+        {
+            return _context.Database.CreateExecutionStrategy();
         }
     }
 }
