@@ -1,12 +1,12 @@
 import Link from 'next/link';
-import { getProducts } from '@/lib/actions/product-actions';
-import { IOrderService } from '@/lib/services/order/interface';
-import { OrderService } from '@/lib/services/order/service';
+import { getProducts } from '../../lib/actions/product-actions';
+import { IOrderService } from '../../lib/services/order/interface';
+import { OrderService } from '../../lib/services/order/service';
 import { getStatusColor, getStatusText } from './orders/page';
-import { OrderStatus } from '@/types/order';
-import { IUserService } from '@/lib/services/user/interface';
-import { UserService } from '@/lib/services/user/service';
-
+import { OrderStatus } from '../../types/order';
+import { IUserService } from '../../lib/services/user/interface';
+import { UserService } from '../../lib/services/user/service';
+export const dynamic = 'force-dynamic';
 export default async function AdminDashboard() {
   try {
     const products = await getProducts();

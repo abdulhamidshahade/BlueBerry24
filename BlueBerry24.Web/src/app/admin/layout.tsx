@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
-import MiniCart from '@/components/cart/MiniCart';
+import { getCurrentUser } from '../../lib/actions/auth-actions';
+import MiniCart from '../../components/cart/MiniCart';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
@@ -52,9 +52,9 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
               </li>
               
               <li className="nav-item mb-1">
-                <h6 className="nav-header text-muted small text-uppercase mt-3 mb-2">
-                  Catalog Management
-                </h6>
+                <h6 className="text-white small text-uppercase mt-3 mb-2 opacity-50">
+  Catalog Management
+</h6>
               </li>
               
               <li className="nav-item mb-1">
@@ -79,7 +79,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
               </li>
 
               <li className="nav-item mb-1">
-                <h6 className="nav-header text-muted small text-uppercase mt-3 mb-2">
+                <h6 className="text-white small text-uppercase mt-3 mb-2 opacity-50">
                   Sales & Marketing
                 </h6>
               </li>
@@ -113,7 +113,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
               </li>
 
               <li className="nav-item mb-1">
-                <h6 className="nav-header text-muted small text-uppercase mt-3 mb-2">
+                <h6 className="text-white small text-uppercase mt-3 mb-2 opacity-50">
                   Analytics & Reports
                 </h6>
               </li>
@@ -140,7 +140,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
               </li>
 
               <li className="nav-item mb-1">
-                <h6 className="nav-header text-muted small text-uppercase mt-3 mb-2">
+                <h6 className="text-white small text-uppercase mt-3 mb-2 opacity-50">
                   System
                 </h6>
               </li>
