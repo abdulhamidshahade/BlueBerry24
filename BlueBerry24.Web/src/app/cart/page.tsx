@@ -1,18 +1,20 @@
-import { getCart, getOrCreateCart } from '@/lib/actions/cart-actions';
-import { getProducts } from '@/lib/actions/product-actions';
-import CartItem from '@/components/cart/CartItem';
-import CartSummary from '@/components/cart/CartSummary';
-import CouponSection from '@/components/cart/CouponSection';
-import ClearCartButton from '@/components/cart/ClearCartButton';
-import CartStatusIndicator, { CartStatusMessage } from '@/components/cart/CartStatus';
-import { ProductDto } from '@/types/product';
-import { CartStatus } from '@/types/cart';
+import { getCart, getOrCreateCart } from '../../lib/actions/cart-actions';
+import { getProducts } from '../../lib/actions/product-actions';
+import CartItem from '../../components/cart/CartItem';
+import CartSummary from '../../components/cart/CartSummary';
+import CouponSection from '../../components/cart/CouponSection';
+import ClearCartButton from '../../components/cart/ClearCartButton';
+import CartStatusIndicator, { CartStatusMessage } from '../../components/cart/CartStatus';
+import { ProductDto } from '../../types/product';
+import { CartStatus } from '../../types/cart';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export default async function CartPage({
   searchParams,
 }: {
-  searchParams: { confirm_clear?: string; error?: string, code: string };
+  searchParams: Promise<{ confirm_clear?: string; error?: string, code: string }>;
 }) {
 
   try {
