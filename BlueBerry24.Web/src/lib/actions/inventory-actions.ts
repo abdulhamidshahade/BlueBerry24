@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { InventoryService, AddStockRequest, AdjustStockRequest } from '@/lib/services/inventory/service'
+import { InventoryService, AddStockRequest, AdjustStockRequest } from '../services/inventory/service'
 
 const inventoryService = new InventoryService();
 
