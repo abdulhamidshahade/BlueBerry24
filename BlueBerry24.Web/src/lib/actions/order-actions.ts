@@ -2,8 +2,8 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { OrderService } from '@/lib/services/order/service';
-import { OrderStatus } from '@/types/order';
+import { OrderService } from '../services/order/service';
+import { OrderStatus } from '../../types/order';
 
 const orderService = new OrderService();
 
