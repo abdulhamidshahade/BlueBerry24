@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { PaymentService } from '../services/payment/service';
 import { IPaymentService } from '../services/payment/interface';
-import { CreatePayment, PaymentMethod, PaymentStatus } from '@/types/payment';
+import { CreatePayment, PaymentMethod, PaymentStatus } from '../../types/payment';
 
 const paymentService: IPaymentService = new PaymentService();
 
