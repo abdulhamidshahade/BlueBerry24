@@ -2,9 +2,9 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { RoleManagementService } from '@/lib/services/roleManagement/service';
+import { RoleManagementService } from '../services/roleManagement/service';
 import { getCurrentUser } from './auth-actions';
-import { Role, UserWithRoles, RoleStats } from '@/types/roleManagement';
+import { Role, UserWithRoles, RoleStats } from '../../types/roleManagement';
 
 async function checkSuperAdminAccess() {
   const user = await getCurrentUser();
