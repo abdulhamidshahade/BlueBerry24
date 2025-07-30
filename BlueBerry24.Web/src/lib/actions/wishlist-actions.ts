@@ -3,14 +3,14 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from './auth-actions';
-import { WishlistService } from '@/lib/services/wishlist/service';
+import { WishlistService } from '../services/wishlist/service';
 import { 
   CreateWishlistDto, 
   UpdateWishlistDto, 
   AddToWishlistDto, 
   UpdateWishlistItemDto,
   WishlistPriority 
-} from '@/types/wishlist';
+} from '../../types/wishlist';
 
 const wishlistService = new WishlistService();
 
