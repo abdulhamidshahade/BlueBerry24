@@ -2,10 +2,10 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { UserService } from '@/lib/services/user/service';
-import { RoleManagementService } from '@/lib/services/roleManagement/service';
-import { IUserService } from '@/lib/services/user/interface';
-import { CreateUserData, UpdateUserData } from '@/types/user';
+import { UserService } from '../services/user/service';
+import { RoleManagementService } from '../services/roleManagement/service';
+import { IUserService } from '../services/user/interface';
+import { CreateUserData, UpdateUserData } from '../../types/user';
 import { getCurrentUser } from './auth-actions';
 
 const userService: IUserService = new UserService();
