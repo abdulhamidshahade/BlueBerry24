@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { ProductService } from "@/lib/services/product/service";
-import { CreateProductDto, UpdateProductDto } from "@/types/product";
+import { ProductService } from "../services/product/service";
+import { CreateProductDto, UpdateProductDto } from "../../types/product";
 import { IProductService } from "../services/product/interface";
 import fs from "fs";
 import path from "path";
