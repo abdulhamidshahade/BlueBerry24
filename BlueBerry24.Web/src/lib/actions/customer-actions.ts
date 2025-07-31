@@ -1,9 +1,9 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { UserService } from '@/lib/services/user/service';
-import { IUserService } from '@/lib/services/user/interface';
-import { CreateUserData, UpdateUserData } from '@/types/user';
+import { UserService } from '../services/user/service';
+import { IUserService } from '../services/user/interface';
+import { CreateUserData, UpdateUserData } from '../../types/user';
 
 const userService: IUserService = new UserService();
 
