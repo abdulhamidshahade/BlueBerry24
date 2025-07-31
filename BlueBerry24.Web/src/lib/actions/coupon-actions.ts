@@ -4,9 +4,9 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { CouponService } from '../services/coupon/service';
 import { ICouponService } from '../services/coupon/interface';
-import { CreateCouponDto, UpdateCouponDto, CouponType, CouponDto } from '@/types/coupon';
+import { CreateCouponDto, UpdateCouponDto, CouponType, CouponDto } from '../../types/coupon';
 import { getCurrentUser } from './auth-actions';
-import { User } from '@/types/user';
+import { User } from '../../types/user';
 import { IUserService } from '../services/user/interface';
 import { UserService } from '../services/user/service';
 
