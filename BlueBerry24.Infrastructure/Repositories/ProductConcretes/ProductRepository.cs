@@ -41,6 +41,8 @@ namespace BlueBerry24.Infrastructure.Repositories.ProductConcretes
 
         public async Task<IEnumerable<Product>> GetAllAsync()
         {
+
+            //select * from products;
             var products = await _context.Products
                 .Include(c => c.ProductCategories)
                 .ThenInclude(c => c.Category)
