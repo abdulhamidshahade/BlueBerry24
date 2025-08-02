@@ -51,7 +51,7 @@ namespace BlueBerry24.API.Controllers
                 {
                     cart = await _cartService.CreateCartAsync(GetCurrentUserId(), null);
 
-                    if(cart == null)
+                    if (cart == null)
                     {
                         return NotFound(new ResponseDto<CartDto>
                         {
@@ -60,7 +60,7 @@ namespace BlueBerry24.API.Controllers
                             StatusMessage = "Cart not found"
                         });
                     }
-                    
+
                 }
 
                 return Ok(new ResponseDto<CartDto>
@@ -108,7 +108,7 @@ namespace BlueBerry24.API.Controllers
                 {
                     cart = await _cartService.CreateCartAsync(null, GetSessionId());
 
-                    if(cart == null)
+                    if (cart == null)
                     {
                         return NotFound(new ResponseDto<CartDto>
                         {
@@ -117,7 +117,7 @@ namespace BlueBerry24.API.Controllers
                             StatusMessage = "Cart not found for session"
                         });
                     }
-                    
+
                 }
 
                 return Ok(new ResponseDto<CartDto>
@@ -238,7 +238,7 @@ namespace BlueBerry24.API.Controllers
         }
 
         [HttpPost("add-item")]
-        public async Task<ActionResult<ResponseDto<CartDto>>> AddItemToCart(int cartId, [FromBody] AddItemRequest itemRequest)
+        public async Task<ActionResult<ResponseDto<CartDto>>> AddItemToCart([FromBody] AddItemRequest itemRequest)
         {
             try
             {
@@ -315,13 +315,13 @@ namespace BlueBerry24.API.Controllers
                 if (itemRequest.Quantity == 0)
                 {
                     var removeResult = await RemoveItemFromCart(itemRequest.CartId, itemRequest.ProductId);
-                    return  Ok(new ResponseDto<CartDto>
+                    return Ok(new ResponseDto<CartDto>
                     {
                         IsSuccess = true,
                         StatusCode = 200,
                         StatusMessage = "Item quantity updated successfully",
                         Data = new CartDto()
-                    }); 
+                    });
                 }
 
                 var isInStock = await _inventoryService.IsInStockAsync(itemRequest.ProductId, itemRequest.Quantity);
