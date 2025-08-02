@@ -92,7 +92,6 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
                 .ThenInclude(c => c.Coupon)
                 .FirstOrDefaultAsync();
 
-
             return shoppingCart;
         }
 
@@ -239,7 +238,7 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
             else if (!string.IsNullOrEmpty(sessionId))
             {
                 cart = await _context.ShoppingCarts
-                    .Where(c => c.Id == 92 && c.Status == CartStatus.Active)
+                    .Where(c => c.SessionId == sessionId && c.Status == CartStatus.Active)
                     .Include(c => c.CartItems)
                     .FirstOrDefaultAsync();
             }
