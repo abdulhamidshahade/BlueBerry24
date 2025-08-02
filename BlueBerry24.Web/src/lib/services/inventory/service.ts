@@ -46,9 +46,8 @@ export interface IInventoryService {
 export class InventoryService implements IInventoryService {
   private readonly baseUrl: string;
   
-  //TODO: remove the constructor and replace it with .env.local
   constructor() {
-    this.baseUrl = "https://localhost:7105/api";
+    this.baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "https://localhost:7105/api";
   }
 
   async addStock(request: AddStockRequest): Promise<boolean> {
