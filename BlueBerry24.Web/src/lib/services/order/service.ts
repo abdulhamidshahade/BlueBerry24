@@ -4,7 +4,7 @@ import { ResponseDto } from "../../../types/responseDto";
 import { cookies } from 'next/headers';
 import { apiRequest } from "../../utils/api";
 
-const API_BASE_URL = 'https://localhost:7105/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://localhost:7105/api';
 const API_BASE_ORDER = `${API_BASE_URL}/Orders`;
 
 
