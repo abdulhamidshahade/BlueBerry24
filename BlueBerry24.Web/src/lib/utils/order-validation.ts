@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { Order } from '@/types/order';
+import { Order } from '../../types/order';
 
 export async function validateOrderAccess(order: Order): Promise<boolean> {
   const cookieStore = cookies();
