@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPaymentById } from '@/lib/actions/payment-actions';
-import { getOrderByPaymentId } from '@/lib/actions/order-actions';
-import { PaymentStatus, PaymentMethod } from '@/types/payment';
-import { OrderStatus } from '@/types/order';
+import { getPaymentById } from '../../../../../lib/actions/payment-actions';
+import { getOrderByPaymentId } from '../../../../../lib/actions/order-actions';
+import { PaymentStatus, PaymentMethod } from '../../../../../types/payment';
+import { OrderStatus } from '../../../../../types/order';
 
 export async function GET(
   request: NextRequest,
