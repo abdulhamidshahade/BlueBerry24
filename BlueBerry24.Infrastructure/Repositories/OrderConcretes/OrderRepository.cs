@@ -50,6 +50,7 @@ namespace BlueBerry24.Infrastructure.Repositories.OrderConcretes
                 .OrderByDescending(o => o.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .AsNoTracking() // Optimize for read-only operations
                 .ToListAsync();
         }
 
