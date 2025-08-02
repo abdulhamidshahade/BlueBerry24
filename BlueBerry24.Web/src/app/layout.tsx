@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import Navigation from "@/components/layout/Navigation";
+import Navigation from "../components/layout/Navigation";
 
 //important
 import Script from 'next/script';
