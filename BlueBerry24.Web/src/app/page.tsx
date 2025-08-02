@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { ProductService } from '@/lib/services/product/service';
-import { CategoryService } from '@/lib/services/category/service';
-import { getCurrentUser } from '@/lib/actions/auth-actions';
-import { formatCurrency } from '@/lib/utils/formatCurrency';
-import { ProductDto } from '@/types/product';
-import { CategoryDto } from '@/types/category';
+import { ProductService } from '../lib/services/product/service';
+import { CategoryService } from '../lib/services/category/service';
+import { getCurrentUser } from '../lib/actions/auth-actions';
+import { formatCurrency } from '../lib/utils/formatCurrency';
+import { ProductDto } from '../types/product';
+import { CategoryDto } from '../types/category';
 import './home.css';
 
 function HeroSection() {
