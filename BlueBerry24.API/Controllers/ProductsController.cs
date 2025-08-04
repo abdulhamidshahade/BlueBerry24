@@ -26,22 +26,21 @@ namespace BlueBerry24.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<ResponseDto<IEnumerable<ProductDto>>>> GetAll()
+        public async Task<ActionResult<ResponseDto<IEnumerable<ProductDto>>>> GetAll([FromQuery]int pageNumber, [FromQuery]int pageSize)
         {
             _logger.LogInformation("Getting all products");
 
-            var products = await _productService.GetAllAsync();
+            var products = await _productService.GetAllAsync(pageNumber, pageSize);
 
-            if (products == null)
+            if (!products.Any())
             {
-                _logger.LogError("Error retrieving all products");
-                return new ResponseDto<IEnumerable<ProductDto>>
+                _logger.LogError("No products found");
+                return NotFound(new ResponseDto<IEnumerable<ProductDto>>
                 {
                     IsSuccess = false,
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    StatusMessage = "Error retrieving products",
-                    Errors = new List<string> { "An unexpected error occurred" }
-                };
+                    StatusCode = StatusCodes.Status404NotFound,
+                    StatusMessage = "No products found",
+                });
 
             }
             var response = new ResponseDto<IEnumerable<ProductDto>>
@@ -51,8 +50,8 @@ namespace BlueBerry24.API.Controllers
                 StatusMessage = "Products retrieved successfully",
                 Data = products
             };
-            return Ok(response);
 
+            return Ok(response);
         }
 
         [HttpGet]
