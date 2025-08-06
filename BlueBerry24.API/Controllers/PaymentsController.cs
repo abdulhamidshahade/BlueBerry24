@@ -57,6 +57,7 @@ namespace BlueBerry24.API.Controllers
                 var mappedOrder = _mapper.Map<Order>(order);
 
                 await _orderService.UpdateOrderStatusAsync(mappedOrder, OrderStatus.Completed);
+                await _orderService.UpdateOrderPaymentStatusAsync(mappedOrder, PaymentStatus.Completed);
 
                 return Ok(result);
             }
