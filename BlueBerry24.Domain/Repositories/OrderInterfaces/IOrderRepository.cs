@@ -18,5 +18,6 @@ namespace BlueBerry24.Domain.Repositories.OrderInterfaces
         Task<OrderItem> CreateOrderItemAsync(OrderItem item);
         Task<Order?> GetOrderByReferenceNumberAsync(string referenceNumber);
         Task<List<Order>> GetOrdersByStatusAsync(OrderStatus status, int page = 1, int pageSize = 10);
+        Task<bool> UpdateOrderPaymentStatusAsync(int orderId, PaymentStatus paymentStatus);
     }
 }
