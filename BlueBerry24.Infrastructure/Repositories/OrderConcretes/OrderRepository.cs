@@ -133,5 +133,22 @@ namespace BlueBerry24.Infrastructure.Repositories.OrderConcretes
                 .Take(pageSize)
                 .ToListAsync();
         }
+
+        public async Task<bool> UpdateOrderPaymentStatusAsync(int orderId, PaymentStatus paymentStatus)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(v => v.Id == orderId);
+            
+            if(paymentStatus == PaymentStatus.Completed)
+            {
+                order.isPaid = true;
+            }
+            else
+            {
+                order.isPaid = false;
+            }
+
+            _context.Orders.Update(order);
+            return await _unitOfWork.SaveDbChangesAsync();
+        }
     }
 }
