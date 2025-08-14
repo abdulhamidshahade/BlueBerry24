@@ -18,6 +18,8 @@ namespace BlueBerry24.Domain.Entities.OrderEntities
         public int Id { get; set; }
         public int UserId { get; set; }
         public int CartId { get; set; }
+        public string? sessionId { get; set; }
+        public bool isPaid { get; set; }
 
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
         public decimal SubTotal { get; set; }
@@ -28,7 +30,7 @@ namespace BlueBerry24.Domain.Entities.OrderEntities
         public decimal DiscountTotal { get; set; }
 
         public string CustomerEmail { get; set; }
-        public string CustomerPhone { get; set; }
+        public string? CustomerPhone { get; set; }
 
 
         public string? ReferenceNumber { get; set; }
