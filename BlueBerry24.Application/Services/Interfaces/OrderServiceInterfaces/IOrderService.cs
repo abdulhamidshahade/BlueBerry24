@@ -17,6 +17,7 @@ namespace BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces
         Task<List<OrderDto>> GetAllOrdersAsync(int page = 1, int pageSize = 50);
         Task<Order?> CreateOrderFromCartAsync(int cartId, CreateOrderDto orderDto);
         Task<bool> UpdateOrderStatusAsync(Order order, OrderStatus newStatus);
+        Task<bool> UpdateOrderPaymentStatusAsync(Order order, PaymentStatus paymentStatus);
         Task<bool> CancelOrderAsync(int orderId, string reason);
         Task<bool> RefundOrderAsync(int orderId, string reason);
         Task<bool> ProcessOrderAsync(int orderId);
