@@ -308,5 +308,10 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
 
             return orderStatusUpdated;
         }
+
+        public Task<bool> UpdateOrderPaymentStatusAsync(Order order, PaymentStatus paymentStatus)
+        {
+            return _orderRepository.UpdateOrderPaymentStatusAsync(order.Id, paymentStatus);
+        }
     }
 }
