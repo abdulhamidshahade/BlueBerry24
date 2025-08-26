@@ -245,7 +245,7 @@ export default function AdminWishlistManagement({
                         <span className="fw-medium">{formatCurrency(wishlist.totalValue)}</span>
                       </td>
                       <td>
-                        <form action={adminToggleWishlistVisibility} method="POST" style={{ display: 'inline' }}>
+                        <form action={adminToggleWishlistVisibility} style={{ display: 'inline' }}>
                           <input type="hidden" name="wishlistId" value={wishlist.id} />
                           <input type="hidden" name="isPublic" value={wishlist.isPublic ? 'false' : 'true'} />
                           <button 
@@ -543,7 +543,7 @@ function AdminClearWishlistOverlay({ wishlist }: { wishlist?: WishlistDto }) {
           </div>
           <div className="modal-footer">
             <a href="/admin/wishlists" className="btn btn-secondary">Cancel</a>
-            <form action={adminClearWishlist} method="POST" style={{ display: 'inline' }}>
+                            <form action={adminClearWishlist} style={{ display: 'inline' }}>
               <input type="hidden" name="wishlistId" value={wishlist.id} />
               <button type="submit" className="btn btn-warning">
                 <i className="bi bi-trash3 me-1"></i>
