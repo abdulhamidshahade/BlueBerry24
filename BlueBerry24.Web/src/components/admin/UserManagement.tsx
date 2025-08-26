@@ -434,7 +434,7 @@ export default function UserManagement({
                         </td>
                         <td>
                           <div className="btn-group" role="group">
-                            <form action={promoteUserToAdmin} method="POST" style={{ display: 'inline' }}>
+                            <form action={promoteUserToAdmin} style={{ display: 'inline' }}>
                               <input type="hidden" name="userId" value={regularUser.id} />
                               <input type="hidden" name="roleName" value="Admin" />
                               <button 
@@ -447,7 +447,7 @@ export default function UserManagement({
                                 Make Admin
                               </button>
                             </form>
-                            <form action={promoteUserToAdmin} method="POST" style={{ display: 'inline' }}>
+                            <form action={promoteUserToAdmin} style={{ display: 'inline' }}>
                               <input type="hidden" name="userId" value={regularUser.id} />
                               <input type="hidden" name="roleName" value="SuperAdmin" />
                               <button 
@@ -789,7 +789,7 @@ function DemoteUserOverlay({ user }: { user: UserWithRoles }) {
             <div className="mt-3">
               <p className="text-muted">Choose which admin role to remove:</p>
               {adminRoles.map((role) => (
-                <form key={role} action={demoteAdminUser} method="POST" className="d-inline me-2">
+                                        <form key={role} action={demoteAdminUser} className="d-inline me-2">
                   <input type="hidden" name="userId" value={user.id} />
                   <input type="hidden" name="roleName" value={role} />
                   <button type="submit" className="btn btn-outline-danger btn-sm">
