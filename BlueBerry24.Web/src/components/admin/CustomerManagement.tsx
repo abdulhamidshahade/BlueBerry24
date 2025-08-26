@@ -370,7 +370,7 @@ export default function CustomerManagement({
                               <i className="bi bi-key"></i>
                             </a>
                             {status.status === 'Locked' ? (
-                              <form action={quickActionUnlock} method="POST" style={{ display: 'inline' }}>
+                              <form action={quickActionUnlock} style={{ display: 'inline' }}>
                                 <input type="hidden" name="userId" value={customer.id} />
                                 <button 
                                   type="submit" 
@@ -381,7 +381,7 @@ export default function CustomerManagement({
                                 </button>
                               </form>
                             ) : (
-                              <form action={quickActionLock} method="POST" style={{ display: 'inline' }}>
+                              <form action={quickActionLock} style={{ display: 'inline' }}>
                                 <input type="hidden" name="userId" value={customer.id} />
                                 <button 
                                   type="submit" 
@@ -393,7 +393,7 @@ export default function CustomerManagement({
                               </form>
                             )}
                             {!customer.emailConfirmed && (
-                              <form action={quickActionVerify} method="POST" style={{ display: 'inline' }}>
+                              <form action={quickActionVerify} style={{ display: 'inline' }}>
                                 <input type="hidden" name="userId" value={customer.id} />
                                 <button 
                                   type="submit" 
