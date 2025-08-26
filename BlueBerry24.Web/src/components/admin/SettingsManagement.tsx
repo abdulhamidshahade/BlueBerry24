@@ -747,7 +747,7 @@ function ResetSettingsOverlay() {
             <a href="/admin/settings" className="btn btn-secondary">
               Cancel
             </a>
-            <form action={resetToDefaults} method="POST" style={{ display: 'inline' }}>
+                          <form action={resetToDefaults} style={{ display: 'inline' }}>
               <button type="submit" className="btn btn-danger">
                 <i className="bi bi-arrow-clockwise me-1"></i>
                 Reset to Defaults
@@ -772,7 +772,7 @@ function ImportSettingsOverlay() {
             </h5>
             <a href="/admin/settings" className="btn-close"></a>
           </div>
-          <form action={importSettings} encType="multipart/form-data">
+          <form action={importSettings}>
             <div className="modal-body">
               <div className="mb-3">
                 <label htmlFor="settingsFile" className="form-label">Settings File</label>
