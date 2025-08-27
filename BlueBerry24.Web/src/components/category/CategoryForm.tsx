@@ -46,7 +46,7 @@ export default function CategoryForm({
                 </div>
               )}
 
-              <form action={action} encType="multipart/form-data">
+              <form action={action}>
                 {isEdit && category && (
                   <input type="hidden" name="id" value={category.id} />
                 )}
