@@ -242,7 +242,7 @@ export default function RolesTable({
                                   {isEditing ? 'Cancel' : 'Edit'}
                                 </a>
                                 {roleCanBeDeleted && (
-                                  <form action={deleteRoleAction} method="post" className="d-inline">
+                                  <form action={deleteRoleAction} className="d-inline">
                                     <input type="hidden" name="roleName" value={role.name} />
                                     <input type="hidden" name="redirectUrl" value={createRoleUrl()} />
                                     <button
@@ -329,7 +329,7 @@ export default function RolesTable({
                                         Edit Role
                                       </a>
                                       {roleCanBeDeleted && (
-                                        <form action={deleteRoleAction} method="post" className="d-inline">
+                                        <form action={deleteRoleAction} className="d-inline">
                                           <input type="hidden" name="roleName" value={role.name} />
                                           <input type="hidden" name="redirectUrl" value={createRoleUrl()} />
                                           <button
@@ -360,7 +360,7 @@ export default function RolesTable({
                             <div className="row g-4">
                               <div className="col-md-8">
                                 <h6 className="fw-semibold text-dark mb-3">Edit Role</h6>
-                                <form action={updateRoleAction} method="post">
+                                                                  <form action={updateRoleAction}>
                                   <input type="hidden" name="oldRoleName" value={role.name} />
                                   <div className="row g-3">
                                     <div className="col-md-6">
