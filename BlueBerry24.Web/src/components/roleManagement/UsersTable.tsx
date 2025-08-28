@@ -344,7 +344,7 @@ export default function UsersTable({
                                       <div key={role} className="d-flex justify-content-between align-items-center p-2 border rounded">
                                         <span className={getRoleBadgeClass(role)}>{role}</span>
                                         {role !== 'SuperAdmin' && (
-                                          <form action={removeRoleFromUserAction} method="post" className="d-inline">
+                                          <form action={removeRoleFromUserAction} className="d-inline">
                                             <input type="hidden" name="userId" value={user.id} />
                                             <input type="hidden" name="roleName" value={role} />
                                             <input type="hidden" name="redirectUrl" value={createUserUrl(user.id)} />
@@ -370,7 +370,7 @@ export default function UsersTable({
                                 {availableRoles.length === 0 ? (
                                   <p className="text-muted small">All available roles have been assigned to this user.</p>
                                 ) : (
-                                  <form action={assignRoleToUserAction} method="post">
+                                  <form action={assignRoleToUserAction}>
                                     <input type="hidden" name="userId" value={user.id} />
                                     <input type="hidden" name="redirectUrl" value={createUserUrl(user.id)} />
                                     <div className="d-flex gap-2">
