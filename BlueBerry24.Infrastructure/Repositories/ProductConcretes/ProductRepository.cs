@@ -8,10 +8,104 @@ namespace BlueBerry24.Infrastructure.Repositories.ProductConcretes
     public class ProductRepository : IProductRepository
     {
         private readonly ApplicationDbContext _context;
-        
+
         public ProductRepository(ApplicationDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<IReadOnlyList<Product>> GetAllAsync()
+        {
+            return await _context.Products
+                .Include(pc => pc.ProductCategories)
+                .ThenInclude(c => c.Category)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetTotalCountAsync()
+        {
+            return await _context.Products.CountAsync();
+        }
+
+        public async Task<IReadOnlyList<Product>> GetFilteredAsync(string? searchTerm = null, string? category = null,
+            string? sortBy = "name", decimal? minPrice = null, decimal? maxPrice = null,
+            bool? isActive = true, int pageNumber = 1, int pageSize = 10)
+        {
+            var query = _context.Products
+                .Include(pc => pc.ProductCategories)
+                .ThenInclude(c => c.Category)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(p => p.Name.Contains(searchTerm) || p.Description.Contains(searchTerm));
+            }
+
+            if (!string.IsNullOrWhiteSpace(category))
+            {
+                query = query.Where(p => p.ProductCategories.Any(pc => pc.Category.Name.ToLower() == category.ToLower()));
+            }
+
+            if (minPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= minPrice.Value);
+            }
+
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= maxPrice.Value);
+            }
+
+            if (isActive.HasValue)
+            {
+                query = query.Where(p => p.IsActive == isActive.Value);
+            }
+
+            query = sortBy?.ToLower() switch
+            {
+                "price-low" => query.OrderBy(p => p.Price),
+                "price-high" => query.OrderByDescending(p => p.Price),
+                "newest" => query.OrderByDescending(p => p.CreatedAt),
+                _ => query.OrderBy(p => p.Name)
+            };
+
+            return await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetFilteredCountAsync(string? searchTerm = null, string? category = null,
+            decimal? minPrice = null, decimal? maxPrice = null, bool? isActive = true)
+        {
+            var query = _context.Products.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(p => p.Name.Contains(searchTerm) || p.Description.Contains(searchTerm));
+            }
+
+            if (!string.IsNullOrWhiteSpace(category))
+            {
+                query = query.Where(p => p.ProductCategories.Any(pc => pc.Category.Name.ToLower() == category.ToLower()));
+            }
+
+            if (minPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= minPrice.Value);
+            }
+
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= maxPrice.Value);
+            }
+
+            if (isActive.HasValue)
+            {
+                query = query.Where(p => p.IsActive == isActive.Value);
+            }
+
+            return await query.CountAsync();
         }
 
         public async Task<Product> CreateAsync(Product product)
@@ -39,19 +133,7 @@ namespace BlueBerry24.Infrastructure.Repositories.ProductConcretes
         }
 
 
-        public async Task<IEnumerable<Product>> GetAllAsync()
-        {
 
-            //select * from products;
-            var products = await _context.Products
-                .Include(c => c.ProductCategories)
-                .ThenInclude(c => c.Category)
-                .ToListAsync();
-
-            if (products == null) return null;
-
-            return products;
-        }
 
         public async Task<Product> GetByIdAsync(int id)
         {
@@ -62,7 +144,7 @@ namespace BlueBerry24.Infrastructure.Repositories.ProductConcretes
 
             if (product == null) return null;
 
-            return product; 
+            return product;
         }
 
         public async Task<Product> GetByNameAsync(string name)
