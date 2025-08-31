@@ -144,7 +144,7 @@ export default async function OrderReviewPage({ searchParams }: OrderReviewPageP
 
                 <div className="d-grid mt-3">
                   <Link
-                    href={`/payment?orderId=${order.id}`}
+                    href={`/payment?orderId=${order.id}&amount=${order.total}`}
                     className="btn btn-primary btn-lg d-flex align-items-center justify-content-center text-decoration-none"
                   >
                     Continue to Payment
