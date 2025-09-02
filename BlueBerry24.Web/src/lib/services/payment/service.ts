@@ -51,7 +51,6 @@ export class PaymentService implements IPaymentService {
 
   async getPaymentById(id: number): Promise<Payment> {
       const res = await fetch(`${API_BASE_URL}/${id}`, {
-      credentials: 'include',
       headers: await getDefaultHeaders(),
     });
     
