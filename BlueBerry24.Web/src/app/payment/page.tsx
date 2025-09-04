@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { processPayment } from '../../lib/actions/payment-actions';
+import { OrderService } from '../../lib/services/order/service';
 
 interface PaymentPageProps {
   searchParams: Promise<{
@@ -25,6 +26,17 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
   const amount = params.amount;
   const error = params.error;
 
+  // Fetch order details if orderId is provided
+  let order = null;
+  if (orderId) {
+    try {
+      const orderService = new OrderService();
+      order = await orderService.getById(parseInt(orderId));
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+    }
+  }
+
   // if (!amount) {
   //   redirect('/cart?error=' + encodeURIComponent('Payment amount is required.'));
   // }
@@ -42,8 +54,9 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
     billingPostalCode: params.error_billingPostalCode || '',
   };
 
-  const processingFee = parseFloat(amount || '0') * 0.029 + 0.30;
-  const total = parseFloat(amount || '0') + processingFee;
+  const orderAmount = parseFloat(amount || '0');
+  const processingFee = orderAmount * 0.029 + 0.30;
+  const total = orderAmount + processingFee;
 
   return (
     <div className="min-vh-100 bg-light">
@@ -388,18 +401,55 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
 
               <div className="card-body">
                 <div className="border-top pt-3">
-                  <div className="d-flex justify-content-between mb-2">
-                    <span className="fw-medium">Subtotal</span>
-                    <span className="fw-medium">${amount}</span>
-                  </div>
-                  <div className="d-flex justify-content-between mb-2">
-                    <span className="fw-medium">Processing Fee</span>
-                    <span className="fw-medium">${processingFee.toFixed(2)}</span>
-                  </div>
-                  <div className="border-top pt-3 d-flex justify-content-between">
-                    <span className="fs-5 fw-bold">Total</span>
-                    <span className="fs-5 fw-bold">${total.toFixed(2)}</span>
-                  </div>
+                  {order ? (
+                    <>
+                      <div className="d-flex justify-content-between mb-2">
+                        <span className="fw-medium">Subtotal</span>
+                        <span className="fw-medium">${order.subTotal.toFixed(2)}</span>
+                      </div>
+                      {order.discountTotal > 0 && (
+                        <div className="d-flex justify-content-between mb-2 text-success">
+                          <span className="fw-medium">Discount</span>
+                          <span className="fw-medium">-${order.discountTotal.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="d-flex justify-content-between mb-2">
+                        <span className="fw-medium">Shipping</span>
+                        <span className="fw-medium">${order.shippingAmount.toFixed(2)}</span>
+                      </div>
+                      <div className="d-flex justify-content-between mb-2">
+                        <span className="fw-medium">Tax</span>
+                        <span className="fw-medium">${order.taxAmount.toFixed(2)}</span>
+                      </div>
+                      <div className="border-top pt-3 d-flex justify-content-between mb-2">
+                        <span className="fw-medium">Order Total</span>
+                        <span className="fw-medium">${order.total.toFixed(2)}</span>
+                      </div>
+                      <div className="d-flex justify-content-between mb-2">
+                        <span className="fw-medium">Processing Fee</span>
+                        <span className="fw-medium">${processingFee.toFixed(2)}</span>
+                      </div>
+                      <div className="border-top pt-3 d-flex justify-content-between">
+                        <span className="fs-5 fw-bold">Total</span>
+                        <span className="fs-5 fw-bold">${total.toFixed(2)}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="d-flex justify-content-between mb-2">
+                        <span className="fw-medium">Order Total</span>
+                        <span className="fw-medium">${amount}</span>
+                      </div>
+                      <div className="d-flex justify-content-between mb-2">
+                        <span className="fw-medium">Processing Fee</span>
+                        <span className="fw-medium">${processingFee.toFixed(2)}</span>
+                      </div>
+                      <div className="border-top pt-3 d-flex justify-content-between">
+                        <span className="fs-5 fw-bold">Total</span>
+                        <span className="fs-5 fw-bold">${total.toFixed(2)}</span>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {orderId && (
