@@ -1,5 +1,6 @@
 ﻿
 using AutoMapper;
+using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.ProductDtos;
 using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
 using BlueBerry24.Domain.Entities.ProductEntities;
@@ -7,14 +8,14 @@ using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.ProductInterfaces;
 
 namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
-{ 
+{
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
         private readonly IProductCategoryService _productCategoryService;
         private readonly IUnitOfWork _unitOfWork;
-        
+
 
         public ProductService(IProductRepository productRepository,
                               IMapper mapper,
@@ -26,6 +27,12 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
             _mapper = mapper;
             _productCategoryService = productCategoryService;
             _unitOfWork = unitOfWork;
+        }
+
+        public async Task<IReadOnlyList<ProductDto>> GetAllAsync()
+        {
+            var products = await _productRepository.GetAllAsync();
+            return _mapper.Map<IReadOnlyList<ProductDto>>(products);
         }
 
         public async Task<ProductDto> GetByIdAsync(int id)
@@ -48,7 +55,7 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
             }
 
             var product = await _productRepository.GetByNameAsync(name);
-            
+
             if (product == null)
             {
                 return null;
@@ -57,11 +64,7 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
             return _mapper.Map<ProductDto>(product);
         }
 
-        public async Task<IEnumerable<ProductDto>> GetAllAsync()
-        {
-            var products = await _productRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<ProductDto>>(products);
-        }
+
 
         public async Task<ProductDto> CreateAsync(CreateProductDto productDto, List<int> categories)
         {
@@ -110,7 +113,7 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
 
             var isProductExists = await GetByNameAsync(productDto.Name);
 
-            if(isProductExists != null && isProductExists.Id != id)
+            if (isProductExists != null && isProductExists.Id != id)
             {
                 return null;
             }
@@ -123,7 +126,7 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
 
             var productToDto = _mapper.Map<ProductDto>(updatedProduct);
 
-            if(!await _productCategoryService.UpdateProductCategoryAsync(productToDto, categories))
+            if (!await _productCategoryService.UpdateProductCategoryAsync(productToDto, categories))
             {
                 await _unitOfWork.RollbackTransactionAsync();
                 return null;
@@ -162,13 +165,46 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
             return await _productRepository.ExistsByNameAsync(name);
         }
 
+        public async Task<PaginationDto<ProductDto>> GetPaginatedAsync(ProductFilterDto filter)
+        {
 
+            var products = await _productRepository.GetFilteredAsync(
+                filter.SearchTerm,
+                filter.Category,
+                filter.SortBy,
+                filter.MinPrice,
+                filter.MaxPrice,
+                filter.IsActive,
+                filter.PageNumber,
+                filter.PageSize
+            );
 
-        //public async Task<bool> ExistsByShopIdAsync(string productId, string shopId)
-        //{
-        //    var exists = await _context.Products.Where(i => i.Id == productId && i.ShopId == shopId).AnyAsync();
+            var totalCount = await _productRepository.GetFilteredCountAsync(
+                filter.SearchTerm,
+                filter.Category,
+                filter.MinPrice,
+                filter.MaxPrice,
+                filter.IsActive
+            );
 
-        //    return exists;
-        //}
+            var productDtos = _mapper.Map<IReadOnlyList<ProductDto>>(products);
+            var paginationResult = new PaginationDto<ProductDto>(
+                productDtos,
+                filter.PageNumber,
+                filter.PageSize,
+                totalCount
+            );
+
+            return paginationResult;
+        }
     }
+
+
+
+    //public async Task<bool> ExistsByShopIdAsync(string productId, string shopId)
+    //{
+    //    var exists = await _context.Products.Where(i => i.Id == productId && i.ShopId == shopId).AnyAsync();
+
+    //    return exists;
+    //}
 }
