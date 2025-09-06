@@ -26,11 +26,61 @@ namespace BlueBerry24.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<ResponseDto<IEnumerable<ProductDto>>>> GetAll([FromQuery]int pageNumber, [FromQuery]int pageSize)
+        public async Task<ActionResult<ResponseDto<PaginationDto<ProductDto>>>> GetAll(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 12,
+            [FromQuery] string? searchTerm = null,
+            [FromQuery] string? category = null,
+            [FromQuery] string? sortBy = "name",
+            [FromQuery] decimal? minPrice = null,
+            [FromQuery] decimal? maxPrice = null,
+            [FromQuery] bool? isActive = true)
         {
-            _logger.LogInformation("Getting all products");
+            _logger.LogInformation("Getting products with pagination and filters");
 
-            var products = await _productService.GetAllAsync(pageNumber, pageSize);
+            var filter = new ProductFilterDto
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                SearchTerm = searchTerm,
+                Category = category,
+                SortBy = sortBy,
+                MinPrice = minPrice,
+                MaxPrice = maxPrice,
+                IsActive = isActive
+            };
+
+            var result = await _productService.GetPaginatedAsync(filter);
+
+            if (!result.Data.Any())
+            {
+                _logger.LogWarning("No products found with the specified filters");
+                return NotFound(new ResponseDto<PaginationDto<ProductDto>>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    StatusMessage = "No products found",
+                    Data = result
+                });
+            }
+
+            return Ok(new ResponseDto<PaginationDto<ProductDto>>
+            {
+                Data = result,
+                IsSuccess = true,
+                StatusCode = 200,
+                StatusMessage = "Products retrieved successfully!"
+            });
+        }
+
+        [HttpGet]
+        [Route("all")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ResponseDto<IEnumerable<ProductDto>>>> GetProducts()
+        {
+            _logger.LogInformation("Getting all products (simple)");
+
+            var products = await _productService.GetAllAsync();
 
             if (!products.Any())
             {
@@ -41,7 +91,6 @@ namespace BlueBerry24.API.Controllers
                     StatusCode = StatusCodes.Status404NotFound,
                     StatusMessage = "No products found",
                 });
-
             }
             var response = new ResponseDto<IEnumerable<ProductDto>>
             {
