@@ -18,7 +18,7 @@ export async function processPayment(formData: FormData) {
     const orderId = formData.get("orderId") ? parseInt(formData.get("orderId") as string) : undefined;
     const method = parseInt(formData.get("method") as string) as PaymentMethod;
     const provider = formData.get("provider") as string;
-    const amount = parseFloat("20" as string);
+    const amount = parseFloat(formData.get("amount") as string);
     const currency = (formData.get("currency") as string) || "USD";
     const payerEmail = formData.get("payerEmail") as string;
     const payerName = formData.get("payerName") as string;
