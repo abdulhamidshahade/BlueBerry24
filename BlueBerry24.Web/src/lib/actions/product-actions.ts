@@ -8,6 +8,7 @@ import { IProductService } from "../services/product/interface";
 import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { ProductFilterDto, PaginationDto } from "../../types/pagination";
 
 const productService: IProductService = new ProductService();
 
@@ -221,6 +222,25 @@ export async function getProducts() {
   } catch (error) {
     console.error("Error fetching products:", error);
     return [];
+  }
+}
+
+export async function getPaginatedProducts(filter: ProductFilterDto): Promise<PaginationDto<any>> {
+  try {
+    return await productService.getPaginated(filter);
+  } catch (error) {
+    console.error("Error fetching paginated products:", error);
+    return {
+      data: [],
+      pageNumber: 1,
+      pageSize: filter.pageSize || 12,
+      totalCount: 0,
+      totalPages: 0,
+      hasPreviousPage: false,
+      hasNextPage: false,
+      firstItemOnPage: 0,
+      lastItemOnPage: 0
+    };
   }
 }
 
