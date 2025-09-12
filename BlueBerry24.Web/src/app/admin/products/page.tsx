@@ -1,12 +1,18 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { getProducts } from '../../../lib/actions/product-actions';
+import { getPaginatedProducts } from '../../../lib/actions/product-actions';
 import ProductCard from '../../../components/product/ProductCard';
+import Pagination from '../../../components/shared/Pagination';
+import { ProductFilterDto } from '../../../types/pagination';
 
 export const dynamic = 'force-dynamic';
 interface SearchParams {
   success?: string;
   error?: string;
+  page?: string;
+  search?: string;
+  category?: string;
+  sort?: string;
 }
 
 function SuccessAlert({ message }: { message: string }) {
@@ -63,10 +69,10 @@ function ProductsLoadingSkeleton() {
   );
 }
 
-async function ProductsList() {
-  const products = await getProducts();
+async function ProductsList({ filter }: { filter: ProductFilterDto }) {
+  const paginationResult = await getPaginatedProducts(filter);
 
-  if (products.length === 0) {
+  if (paginationResult.data.length === 0) {
     return (
       <div className="text-center py-5">
         <div className="mb-4">
@@ -82,14 +88,64 @@ async function ProductsList() {
   }
 
   return (
-    <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
-      {products.map((product) => (
-        <ProductCard 
-          key={product.id} 
-          product={product} 
-          showAdminActions={true}
-        />
-      ))}
+    <>
+      <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        {paginationResult.data.map((product) => (
+          <ProductCard 
+            key={product.id} 
+            product={product} 
+            showAdminActions={true}
+          />
+        ))}
+      </div>
+      
+      <Pagination 
+        pagination={paginationResult}
+        currentPage={filter.pageNumber}
+        baseUrl="/admin/products"
+        searchParams={{
+          ...(filter.category && { category: filter.category }),
+          ...(filter.sortBy && filter.sortBy !== 'name' && { sort: filter.sortBy }),
+          ...(filter.searchTerm && { search: filter.searchTerm })
+        }}
+      />
+    </>
+  );
+}
+
+function AdminSearchFilters({ 
+  currentSearch, 
+  currentPage 
+}: { 
+  currentSearch: string;
+  currentPage: number;
+}) {
+  return (
+    <div className="card shadow-sm mb-4">
+      <div className="card-body">
+        <form action="/admin/products" method="GET" className="d-flex">
+          <input 
+            type="hidden" 
+            name="page" 
+            value="1" 
+          />
+          <input
+            type="text"
+            name="search"
+            className="form-control me-2"
+            placeholder="Search products by name or description..."
+            defaultValue={currentSearch}
+          />
+          <button type="submit" className="btn btn-primary">
+            <i className="bi bi-search"></i>
+          </button>
+          {currentSearch && (
+            <a href="/admin/products" className="btn btn-outline-secondary ms-2">
+              <i className="bi bi-x-circle"></i>
+            </a>
+          )}
+        </form>
+      </div>
     </div>
   );
 }
@@ -99,7 +155,24 @@ export default async function AdminProductsPage({
 }: {
   searchParams: Promise<SearchParams>
 }) {
-  const { success, error } = await searchParams;
+  const { success, error, page, search, category, sort } = await searchParams;
+
+  const currentPage = Math.max(1, parseInt(page || '1'));
+  const searchTerm = search || '';
+  const categoryFilter = category || '';
+  const sortBy = sort || 'name';
+  
+  const filter: ProductFilterDto = {
+    pageNumber: currentPage,
+    pageSize: 12,
+    searchTerm: searchTerm || undefined,
+    category: categoryFilter || undefined,
+    sortBy: sortBy === 'name' ? undefined : sortBy,
+    isActive: undefined,
+    includeInactive: true
+  };
+
+  const paginationResult = await getPaginatedProducts(filter);
 
   return (
     <div className="container-fluid">
@@ -108,7 +181,12 @@ export default async function AdminProductsPage({
           <h1 className="h2 mb-1">
             <i className="bi bi-box-seam me-2"></i>Product Management
           </h1>
-          <p className="text-muted mb-0">Manage your product inventory</p>
+          <p className="text-muted mb-0">
+            Manage your product inventory 
+            {paginationResult.totalCount > 0 && (
+              <span className="ms-2">({paginationResult.totalCount} total products)</span>
+            )}
+          </p>
         </div>
         <Link 
           href="/admin/products/create" 
@@ -121,12 +199,20 @@ export default async function AdminProductsPage({
       {success && <SuccessAlert message={success} />}
       {error && <ErrorAlert message={error} />}
 
+      <AdminSearchFilters 
+        currentSearch={searchTerm}
+        currentPage={currentPage}
+      />
+
       <div className="card shadow-sm">
         <div className="card-header bg-light">
           <div className="row align-items-center">
             <div className="col">
               <h5 className="card-title mb-0">
                 <i className="bi bi-list-ul me-2"></i>Products Overview
+                {searchTerm && (
+                  <span className="text-muted ms-2">(Search: "{searchTerm}")</span>
+                )}
               </h5>
             </div>
             <div className="col-auto">
@@ -151,7 +237,7 @@ export default async function AdminProductsPage({
         </div>
         <div className="card-body">
           <Suspense fallback={<ProductsLoadingSkeleton />}>
-            <ProductsList />
+            <ProductsList filter={filter} />
           </Suspense>
         </div>
       </div>
