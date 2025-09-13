@@ -18,6 +18,7 @@ using BlueBerry24.Infrastructure.Repositories.ShopConcretes;
 using BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes;
 using BlueBerry24.Infrastructure.Repositories.WishlistConcretes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
@@ -35,7 +36,23 @@ namespace BlueBerry24.Infrastructure.DI
                 var connectionString = configuration.GetConnectionString("MSSQLServer");
 
                 options.UseSqlServer(connectionString,
-                    sqloptions => sqloptions.MigrationsAssembly("BlueBerry24.Infrastructure"));
+                    sqloptions => {
+                        sqloptions.MigrationsAssembly("BlueBerry24.Infrastructure");
+
+                        sqloptions.EnableRetryOnFailure(
+                            maxRetryCount: 5,
+                            maxRetryDelay: TimeSpan.FromSeconds(30),
+                            errorNumbersToAdd: null);
+                        sqloptions.CommandTimeout(120);
+                    });
+
+                options.EnableSensitiveDataLogging(false);
+
+                options.EnableServiceProviderCaching();
+                options.EnableDetailedErrors(false);
+
+                options.ConfigureWarnings(warnings =>
+                    warnings.Log(RelationalEventId.MultipleCollectionIncludeWarning));
             });
 
             serviceDescriptors.AddScoped<ICouponRepository, CouponRepository>();
@@ -56,7 +73,12 @@ namespace BlueBerry24.Infrastructure.DI
 
             serviceDescriptors.AddScoped<IWishlistRepository, WishlistRepository>();
 
-            serviceDescriptors.AddScoped<IPaymentRepository, PaymentRepository>();
+            serviceDescriptors.Add(new ServiceDescriptor
+            (
+                typeof(IPaymentRepository),
+                typeof(PaymentRepository),
+                ServiceLifetime.Scoped
+                ));
 
             return serviceDescriptors;
         }
