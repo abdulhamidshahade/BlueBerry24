@@ -198,8 +198,12 @@ async function FeaturedProductsSection() {
   
   try {
     const productService = new ProductService();
-    const allProducts = await productService.getAll();
-    products = allProducts.filter(p => p.isActive).slice(0, 8); // Show first 8 active products
+    const paginatedProducts = await productService.getPaginated({
+      pageNumber: 1,
+      pageSize: 50, // Get more products to filter from
+      isActive: true // Filter for active products only
+    });
+    products = paginatedProducts.data.slice(0, 8); // Show first 8 active products
   } catch (error) {
     console.error('Failed to fetch products:', error);
   }
