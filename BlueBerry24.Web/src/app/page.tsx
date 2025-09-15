@@ -123,7 +123,7 @@ async function CategoriesSection() {
   try {
     const categoryService = new CategoryService();
     const allCategories = await categoryService.getAll();
-    categories = allCategories.slice(0, 6); // Show first 6 categories
+    categories = allCategories.slice(0, 6);
   } catch (error) {
     console.error('Failed to fetch categories:', error);
   }
@@ -200,10 +200,10 @@ async function FeaturedProductsSection() {
     const productService = new ProductService();
     const paginatedProducts = await productService.getPaginated({
       pageNumber: 1,
-      pageSize: 50, // Get more products to filter from
-      isActive: true // Filter for active products only
+      pageSize: 50, 
+      isActive: true
     });
-    products = paginatedProducts.data.slice(0, 8); // Show first 8 active products
+    products = paginatedProducts.data.slice(0, 8);
   } catch (error) {
     console.error('Failed to fetch products:', error);
   }
@@ -388,7 +388,6 @@ function NewsletterSection() {
   );
 }
 
-//hardcoded by me, just for testing, pay attention for that!
 function StatsSection() {
   const stats = [
     { number: "10,000+", label: "Happy Customers", icon: "bi-people" },
