@@ -3,7 +3,7 @@ import { IProductService } from "./interface";
 import { ResponseDto } from "../../../types/responseDto";
 import { apiRequest } from "../../utils/api";
 import { cookies } from 'next/headers';
-
+import { PaginationDto, ProductFilterDto } from "../../../types/pagination";
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const API_BASE = process.env.API_BASE_PRODUCT;
 
@@ -20,6 +20,28 @@ export class ProductService implements IProductService{
             throw new Error('Failed to fetch product');
         }
     }
+
+
+    async getAll(): Promise<ProductDto[]> {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('cart_session')?.value;
+        try {
+            const json: ResponseDto<ProductDto[]> = await apiRequest(`${API_BASE}/all`, {
+                isPublic: true,
+                headers: {
+                    'X-Session-Id': token ?? ''
+                }
+            });
+            if(!json.isSuccess || !json.data) {
+                console.warn('Products API returned no data, returning empty array');
+                return [];
+            }
+            return json.data;
+        } catch (error) {
+            console.error('Failed to fetch products:', error);
+            return [];
+        }
+    }
     
     async getByName(name: string): Promise<ProductDto> {
         try {
@@ -34,25 +56,59 @@ export class ProductService implements IProductService{
         }
     }
     
-    async getAll(): Promise<ProductDto[]> {
+    async getPaginated(filter: ProductFilterDto): Promise<PaginationDto<ProductDto>> {
         const cookieStore = await cookies();
-    const token = cookieStore.get('cart_session')?.value;
+        const token = cookieStore.get('cart_session')?.value;
+        
         try {
-            const json: ResponseDto<ProductDto[]> = await apiRequest(`${API_BASE}`, {
+            const queryParams = new URLSearchParams();
+            
+            if (filter.pageNumber) queryParams.append('pageNumber', filter.pageNumber.toString());
+            if (filter.pageSize) queryParams.append('pageSize', filter.pageSize.toString());
+            if (filter.searchTerm) queryParams.append('searchTerm', filter.searchTerm);
+            if (filter.category) queryParams.append('category', filter.category);
+            if (filter.sortBy) queryParams.append('sortBy', filter.sortBy);
+            if (filter.minPrice !== undefined) queryParams.append('minPrice', filter.minPrice.toString());
+            if (filter.maxPrice !== undefined) queryParams.append('maxPrice', filter.maxPrice.toString());
+            if (filter.isActive !== undefined) queryParams.append('isActive', filter.isActive.toString());
+
+            const url = `${API_BASE}?${queryParams.toString()}`;
+            
+            const json: ResponseDto<PaginationDto<ProductDto>> = await apiRequest(url, {
                 isPublic: true,
                 headers: {
                     'X-Session-Id': token ?? ''
                 }
-                
             });
+            
             if(!json.isSuccess || !json.data) {
-                console.warn('Products API returned no data, returning empty array');
-                return [];
+                console.warn('Products pagination API returned no data, returning empty pagination');
+                return {
+                    data: [],
+                    pageNumber: 1,
+                    pageSize: filter.pageSize || 12,
+                    totalCount: 0,
+                    totalPages: 0,
+                    hasPreviousPage: false,
+                    hasNextPage: false,
+                    firstItemOnPage: 0,
+                    lastItemOnPage: 0
+                };
             }
             return json.data;
         } catch (error) {
-            console.error('Failed to fetch products:', error);
-            return [];
+            console.error('Failed to fetch paginated products:', error);
+            return {
+                data: [],
+                pageNumber: 1,
+                pageSize: filter.pageSize || 12,
+                totalCount: 0,
+                totalPages: 0,
+                hasPreviousPage: false,
+                hasNextPage: false,
+                firstItemOnPage: 0,
+                lastItemOnPage: 0
+            };
         }
     }
     
