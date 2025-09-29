@@ -5,7 +5,7 @@ import { ResponseDto } from "../../../types/responseDto";
 import { apiRequest } from "../../utils/api";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-const API_BASE = process.env.API_BASE_AUTH
+const API_BASE = process.env.API_BASE_AUTH;
 
 export class UserService implements IUserService {
   async getAll(): Promise<User[]> {
