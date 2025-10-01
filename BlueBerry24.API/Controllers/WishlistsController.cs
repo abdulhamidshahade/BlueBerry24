@@ -45,7 +45,6 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // GET: api/wishlists/{id}
         [HttpGet("{id}")]
         [UserAndAbove]
         public async Task<IActionResult> GetWishlist(int id)
