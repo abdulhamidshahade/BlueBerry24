@@ -70,7 +70,7 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // GET: api/wishlists/default
+
         [HttpGet("default")]
         [UserAndAbove]
         public async Task<IActionResult> GetDefaultWishlist()
@@ -90,7 +90,7 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // GET: api/wishlists/summary
+
         [HttpGet("summary")]
         [UserAndAbove]
         public async Task<IActionResult> GetUserSummary()
@@ -110,7 +110,7 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // POST: api/wishlists
+
         [HttpPost]
         [UserAndAbove]
         public async Task<IActionResult> CreateWishlist([FromBody] CreateWishlistDto createWishlistDto)
@@ -134,7 +134,7 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // PUT: api/wishlists/{id}
+
         [HttpPut("{id}")]
         [UserAndAbove]
         public async Task<IActionResult> UpdateWishlist(int id, [FromBody] UpdateWishlistDto updateWishlistDto)
@@ -164,7 +164,6 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // DELETE: api/wishlists/{id}
         [HttpDelete("{id}")]
         [UserAndAbove]
         public async Task<IActionResult> DeleteWishlist(int id)
@@ -194,7 +193,6 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // POST: api/wishlists/items/add
         [HttpPost("items/add")]
         [UserAndAbove]
         public async Task<IActionResult> AddItem([FromBody] AddToWishlistDto addToWishlistDto)
@@ -220,7 +218,7 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // PUT: api/wishlists/{wishlistId}/items/{productId}
+
         [HttpPut("{wishlistId}/items/{productId}")]
         [UserAndAbove]
         public async Task<IActionResult> UpdateItem(int wishlistId, int productId, [FromBody] UpdateWishlistItemDto updateItemDto)
@@ -247,7 +245,6 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // DELETE: api/wishlists/{wishlistId}/items/{productId}
         [HttpDelete("{wishlistId}/items/{productId}")]
         [UserAndAbove]
         public async Task<IActionResult> RemoveItem(int wishlistId, int productId)
@@ -274,7 +271,6 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // GET: api/wishlists/check-product/{productId}
         [HttpGet("check-product/{productId}")]
         [UserAndAbove]
         public async Task<IActionResult> CheckProductInWishlist(int productId)
@@ -294,7 +290,6 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // POST: api/wishlists/{wishlistId}/items/bulk-add
         [HttpPost("{wishlistId}/items/bulk-add")]
         [UserAndAbove]
         public async Task<IActionResult> AddMultipleItems(int wishlistId, [FromBody] List<int> productIds)
@@ -321,7 +316,6 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // DELETE: api/wishlists/{wishlistId}/items/bulk-remove
         [HttpDelete("{wishlistId}/items/bulk-remove")]
         [UserAndAbove]
         public async Task<IActionResult> RemoveMultipleItems(int wishlistId, [FromBody] List<int> productIds)
@@ -345,7 +339,6 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // PUT: api/wishlists/{wishlistId}/share
         [HttpPut("{wishlistId}/share")]
         [UserAndAbove]
         public async Task<IActionResult> ShareWishlist(int wishlistId, [FromBody] bool isPublic)
@@ -369,7 +362,6 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // POST: api/wishlists/{wishlistId}/duplicate
         [HttpPost("{wishlistId}/duplicate")]
         [UserAndAbove]
         public async Task<IActionResult> DuplicateWishlist(int wishlistId, [FromBody] string newName)
@@ -396,7 +388,6 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // DELETE: api/wishlists/{wishlistId}/clear
         [HttpDelete("{wishlistId}/clear")]
         [UserAndAbove]
         public async Task<IActionResult> ClearWishlist(int wishlistId)
@@ -422,7 +413,6 @@ namespace BlueBerry24.API.Controllers
 
         // ADMIN ENDPOINTS
 
-        // GET: api/wishlists/admin/all
         [HttpGet("admin/all")]
         [AdminAndAbove]
         public async Task<IActionResult> GetAllWishlistsForAdmin()
@@ -439,7 +429,6 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // GET: api/wishlists/admin/stats
         [HttpGet("admin/stats")]
         [AdminAndAbove]
         public async Task<IActionResult> GetGlobalWishlistStats()
@@ -455,7 +444,6 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // DELETE: api/wishlists/admin/{id}
         [HttpDelete("admin/{id}")]
         [AdminAndAbove]
         public async Task<IActionResult> AdminDeleteWishlist(int id)
@@ -474,7 +462,6 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // DELETE: api/wishlists/admin/{id}/clear
         [HttpDelete("admin/{id}/clear")]
         [AdminAndAbove]
         public async Task<IActionResult> AdminClearWishlist(int id)
@@ -490,7 +477,6 @@ namespace BlueBerry24.API.Controllers
             }
         }
 
-        // PUT: api/wishlists/admin/{id}/visibility
         [HttpPut("admin/{id}/visibility")]
         [AdminAndAbove]
         public async Task<IActionResult> AdminToggleWishlistVisibility(int id, [FromBody] bool isPublic)
