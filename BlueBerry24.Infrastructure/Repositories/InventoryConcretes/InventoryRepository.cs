@@ -18,7 +18,6 @@ namespace BlueBerry24.Infrastructure.Repositories.InventoryConcretes
             _unitOfWork = unitOfWork;
         }
 
-        //TODO add in interface
         public async Task<InventoryLog> CreateInventory(InventoryLog inventoryLog)
         {
             await _context.InventoryLogs.AddAsync(inventoryLog);
