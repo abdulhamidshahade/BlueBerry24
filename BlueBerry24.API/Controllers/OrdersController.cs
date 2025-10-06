@@ -485,25 +485,4 @@ namespace BlueBerry24.API.Controllers
         }
     }
 
-    public class CancelOrderRequest
-    {
-        public string Reason { get; set; } = string.Empty;
-    }
-
-    public class RefundOrderRequest
-    {
-        public string Reason { get; set; } = string.Empty;
-    }
-
-    public class MarkOrderPaidRequest
-    {
-        public int PaymentTransactionId { get; set; }
-        public string PaymentProvider { get; set; } = string.Empty;
-    }
-
-    public class UpdateOrderStatusRequest
-    {
-        public OrderStatus NewStatus { get; set; }
-    }
-
 }
