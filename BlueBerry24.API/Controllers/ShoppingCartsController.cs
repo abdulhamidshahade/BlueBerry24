@@ -147,16 +147,6 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                //if (string.IsNullOrWhiteSpace(GetSessionId()))
-                //{
-                //    return BadRequest(new ResponseDto
-                //    {
-                //        IsSuccess = false,
-                //        StatusCode = 400,
-                //        StatusMessage = "Session ID is required"
-                //    });
-                //}
-
                 var cart = await _cartService.GetCartByIdAsync(id, CartStatus.Active);
                 if (cart == null)
                 {
