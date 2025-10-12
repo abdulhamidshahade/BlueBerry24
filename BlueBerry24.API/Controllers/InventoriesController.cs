@@ -1,5 +1,6 @@
 ﻿using BlueBerry24.Application.Authorization.Attributes;
 using BlueBerry24.Application.Dtos;
+using BlueBerry24.Application.Dtos.InventoryDtos;
 using BlueBerry24.Application.Services.Interfaces.InventoryServiceInterfaces;
 using BlueBerry24.Domain.Entities.InventoryEntities;
 using BlueBerry24.Domain.Entities.ProductEntities;
@@ -387,14 +388,6 @@ namespace BlueBerry24.API.Controllers
                 });
             }
         }
-    }
-
-    public class ReserveStockRequest
-    {
-        public int ProductId { get; set; }
-        public int Quantity { get; set; }
-        public int ReferenceId { get; set; }
-        public string ReferenceType { get; set; } = string.Empty;
     }
 
     public class ReleaseStockRequest
