@@ -405,12 +405,4 @@ namespace BlueBerry24.API.Controllers
         public int ReferenceId { get; set; }
         public string ReferenceType { get; set; } = string.Empty;
     }
-
-    public class AddStockRequest
-    {
-        public int ProductId { get; set; }
-        public int Quantity { get; set; }
-        public string Notes { get; set; } = string.Empty;
-        public int? PerformedByUserId { get; set; }
-    }
 }
