@@ -51,7 +51,6 @@ namespace BlueBerry24.API.Controllers
 
                 var cart = await _cartService.GetCartByUserIdAsync(userId.Value);
 
-                //await _cartService.ConvertCartAsync(cart.Id);
                 var order = await _orderService.GetOrderByIdAsync(createPaymentDto.OrderId.Value);
 
                 var mappedOrder = _mapper.Map<Order>(order);
