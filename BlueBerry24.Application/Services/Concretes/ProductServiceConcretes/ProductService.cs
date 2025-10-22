@@ -198,13 +198,4 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
             return paginationResult;
         }
     }
-
-
-
-    //public async Task<bool> ExistsByShopIdAsync(string productId, string shopId)
-    //{
-    //    var exists = await _context.Products.Where(i => i.Id == productId && i.ShopId == shopId).AnyAsync();
-
-    //    return exists;
-    //}
 }
