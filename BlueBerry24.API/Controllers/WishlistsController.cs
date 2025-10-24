@@ -1,9 +1,6 @@
 ﻿using BlueBerry24.Application.Authorization.Attributes;
 using BlueBerry24.Application.Dtos.WishlistDtos;
-using BlueBerry24.Application.Services.Concretes.WishlistServiceConcretes;
 using BlueBerry24.Application.Services.Interfaces.WishlistServiceInterfaces;
-using BlueBerry24.Domain.Constants;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
