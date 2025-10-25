@@ -1,7 +1,6 @@
 ﻿using BlueBerry24.Application.Authorization.Attributes;
 using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.CategoryDtos;
-using BlueBerry24.Application.Dtos.ProductDtos;
 using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
