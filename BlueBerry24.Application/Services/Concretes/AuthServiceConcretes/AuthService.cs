@@ -4,7 +4,6 @@ using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.EmailServiceInterfaces;
 using BlueBerry24.Domain.Entities.AuthEntities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
