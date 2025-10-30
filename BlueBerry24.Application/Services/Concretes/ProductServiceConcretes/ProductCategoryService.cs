@@ -5,7 +5,6 @@ using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
 using BlueBerry24.Domain.Entities.ProductEntities;
 using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.ProductInterfaces;
-using Microsoft.EntityFrameworkCore;
 
 
 namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
