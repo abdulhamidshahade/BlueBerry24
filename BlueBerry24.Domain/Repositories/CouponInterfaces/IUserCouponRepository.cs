@@ -1,11 +1,5 @@
 ﻿using BlueBerry24.Domain.Entities.AuthEntities;
 using BlueBerry24.Domain.Entities.CouponEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace BlueBerry24.Domain.Repositories.CouponInterfaces
 {
     public interface IUserCouponRepository
