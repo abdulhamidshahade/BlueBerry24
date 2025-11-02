@@ -3,11 +3,6 @@ using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.ShopInterfaces;
 using BlueBerry24.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlueBerry24.Infrastructure.Repositories.ShopConcretes
 {
