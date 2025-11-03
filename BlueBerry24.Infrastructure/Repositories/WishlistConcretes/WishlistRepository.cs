@@ -3,11 +3,6 @@ using BlueBerry24.Domain.Repositories.WishlistInterfaces;
 using BlueBerry24.Infrastructure.Data;
 using BlueBerry24.Application.Dtos.WishlistDtos;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlueBerry24.Infrastructure.Repositories.WishlistConcretes
 {
