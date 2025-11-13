@@ -1,10 +1,5 @@
 ﻿using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Entities.OrderEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlueBerry24.Domain.Repositories.OrderInterfaces
 {
