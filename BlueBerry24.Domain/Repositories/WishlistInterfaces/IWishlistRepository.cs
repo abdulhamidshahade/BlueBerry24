@@ -1,10 +1,5 @@
 ﻿using BlueBerry24.Domain.Entities.WishlistEntities;
 using BlueBerry24.Application.Dtos.WishlistDtos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlueBerry24.Domain.Repositories.WishlistInterfaces
 {
