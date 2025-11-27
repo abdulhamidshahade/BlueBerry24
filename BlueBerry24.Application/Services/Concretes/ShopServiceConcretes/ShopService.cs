@@ -3,12 +3,6 @@ using BlueBerry24.Application.Dtos.ShopDtos;
 using BlueBerry24.Application.Services.Interfaces.ShopServiceInterfaces;
 using BlueBerry24.Domain.Entities.ShopEntities;
 using BlueBerry24.Domain.Repositories.ShopInterfaces;
-using Microsoft.Extensions.Logging.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlueBerry24.Application.Services.Concretes.ShopServiceConcretes
 {
