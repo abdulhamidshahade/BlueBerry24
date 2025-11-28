@@ -6,11 +6,6 @@ using BlueBerry24.Application.Services.Interfaces.WishlistServiceInterfaces;
 using BlueBerry24.Domain.Entities.WishlistEntities;
 using BlueBerry24.Domain.Repositories.ProductInterfaces;
 using BlueBerry24.Domain.Repositories.WishlistInterfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlueBerry24.Application.Services.Concretes.WishlistServiceConcretes
 {
