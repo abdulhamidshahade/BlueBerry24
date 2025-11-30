@@ -11,10 +11,10 @@ namespace BlueBerry24.Application.Services.Concretes.EmailServiceConcretes
 {
     public class GmailService : IMailService
     {
-        private readonly GmailOption _gmailOption;
+        private readonly GmailSettings _gmailOption;
         private readonly ILogger<GmailService> _logger;
 
-        public GmailService(IOptions<GmailOption> gmailOptions, ILogger<GmailService> logger)
+        public GmailService(IOptions<GmailSettings> gmailOptions, ILogger<GmailService> logger)
         {
             _gmailOption = gmailOptions.Value;
             _logger = logger;
