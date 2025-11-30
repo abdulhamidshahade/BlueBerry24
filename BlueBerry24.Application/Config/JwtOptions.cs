@@ -1,5 +1,5 @@
-﻿namespace BlueBerry24.Domain.Entities.AuthEntities
-{
+﻿namespace BlueBerry24.Application.Config
+{ 
     public class JwtOptions
     {
         public string SecretKey { get; set; } = string.Empty;
