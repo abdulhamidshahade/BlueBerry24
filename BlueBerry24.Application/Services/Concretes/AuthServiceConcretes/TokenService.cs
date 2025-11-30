@@ -1,4 +1,5 @@
-﻿using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
+﻿using BlueBerry24.Application.Config;
+using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
 using BlueBerry24.Domain.Entities.AuthEntities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
