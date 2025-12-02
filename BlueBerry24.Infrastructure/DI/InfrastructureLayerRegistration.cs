@@ -23,11 +23,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
+// TODO: Use here Microsoft.Extensions.DependencyInjection namespace
+
 namespace BlueBerry24.Infrastructure.DI
 {
     public static class InfrastructureLayerRegistration
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection serviceDescriptors)
+        public static IServiceCollection AddInfrastructureServices(this IServiceCollection serviceDescriptors)
         {
 
             serviceDescriptors.AddDbContext<ApplicationDbContext>((provider, options) =>
