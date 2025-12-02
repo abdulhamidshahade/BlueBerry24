@@ -20,12 +20,13 @@ using BlueBerry24.Application.Services.Interfaces.ShopServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.WishlistServiceInterfaces;
 using Microsoft.Extensions.DependencyInjection;
 
+// TODO: Use here Microsoft.Extensions.DependencyInjection namespace
 
 namespace BlueBerry24.Application.DI
 {
     public static class ApplicationLayerRegistration
     {
-        public static IServiceCollection AddApplication(this IServiceCollection serviceDescriptors)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection serviceDescriptors)
         {
             serviceDescriptors.AddScoped<IAuthService, AuthService>();
             serviceDescriptors.AddScoped<ITokenService, TokenService>();
