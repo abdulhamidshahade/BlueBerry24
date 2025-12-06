@@ -9,10 +9,8 @@ using BlueBerry24.Domain.Entities.ProductEntities;
 using BlueBerry24.Domain.Entities.ShoppingCartEntities;
 using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.ShoppingCartInterfaces;
-using Microsoft.EntityFrameworkCore.Storage.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Threading;
 
 namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcretes
 {
