@@ -1,11 +1,6 @@
 ﻿using AutoMapper;
 using BlueBerry24.Application.Dtos.AuthDtos;
 using BlueBerry24.Domain.Entities.AuthEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlueBerry24.Application.Mapping
 {
