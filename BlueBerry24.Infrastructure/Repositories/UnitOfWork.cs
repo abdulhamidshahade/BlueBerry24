@@ -1,7 +1,5 @@
 ﻿using BlueBerry24.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
-using StackExchange.Redis;
 
 namespace BlueBerry24.Domain.Repositories
 {
