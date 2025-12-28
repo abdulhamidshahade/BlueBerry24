@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BlueBerry24.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     public class AuthController : BaseController
     {
         private readonly IAuthService _authService;
