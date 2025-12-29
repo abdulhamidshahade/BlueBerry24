@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BlueBerry24.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/inventories")]
     [ApiController]
     public class InventoriesController : BaseController
     {
