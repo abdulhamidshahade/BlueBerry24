@@ -11,7 +11,7 @@ using System.Security.Claims;
 
 namespace BlueBerry24.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/shopping-carts")]
     [ApiController]
     public class ShoppingCartsController : BaseController
     {
