@@ -7,7 +7,7 @@ using System.Security.Claims;
 namespace BlueBerry24.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/wishlists")]
     public class WishlistsController : ControllerBase
     {
         private readonly IWishlistService _wishlistService;
