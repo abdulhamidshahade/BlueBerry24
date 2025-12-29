@@ -11,7 +11,7 @@ using System.Security.Claims;
 namespace BlueBerry24.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/orders")]
     public class OrdersController : BaseController
     {
         private readonly ILogger<OrdersController> _logger;
