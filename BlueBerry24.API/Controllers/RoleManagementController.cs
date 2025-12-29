@@ -7,17 +7,17 @@ using Microsoft.AspNetCore.Mvc;
 namespace BlueBerry24.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/role-managements")]
     [SuperAdminOnly]
-    public class RoleManagementController : BaseController
+    public class RoleManagementsController : BaseController
     {
         private readonly IRoleManagementService _roleManagementService;
-        private readonly ILogger<RoleManagementController> _logger;
+        private readonly ILogger<RoleManagementsController> _logger;
         
 
-        public RoleManagementController(
+        public RoleManagementsController(
             IRoleManagementService roleManagementService,
-            ILogger<RoleManagementController> logger) : base(logger)
+            ILogger<RoleManagementsController> logger) : base(logger)
         {
             _roleManagementService = roleManagementService;
             _logger = logger;
