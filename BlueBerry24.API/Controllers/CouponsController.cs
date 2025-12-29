@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BlueBerry24.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/coupons")]
     [ApiController]
     public class CouponsController : BaseController
     {
