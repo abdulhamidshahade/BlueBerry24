@@ -35,7 +35,6 @@ namespace BlueBerry24.API.Controllers
             [FromQuery] decimal? maxPrice = null,
             [FromQuery] bool? isActive = true)
         {
-            _logger.LogInformation("Getting products with pagination and filters");
 
             var filter = new ProductFilterDto
             {
@@ -53,7 +52,6 @@ namespace BlueBerry24.API.Controllers
 
             if (!result.Data.Any())
             {
-                _logger.LogWarning("No products found with the specified filters");
                 return NotFound(new ResponseDto<PaginationDto<ProductDto>>
                 {
                     IsSuccess = false,
@@ -77,13 +75,11 @@ namespace BlueBerry24.API.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<ResponseDto<IEnumerable<ProductDto>>>> GetProducts()
         {
-            _logger.LogInformation("Getting all products (simple)");
 
             var products = await _productService.GetAllAsync();
 
             if (!products.Any())
             {
-                _logger.LogError("No products found");
                 return NotFound(new ResponseDto<IEnumerable<ProductDto>>
                 {
                     IsSuccess = false,
@@ -107,12 +103,10 @@ namespace BlueBerry24.API.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<ResponseDto<ProductDto>>> GetById(int id)
         {
-            _logger.LogInformation($"Getting product with ID: {id}");
             var product = await _productService.GetByIdAsync(id);
 
             if (product == null)
             {
-                _logger.LogError($"Error retrieving product with ID {id}");
                 return new ResponseDto<ProductDto>
                 {
                     IsSuccess = false,
@@ -139,12 +133,10 @@ namespace BlueBerry24.API.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<ResponseDto<ProductDto>>> GetByName(string name)
         {
-            _logger.LogInformation($"Getting product with name: {name}");
             var product = await _productService.GetByNameAsync(name);
 
             if (product == null)
             {
-                _logger.LogError($"Error retrieving product with name {name}");
                 return new ResponseDto<ProductDto>
                 {
                     IsSuccess = false,
@@ -169,12 +161,10 @@ namespace BlueBerry24.API.Controllers
         public async Task<ActionResult<ResponseDto<ProductDto>>> Create([FromBody] CreateProductDto productDto,
             [FromQuery] List<int> categories)
         {
-            _logger.LogInformation($"Creating new product with name: {productDto.Name}");
             var createdProduct = await _productService.CreateAsync(productDto, categories);
 
             if (createdProduct == null)
             {
-                _logger.LogError("Error creating product");
                 return new ResponseDto<ProductDto>
                 {
                     IsSuccess = false,
@@ -202,12 +192,10 @@ namespace BlueBerry24.API.Controllers
         public async Task<ActionResult<ResponseDto<ProductDto>>> Update(int id, [FromBody] UpdateProductDto productDto,
             [FromQuery] List<int> categories)
         {
-            _logger.LogInformation($"Updating product with Id: {id}");
             var updatedProduct = await _productService.UpdateAsync(id, productDto, categories);
 
             if (updatedProduct == null)
             {
-                _logger.LogError($"Error updating product with ID {id}");
                 return new ResponseDto<ProductDto>
                 {
                     IsSuccess = false,
@@ -234,12 +222,10 @@ namespace BlueBerry24.API.Controllers
         [AdminAndAbove]
         public async Task<ActionResult<ResponseDto<bool>>> Delete(int id)
         {
-            _logger.LogInformation($"Deleting product with ID: {id}");
             var deleted = await _productService.DeleteAsync(id);
 
             if (!deleted)
             {
-                _logger.LogWarning($"Product with ID {id} not found for deletion");
                 var notFoundResponse = new ResponseDto<bool>
                 {
                     IsSuccess = false,
