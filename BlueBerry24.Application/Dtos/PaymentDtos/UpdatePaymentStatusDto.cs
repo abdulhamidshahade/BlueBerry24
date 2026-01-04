@@ -1,5 +1,4 @@
-﻿using BlueBerry24.Application.Dtos.PaymentDtos;
-using BlueBerry24.Domain.Constants;
+﻿using BlueBerry24.Domain.Constants;
 
 namespace BlueBerry24.API.Controllers
 {
