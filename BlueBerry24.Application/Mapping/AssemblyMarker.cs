@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BlueBerry24.Application.Mapping
+﻿namespace BlueBerry24.Application.Mapping
 {
     public class AssemblyMarker
     {
