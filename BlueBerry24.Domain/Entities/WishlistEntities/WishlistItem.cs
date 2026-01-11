@@ -1,12 +1,6 @@
 ﻿using BlueBerry24.Domain.Entities.Base;
 using BlueBerry24.Domain.Entities.ProductEntities;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace BlueBerry24.Domain.Entities.WishlistEntities
 {
     public class WishlistItem : IAuditableEntity
