@@ -1,10 +1,5 @@
 ﻿using BlueBerry24.Domain.Entities.InventoryEntities;
 using BlueBerry24.Domain.Entities.ProductEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlueBerry24.Application.Services.Interfaces.InventoryServiceInterfaces
 {
