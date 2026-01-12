@@ -1,11 +1,6 @@
 ﻿using AutoMapper;
 using BlueBerry24.Application.Dtos.ShoppingCartDtos;
 using BlueBerry24.Domain.Entities.ShoppingCartEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlueBerry24.Application.Mapping
 {
