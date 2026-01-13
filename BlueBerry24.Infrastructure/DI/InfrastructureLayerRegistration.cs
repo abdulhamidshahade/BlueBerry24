@@ -1,5 +1,4 @@
-﻿using BlueBerry24.Domain.Entities.WishlistEntities;
-using BlueBerry24.Domain.Repositories;
+﻿using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.CouponInterfaces;
 using BlueBerry24.Domain.Repositories.InventoryInterfaces;
 using BlueBerry24.Domain.Repositories.OrderInterfaces;
