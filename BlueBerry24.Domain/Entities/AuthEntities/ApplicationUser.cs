@@ -2,7 +2,6 @@
 using BlueBerry24.Domain.Entities.CouponEntities;
 using BlueBerry24.Domain.Entities.OrderEntities;
 using BlueBerry24.Domain.Entities.PaymentEntities;
-using BlueBerry24.Domain.Entities.ShopEntities;
 using BlueBerry24.Domain.Entities.ShoppingCartEntities;
 using BlueBerry24.Domain.Entities.WishlistEntities;
 using Microsoft.AspNetCore.Identity;
