@@ -1,12 +1,6 @@
 ﻿using BlueBerry24.Domain.Entities.AuthEntities;
 using BlueBerry24.Domain.Entities.Base;
 using BlueBerry24.Domain.Entities.CouponEntities;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlueBerry24.Domain.Entities.ShoppingCartEntities
 {
