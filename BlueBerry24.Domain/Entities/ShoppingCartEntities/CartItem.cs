@@ -1,6 +1,5 @@
 ﻿using BlueBerry24.Domain.Entities.Base;
 using BlueBerry24.Domain.Entities.ProductEntities;
-using System.ComponentModel.DataAnnotations;
 
 namespace BlueBerry24.Domain.Entities.ShoppingCartEntities
 {
