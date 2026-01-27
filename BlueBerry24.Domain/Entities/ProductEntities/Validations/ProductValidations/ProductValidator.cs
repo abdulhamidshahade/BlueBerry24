@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace BlueBerry24.Domain.Entities.ProductEntities.Validations.ProductValidations
+﻿namespace BlueBerry24.Domain.Entities.ProductEntities.Validations.ProductValidations
 {
     public class ProductValidator : ProductBaseValidator<Product>
     {
