@@ -2,7 +2,7 @@ namespace BlueBerry24.Application.Dtos
 {
     public class PaginationDto<T>
     {
-        public IEnumerable<T> Data { get; set; } = new List<T>();
+        public IEnumerable<T> Data { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
         public int TotalCount { get; set; }
