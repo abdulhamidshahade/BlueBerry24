@@ -12,7 +12,7 @@ namespace BlueBerry24.Application.Dtos.OrderDtos
         public decimal TaxAmount { get; set; }
         public decimal ShippingAmount { get; set; }
         public decimal Total { get; set; }
-        public decimal DiscountTotal { get; set; }
+        public decimal DiscountTotal { get; set; } = 0;
         public string CustomerEmail { get; set; } = string.Empty;
         public string? CustomerPhone { get; set; }
         public string? PaymentProvider { get; set; }
