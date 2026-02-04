@@ -31,6 +31,6 @@ namespace BlueBerry24.Application.Dtos.OrderDtos
         public string? ShippingCountry { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public List<OrderItemDto> OrderItems { get; set; } = new List<OrderItemDto>();
+        public List<OrderItemDto> OrderItems { get; set; }
     }
 }
