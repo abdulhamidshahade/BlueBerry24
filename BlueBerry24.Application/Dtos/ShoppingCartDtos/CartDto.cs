@@ -12,8 +12,8 @@ namespace BlueBerry24.Application.Dtos.ShoppingCartDtos
 
         public DateTime? ExpiresAt { get; set; }
 
-        public List<CartItemDto> CartItems { get; set; } = new List<CartItemDto>();
-        public List<CartCouponDto> CartCoupons { get; set; } = new List<CartCouponDto>();
+        public List<CartItemDto> CartItems { get; set; }
+        public List<CartCouponDto> CartCoupons { get; set; } 
 
         public string? Note { get; set; }
         public decimal SubTotal { get; set; }
