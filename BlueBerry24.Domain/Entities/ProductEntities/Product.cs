@@ -17,6 +17,9 @@ namespace BlueBerry24.Domain.Entities.ProductEntities
         [Required]
         [StringLength(1000, MinimumLength = 10, ErrorMessage = "Product description must be between 10 and 1000 characters.")]
         public string Description { get; set; }
+
+        [Required]
+        [Range(0, int.MaxValue, ErrorMessage = "Stock quantity cannot be negative.")]
         public int StockQuantity { get; set; }
         public string ImageUrl { get; set; }
         public decimal Price { get; set; }
