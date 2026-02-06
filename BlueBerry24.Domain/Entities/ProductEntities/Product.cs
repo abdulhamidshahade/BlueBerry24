@@ -13,6 +13,9 @@ namespace BlueBerry24.Domain.Entities.ProductEntities
         [Required]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Product name must be between 2 and 100 characters.")]
         public string Name { get; set; }
+
+        [Required]
+        [StringLength(1000, MinimumLength = 10, ErrorMessage = "Product description must be between 10 and 1000 characters.")]
         public string Description { get; set; }
         public int StockQuantity { get; set; }
         public string ImageUrl { get; set; }
