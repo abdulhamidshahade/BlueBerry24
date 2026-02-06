@@ -2,6 +2,7 @@
 using BlueBerry24.Domain.Entities.InventoryEntities;
 using BlueBerry24.Domain.Entities.OrderEntities;
 using BlueBerry24.Domain.Entities.ShoppingCartEntities;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace BlueBerry24.Domain.Entities.ProductEntities
@@ -9,6 +10,8 @@ namespace BlueBerry24.Domain.Entities.ProductEntities
     public class Product : IAuditableEntity
     {
         public int Id { get; set; }
+        [Required]
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "Product name must be between 2 and 100 characters.")]
         public string Name { get; set; }
         public string Description { get; set; }
         public int StockQuantity { get; set; }
