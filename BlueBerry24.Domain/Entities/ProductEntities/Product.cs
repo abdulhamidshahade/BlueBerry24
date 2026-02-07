@@ -2,8 +2,6 @@
 using BlueBerry24.Domain.Entities.InventoryEntities;
 using BlueBerry24.Domain.Entities.OrderEntities;
 using BlueBerry24.Domain.Entities.ShoppingCartEntities;
-using System.ComponentModel.DataAnnotations;
-
 
 namespace BlueBerry24.Domain.Entities.ProductEntities
 {
