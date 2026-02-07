@@ -10,16 +10,8 @@ namespace BlueBerry24.Domain.Entities.ProductEntities
     public class Product : IAuditableEntity
     {
         public int Id { get; set; }
-        [Required]
-        [StringLength(100, MinimumLength = 2, ErrorMessage = "Product name must be between 2 and 100 characters.")]
         public string Name { get; set; }
-
-        [Required]
-        [StringLength(1000, MinimumLength = 10, ErrorMessage = "Product description must be between 10 and 1000 characters.")]
         public string Description { get; set; }
-
-        [Required]
-        [Range(0, int.MaxValue, ErrorMessage = "Stock quantity cannot be negative.")]
         public int StockQuantity { get; set; }
         public string ImageUrl { get; set; }
         public decimal Price { get; set; }
@@ -29,8 +21,6 @@ namespace BlueBerry24.Domain.Entities.ProductEntities
         public string SKU { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-
-
         public List<InventoryLog> InventoryLogs { get; set; }
         public List<ProductCategory> ProductCategories { get; set; }
         public List<CartItem> CartItems { get; set; }
