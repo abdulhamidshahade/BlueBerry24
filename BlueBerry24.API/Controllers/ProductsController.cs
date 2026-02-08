@@ -25,6 +25,14 @@ namespace BlueBerry24.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [EndpointName("GetAllProducts")]
+        [EndpointSummary("Fetches all products")]
+        [EndpointDescription("Returns a paginated list of products. Supports page number and page size parameters.")]
         public async Task<ActionResult<ResponseDto<PaginationDto<ProductDto>>>> GetAll(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 12,
