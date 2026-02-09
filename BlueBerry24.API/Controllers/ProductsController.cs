@@ -9,6 +9,7 @@ namespace BlueBerry24.API.Controllers
 {
     [Route("api/products")]
     [ApiController]
+    [Tags("Products")]
     public class ProductsController : BaseController
     {
         private readonly IProductService _productService;
