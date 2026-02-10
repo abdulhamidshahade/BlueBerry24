@@ -9,7 +9,7 @@
         public string ImageUrl { get; set; }
 
         public int ReservedStock { get; set; }
-        public int LowStockThreshold { get; set; } = 5;
+        public int LowStockThreshold { get; set; } = 10;
 
         public bool IsActive { get; set; } = true;
 
