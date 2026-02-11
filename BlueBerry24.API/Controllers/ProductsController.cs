@@ -4,6 +4,7 @@ using BlueBerry24.Application.Dtos.ProductDtos;
 using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BlueBerry24.API.Controllers
 {
@@ -34,6 +35,7 @@ namespace BlueBerry24.API.Controllers
         [EndpointName("GetAllProducts")]
         [EndpointSummary("Fetches all products")]
         [EndpointDescription("Returns a paginated list of products. Supports page number and page size parameters.")]
+        [EnableRateLimiting("DefaultPolicy")]
         public async Task<ActionResult<ResponseDto<PaginationDto<ProductDto>>>> GetAll(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 12,
