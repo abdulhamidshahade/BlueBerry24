@@ -4,6 +4,7 @@ using BlueBerry24.Application.Dtos.CategoryDtos;
 using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BlueBerry24.API.Controllers
 {
@@ -25,6 +26,7 @@ namespace BlueBerry24.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
+        [EnableRateLimiting("DefaultPolicy")]
         public async Task<ActionResult<ResponseDto<IEnumerable<CategoryDto>>>> GetAll()
         {
             _logger.LogInformation("Getting all categories");
