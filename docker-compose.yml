@@ -1,0 +1,97 @@
+version: '3.9'
+
+services:
+  # SQL Server Database
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: blueberry24-sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SA_PASSWORD}
+      - MSSQL_PID=Express
+      - MSSQL_MEMORY_LIMIT_MB=4096
+      - MSSQL_COLLATION=SQL_Latin1_General_CP1_CI_AS
+    ports:
+      - "11433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - blueberry24-network
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -Q 'SELECT 1' -C"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 60s
+
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: BlueBerry24.API/Dockerfile
+    container_name: blueberry24-backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:7105
+      - ConnectionStrings__MSSQLServer=Server=sqlserver,1433;Database=BlueBerry24;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Connection Timeout=30;Command Timeout=120;Pooling=true;Min Pool Size=5;Max Pool Size=100;MultipleActiveResultSets=true;Packet Size=4096;
+      - ApiSettings__JwtOptions__SecretKey=${ApiSettings__JwtOptions__SecretKey}
+      - ApiSettings__JwtOptions__Issuer=https://blueberry24.com
+      - ApiSettings__JwtOptions__Audience=blueberry24-api
+      - App__BaseUrl=http://localhost:30305
+      - App__AppName=BlueBerry24
+      - App__Version=1.0.0
+      - GmailSettings__Email=${GmailSettings__Email}
+      - GmailSettings__Password=${GmailSettings__Password}
+      - GmailSettings__Host=smtp.gmail.com
+      - GmailSettings__Port=587
+      - GmailSettings__DisplayName=BlueBerry24 Support
+    ports:
+      - "7105:7105"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - blueberry24-network
+
+  # Frontend Web App
+  frontend:
+    build:
+      context: ./BlueBerry24.Web
+      dockerfile: Dockerfile
+    container_name: blueberry24-frontend
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://backend:7105
+      - NEXT_PUBLIC_API_BASE_URL=http://backend:7105/api
+      - NEXT_PUBLIC_APP_URL=http://localhost:30305
+      - API_BASE_PRODUCT=http://backend:7105/api/Products
+      - API_BASE_CATEGORY=http://backend:7105/api/Categories
+      - API_BASE_SHOPPING_CART=http://backend:7105/api/ShoppingCarts
+      - API_BASE_AUTH=http://backend:7105/api/Auth
+      - API_BASE_PAYMENT=http://backend:7105/api/Payments
+      - API_BASE_COUPON=http://backend:7105/api/Coupons
+      - API_BASE_ROLE_MANAGEMENT=http://backend:7105/api/Auth
+      - API_BASE_WISHLIST=http://backend:7105/api/Wishlists
+      - API_BASE_ORDER=http://backend:7105/api/Orders
+      - API_BASE_INVENTORY=http://backend:7105/api/Inventories
+      - USE_CLOUDFLARE=false
+    ports:
+      - "30305:30305"
+    depends_on:
+      - backend
+    networks:
+      - blueberry24-network
+
+volumes:
+  sqlserver_data:
+    driver: local
+
+networks:
+  blueberry24-network:
+    driver: bridge
