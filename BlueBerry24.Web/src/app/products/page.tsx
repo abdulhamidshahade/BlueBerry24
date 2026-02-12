@@ -122,17 +122,18 @@ function ProductsHeader({ category, searchTerm, totalCount }: {
 }
 
 export default async function ProductsPage({ searchParams }: { 
-  searchParams: { 
+  searchParams: Promise<{ 
     page?: string; 
     category?: string; 
     sort?: string; 
     search?: string;
-  } 
+  }>
 }) {
-  const page = Math.max(1, parseInt(searchParams.page || '1'));
-  const category = searchParams.category || 'all';
-  const sortBy = searchParams.sort || 'name';
-  const searchTerm = searchParams.search || '';
+  const params = await searchParams;
+  const page = Math.max(1, parseInt(params.page || '1'));
+  const category = params.category || 'all';
+  const sortBy = params.sort || 'name';
+  const searchTerm = params.search || '';
   
   const filter: ProductFilterDto = {
     pageNumber: page,
