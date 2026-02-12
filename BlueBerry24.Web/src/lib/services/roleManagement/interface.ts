@@ -8,7 +8,7 @@ export interface IRoleManagementService {
     deleteRole(roleName: string): Promise<RoleManagementResponse>;
     getAllUsers(): Promise<RoleManagementResponse<UserWithRoles[]>>;
     getUserById(userId: number): Promise<RoleManagementResponse<UserWithRoles>>;
-    getUserRoles(userId: numberBu): Promise<RoleManagementResponse<string[]>>;
+    getUserRoles(userId: number): Promise<RoleManagementResponse<string[]>>;
     getUsersInRole(roleName: string): Promise<RoleManagementResponse<User[]>>;
     assignRoleToUser(userId: number, roleName: string): Promise<RoleManagementResponse<boolean>>;
     removeRoleFromUser(userId: number, roleName: string): Promise<RoleManagementResponse<boolean>>;
