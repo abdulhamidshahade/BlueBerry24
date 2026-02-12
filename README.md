@@ -236,6 +236,25 @@ Frontend will be available at `http://localhost:3000`
 ### 4. Default Admin Account
 After running the database migrations, you can create an admin account through the registration page and promote it via the database or create one programmatically.
 
+### 5. Run with Docker (optional)
+
+From the repository root:
+
+```bash
+# Copy environment template and add your secrets (do not commit .env)
+cp .env.example .env
+# Edit .env with your SA_PASSWORD, JWT secret, and Gmail credentials
+
+# Build and start all services
+docker compose up -d
+```
+
+- **API**: http://localhost:7105  
+- **Frontend**: http://localhost:30305  
+- **SQL Server**: localhost:11433 (user `sa`, password from `.env`)
+
+Secrets (passwords, JWT key, Gmail) are read from `.env`; only `.env.example` is committed.
+
 ---
 
 ## 🔒 Authorization Levels
