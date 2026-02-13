@@ -13,13 +13,8 @@ namespace BlueBerry24.API.Controllers
     public class CategoriesController : BaseController
     {
         private readonly ICategoryService _categoryService;
-        private readonly ILogger<CategoriesController> _logger;
-
-
-        public CategoriesController(ILogger<CategoriesController> logger,
-                                    ICategoryService categoryService) : base(logger)
+        public CategoriesController(ICategoryService categoryService)
         {
-            _logger = logger;
             _categoryService = categoryService;
         }
 
@@ -29,7 +24,6 @@ namespace BlueBerry24.API.Controllers
         [EnableRateLimiting("DefaultPolicy")]
         public async Task<ActionResult<ResponseDto<IEnumerable<CategoryDto>>>> GetAll()
         {
-            _logger.LogInformation("Getting all categories");
             var categories = await _categoryService.GetAllAsync();
 
             if (categories == null)
@@ -60,12 +54,10 @@ namespace BlueBerry24.API.Controllers
         public async Task<ActionResult<ResponseDto<CategoryDto>>> GetById(int id)
         {
 
-            _logger.LogInformation($"Getting category with ID: {id}");
             var category = await _categoryService.GetByIdAsync(id);
 
             if (category == null)
             {
-                _logger.LogWarning($"Category with ID {id} not found");
                 return NotFound(new ResponseDto<CategoryDto>
                 {
                     IsSuccess = false,
@@ -91,12 +83,10 @@ namespace BlueBerry24.API.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<ResponseDto<CategoryDto>>> GetByName(string name)
         {
-            _logger.LogInformation($"Getting category with name: {name}");
             var category = await _categoryService.GetByNameAsync(name);
 
             if (category == null)
             {
-                _logger.LogWarning($"Category with name {name} not found");
                 return NotFound(new ResponseDto<CategoryDto>
                 {
                     IsSuccess = false,
@@ -120,12 +110,10 @@ namespace BlueBerry24.API.Controllers
         [AdminAndAbove]
         public async Task<ActionResult<ResponseDto<CategoryDto>>> Create([FromBody] CreateCategoryDto categoryDto)
         {
-            _logger.LogInformation($"Creating new category with name: {categoryDto.Name}");
             var createdCategory = await _categoryService.CreateAsync(categoryDto);
 
             if (createdCategory == null)
             {
-                _logger.LogError("Error creating category");
                 return new ResponseDto<CategoryDto>
                 {
                     IsSuccess = false,
@@ -151,12 +139,10 @@ namespace BlueBerry24.API.Controllers
         [AdminAndAbove]
         public async Task<ActionResult<ResponseDto<CategoryDto>>> Update(int id, [FromBody] UpdateCategoryDto categoryDto)
         {
-            _logger.LogInformation($"Updating category with Id: {id}");
             var updatedCategory = await _categoryService.UpdateAsync(id, categoryDto);
 
             if (updatedCategory == null)
             {
-                _logger.LogError($"Error updating category with ID {id}");
                 return new ResponseDto<CategoryDto>
                 {
                     IsSuccess = false,
@@ -184,13 +170,10 @@ namespace BlueBerry24.API.Controllers
         [AdminAndAbove]
         public async Task<ActionResult<ResponseDto<bool>>> Delete(int id)
         {
-
-            _logger.LogInformation($"Deleting category with ID: {id}");
             var deleted = await _categoryService.DeleteAsync(id);
 
             if (!deleted)
             {
-                _logger.LogWarning($"Category with ID {id} not found for deletion");
                 var notFoundResponse = new ResponseDto<bool>
                 {
                     IsSuccess = false,
