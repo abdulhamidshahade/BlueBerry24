@@ -15,7 +15,6 @@ namespace BlueBerry24.API.Controllers
     [ApiController]
     public class ShoppingCartsController : BaseController
     {
-        private readonly ILogger<ShoppingCartsController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly int? _userId;
         private readonly IUserCouponService _userCouponService;
@@ -24,14 +23,12 @@ namespace BlueBerry24.API.Controllers
         private readonly IOrderService _orderService;
 
         public ShoppingCartsController(
-            ILogger<ShoppingCartsController> logger,
             IHttpContextAccessor httpContextAccessor,
             IUserCouponService userCouponService,
             ICartService cartService,
             IInventoryService inventoryService,
-            IOrderService orderService) : base(logger)
+            IOrderService orderService)
         {
-            _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _userId = Convert.ToInt32(_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             _userCouponService = userCouponService;
@@ -73,7 +70,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving cart {UserId}", GetCurrentUserId());
                 return BadRequest(new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
@@ -130,7 +126,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving cart for session {SessionId}", GetSessionId());
                 return BadRequest(new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
@@ -168,7 +163,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving cart for id {cartId}", id);
                 return BadRequest(new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
@@ -216,7 +210,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating cart for user {UserId} or session {SessionId}", _userId, GetSessionId());
                 return BadRequest(new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
@@ -276,7 +269,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error adding item {ProductId} to cart {CartId}", itemRequest.ProductId, itemRequest.CartId);
                 return BadRequest(new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
@@ -348,7 +340,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating quantity for item {ProductId} in cart {CartId}", itemRequest.ProductId, itemRequest.CartId);
                 return BadRequest(new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
@@ -384,7 +375,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error removing item {ProductId} from cart {CartId}", productId, cartId);
                 return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
@@ -421,7 +411,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error clearing cart {CartId}", cartId);
                 return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
@@ -458,7 +447,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error completing cart {CartId}", cartId);
                 return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
@@ -497,7 +485,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving item {ProductId} from cart {CartId}", productId, cartId);
                 return BadRequest(new ResponseDto<CartItemDto>
                 {
                     IsSuccess = false,
@@ -546,7 +533,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error applying coupon {CouponCode} to cart {CartId}", request?.CouponCode, cartId);
                 return BadRequest(new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
@@ -584,7 +570,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error removing coupon {CouponId} from cart {CartId}", couponId, cartId);
                 return BadRequest(new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
@@ -691,7 +676,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during checkout for cart {CartId}", cartId);
                 return BadRequest(new ResponseDto<object>
                 {
                     IsSuccess = false,
