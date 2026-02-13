@@ -11,26 +11,19 @@ namespace BlueBerry24.API.Controllers
     public class ShopsController : BaseController
     {
         private readonly IShopService _shopService;
-        private readonly ILogger<ShopsController> _logger;
-
-        public ShopsController(IShopService shopService,
-                               ILogger<ShopsController> logger) : base(logger)
+        public ShopsController(IShopService shopService)
         {
             _shopService = shopService;
-            _logger = logger;
         }
 
         [HttpGet]
         [Route("{id}")]
         public async Task<ActionResult<ResponseDto<Shop>>> GetById(int id)
         {
-
-            _logger.LogInformation($"Getting shop with ID: {id}");
             var shop = await _shopService.GetShopAsync(id);
 
             if (shop == null)
             {
-                _logger.LogError($"Error retrieving shop with ID {id}");
                 return new ResponseDto<Shop>
                 {
                     IsSuccess = false,
@@ -55,13 +48,10 @@ namespace BlueBerry24.API.Controllers
         [Route("{id}")]
         public async Task<ActionResult<ResponseDto<ShopDto>>> Update(int id, [FromBody] UpdateShopDto shopDto)
         {
-
-            _logger.LogInformation($"Updating shop with ID: {id}");
             var updatedShop = await _shopService.UpdateShopAsync(id, shopDto);
 
             if (updatedShop == null)
             {
-                _logger.LogError($"Error updating shop with ID {id}");
                 return new ResponseDto<ShopDto>
                 {
                     IsSuccess = false,
