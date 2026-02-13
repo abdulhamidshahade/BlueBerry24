@@ -7,12 +7,8 @@ namespace BlueBerry24.API.Controllers
     [Route("api/base")]
     public class BaseController : ControllerBase
     {
-        protected readonly ILogger<BaseController> _logger;
-
-
-        protected BaseController(ILogger<BaseController> logger)
+        protected BaseController()
         {
-            _logger = logger;
         }
 
         protected int? GetCurrentUserId()
