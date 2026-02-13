@@ -14,14 +14,11 @@ namespace BlueBerry24.API.Controllers
     public class ProductsController : BaseController
     {
         private readonly IProductService _productService;
-        private readonly ILogger<ProductsController> _logger;
 
 
-        public ProductsController(IProductService productService,
-                                  ILogger<ProductsController> logger) : base(logger)
+        public ProductsController(IProductService productService)
         {
             _productService = productService;
-            _logger = logger;
         }
 
 
