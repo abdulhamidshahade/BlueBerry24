@@ -13,15 +13,10 @@ namespace BlueBerry24.API.Controllers
     {
         private readonly ICouponService _couponService;
         private readonly IUserCouponService _userCouponService;
-        private readonly ILogger<CouponsController> _logger;
-
-
         public CouponsController(ICouponService couponService,
-                                 ILogger<CouponsController> logger,
-                                 IUserCouponService userCouponService) : base(logger)
+                                 IUserCouponService userCouponService)
         {
             _couponService = couponService ?? throw new ArgumentNullException(nameof(couponService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _userCouponService = userCouponService;
         }
 
@@ -30,13 +25,10 @@ namespace BlueBerry24.API.Controllers
         [AdminAndAbove]
         public async Task<ActionResult<ResponseDto<IEnumerable<CouponDto>>>> GetAll()
         {
-            _logger.LogInformation("Getting all coupons");
-
             var coupons = await _couponService.GetAllAsync();
 
             if (coupons == null)
             {
-                _logger.LogError("Error retrieving all coupons");
                 return new ResponseDto<IEnumerable<CouponDto>>
                 {
                     IsSuccess = false,
@@ -60,12 +52,10 @@ namespace BlueBerry24.API.Controllers
         [UserAndAbove]
         public async Task<ActionResult<ResponseDto<CouponDto>>> GetById(int id)
         {
-            _logger.LogInformation($"Getting coupon with ID: {id}");
             var coupon = await _couponService.GetByIdAsync(id);
 
             if (coupon == null)
             {
-                _logger.LogError($"Error retrieving coupon with ID {id}");
                 return new ResponseDto<CouponDto>
                 {
                     IsSuccess = false,
@@ -90,12 +80,10 @@ namespace BlueBerry24.API.Controllers
         [UserAndAbove]
         public async Task<ActionResult<ResponseDto<CouponDto>>> GetByCode(string code)
         {
-            _logger.LogInformation($"Getting coupon with code: {code}");
             var coupon = await _couponService.GetByCodeAsync(code);
 
             if (coupon == null)
             {
-                _logger.LogError($"Error retrieving coupon with code {code}");
                 return new ResponseDto<CouponDto>
                 {
                     IsSuccess = false,
@@ -119,12 +107,10 @@ namespace BlueBerry24.API.Controllers
         [AdminAndAbove]
         public async Task<ActionResult<ResponseDto<CouponDto>>> Create([FromBody] CreateCouponDto couponDto)
         {
-            _logger.LogInformation($"Creating new coupon with code: {couponDto.Code}");
             var createdCoupon = await _couponService.CreateAsync(couponDto);
 
             if (createdCoupon == null)
             {
-                _logger.LogError("Error creating coupon");
                 return new ResponseDto<CouponDto>
                 {
                     IsSuccess = false,
@@ -151,12 +137,10 @@ namespace BlueBerry24.API.Controllers
         [AdminAndAbove]
         public async Task<ActionResult<ResponseDto<CouponDto>>> Update(int id, [FromBody] UpdateCouponDto couponDto)
         {
-            _logger.LogInformation($"Updating coupon with ID: {id}");
             var updatedCoupon = await _couponService.UpdateAsync(id, couponDto);
 
             if (updatedCoupon == null)
             {
-                _logger.LogError($"Error updating coupon with ID {id}");
                 return new ResponseDto<CouponDto>
                 {
                     IsSuccess = false,
@@ -181,12 +165,10 @@ namespace BlueBerry24.API.Controllers
         [AdminAndAbove]
         public async Task<ActionResult<ResponseDto<bool>>> Delete(int id)
         {
-            _logger.LogInformation($"Deleting coupon with ID: {id}");
             var deleted = await _couponService.DeleteAsync(id);
 
             if (!deleted)
             {
-                _logger.LogWarning($"Coupon with ID {id} not found for deletion");
                 var notFoundResponse = new ResponseDto<bool>
                 {
                     IsSuccess = false,
