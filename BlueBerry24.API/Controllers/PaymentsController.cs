@@ -20,7 +20,6 @@ namespace BlueBerry24.API.Controllers
         private readonly IMapper _mapper;
 
         public PaymentsController(ILogger<PaymentsController> logger, IPaymentService paymentService, ICartService cartService, IOrderService orderService, IMapper mapper)
-            : base(logger)
         {
             _paymentService = paymentService;
             _cartService = cartService;
@@ -62,7 +61,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing payment");
                 return StatusCode(500, "An error occurred while processing payment");
             }
         }
@@ -83,7 +81,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting payment by ID: {PaymentId}", id);
                 return StatusCode(500, "An error occurred while retrieving payment");
             }
         }
@@ -104,7 +101,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting payment by transaction ID: {TransactionId}", transactionId);
                 return StatusCode(500, "An error occurred while retrieving payment");
             }
         }
@@ -125,7 +121,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting payment by order ID: {OrderId}", orderId);
                 return StatusCode(500, "An error occurred while retrieving payment");
             }
         }
@@ -147,7 +142,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting all payments");
                 return StatusCode(500, "An error occurred while retrieving payments");
             }
         }
@@ -177,7 +171,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting payments by user ID: {UserId}", userId);
                 return StatusCode(500, "An error occurred while retrieving user payments");
             }
         }
@@ -205,7 +198,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting current user payments");
                 return StatusCode(500, "An error occurred while retrieving your payments");
             }
         }
@@ -227,7 +219,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting payments by status: {Status}", status);
                 return StatusCode(500, "An error occurred while retrieving payments by status");
             }
         }
@@ -249,7 +240,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting payments by date range");
                 return StatusCode(500, "An error occurred while retrieving payments by date range");
             }
         }
@@ -271,7 +261,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting paginated payments");
                 return StatusCode(500, "An error occurred while retrieving paginated payments");
             }
         }
@@ -298,7 +287,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating payment status for ID: {PaymentId}", id);
                 return StatusCode(500, "An error occurred while updating payment status");
             }
         }
@@ -325,7 +313,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error refunding payment for ID: {PaymentId}", id);
                 return StatusCode(500, "An error occurred while processing refund");
             }
         }
@@ -347,7 +334,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting payment for ID: {PaymentId}", id);
                 return StatusCode(500, "An error occurred while deleting payment");
             }
         }
@@ -369,7 +355,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting total payment count");
                 return StatusCode(500, "An error occurred while retrieving payment count");
             }
         }
@@ -391,7 +376,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting total amount by date range");
                 return StatusCode(500, "An error occurred while retrieving total amount");
             }
         }
@@ -413,7 +397,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error searching payments with term: {SearchTerm}", searchTerm);
                 return StatusCode(500, "An error occurred while searching payments");
             }
         }
@@ -435,7 +418,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error verifying payment with transaction ID: {TransactionId}", transactionId);
                 return StatusCode(500, "An error occurred while verifying payment");
             }
         }
