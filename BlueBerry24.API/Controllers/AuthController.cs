@@ -13,16 +13,13 @@ namespace BlueBerry24.API.Controllers
     public class AuthController : BaseController
     {
         private readonly IAuthService _authService;
-        private readonly ILogger<AuthController> _logger;
         private readonly IUserService _userService;
         private readonly ICartService _cartService;
         public AuthController(IAuthService authService,
-                              ILogger<AuthController> logger,
                               IUserService userService,
-                              ICartService cartService) : base(logger)
+                              ICartService cartService)
         {
             _authService = authService;
-            _logger = logger;
             _userService = userService;
             _cartService = cartService;
         }
@@ -156,7 +153,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing forgot password request");
                 return StatusCode(500, new ResponseDto<object>
                 {
                     IsSuccess = false,
@@ -205,7 +201,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error confirming email");
                 return StatusCode(500, new ResponseDto<object>
                 {
                     IsSuccess = false,
@@ -254,7 +249,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error resending confirmation email");
                 return StatusCode(500, new ResponseDto<object>
                 {
                     IsSuccess = false,
@@ -303,7 +297,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing password reset");
                 return StatusCode(500, new ResponseDto<object>
                 {
                     IsSuccess = false,
@@ -391,7 +384,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error refreshing token");
                 return StatusCode(500, new ResponseDto<object>
                 {
                     IsSuccess = false,
@@ -433,7 +425,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving users");
                 return StatusCode(500, new ResponseDto<List<ApplicationUserDto>>
                 {
                     IsSuccess = false,
@@ -471,7 +462,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error retrieving user with ID {id}");
                 return StatusCode(500, new ResponseDto<ApplicationUserDto>
                 {
                     IsSuccess = false,
@@ -558,7 +548,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error locking user account for user ID {userId}");
                 return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
@@ -596,7 +585,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error unlocking user account for user ID {userId}");
                 return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
@@ -644,7 +632,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error resetting password for user ID {userId}");
                 return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
@@ -682,7 +669,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error verifying email for user ID {userId}");
                 return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
@@ -731,7 +717,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error updating user with ID {userId}");
                 return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
@@ -781,7 +766,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating user");
                 return StatusCode(500, new ResponseDto<ApplicationUserDto>
                 {
                     IsSuccess = false,
@@ -819,7 +803,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error deleting user with ID {userId}");
                 return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
