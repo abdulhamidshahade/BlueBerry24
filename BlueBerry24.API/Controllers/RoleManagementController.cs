@@ -12,15 +12,11 @@ namespace BlueBerry24.API.Controllers
     public class RoleManagementsController : BaseController
     {
         private readonly IRoleManagementService _roleManagementService;
-        private readonly ILogger<RoleManagementsController> _logger;
-        
-
         public RoleManagementsController(
             IRoleManagementService roleManagementService,
-            ILogger<RoleManagementsController> logger) : base(logger)
+            ILogger<RoleManagementsController> logger)
         {
             _roleManagementService = roleManagementService;
-            _logger = logger;
         }
 
 
