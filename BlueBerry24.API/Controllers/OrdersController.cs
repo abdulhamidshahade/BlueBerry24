@@ -14,18 +14,15 @@ namespace BlueBerry24.API.Controllers
     [Route("api/orders")]
     public class OrdersController : BaseController
     {
-        private readonly ILogger<OrdersController> _logger;
         private readonly IOrderService _orderService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly int? _userId;
         private readonly IMapper _mapper;
 
-        public OrdersController(ILogger<OrdersController> logger,
-                                IOrderService orderService,
+        public OrdersController(IOrderService orderService,
                                 IHttpContextAccessor httpContextAccessor,
-                                IMapper mapper) : base(logger)
+                                IMapper mapper)
         {
-            _logger = logger;
             _orderService = orderService;
             _httpContextAccessor = httpContextAccessor;
             _userId = Convert.ToInt32(_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -72,7 +69,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating order for cart {CartId}", request?.CartId);
                 return BadRequest(new ResponseDto<Order>
                 {
                     IsSuccess = false,
@@ -113,7 +109,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving order {OrderId}", id);
                 return BadRequest(new ResponseDto<object>
                 {
                     IsSuccess = false,
@@ -142,7 +137,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving orders for user {UserId}", userId);
                 return BadRequest(new ResponseDto<List<OrderDto>>
                 {
                     IsSuccess = false,
@@ -190,7 +184,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error cancelling order {OrderId}", orderId);
                 return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
@@ -238,7 +231,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error refunding order {OrderId}", orderId);
                 return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
@@ -278,7 +270,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error calculating order totals for cart {CartId}", cartId);
                 return BadRequest(new ResponseDto<OrderTotal>
                 {
                     IsSuccess = false,
@@ -329,7 +320,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating status for order {OrderId}", orderId);
                 return BadRequest(new ResponseDto<OrderDto>
                 {
                     IsSuccess = false,
@@ -377,7 +367,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving order by reference {ReferenceNumber}", referenceNumber);
                 return BadRequest(new ResponseDto<Order>
                 {
                     IsSuccess = false,
@@ -406,7 +395,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving orders by status {Status}", status);
                 return BadRequest(new ResponseDto<List<Order>>
                 {
                     IsSuccess = false,
@@ -435,7 +423,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving all orders for admin");
                 return BadRequest(new ResponseDto<List<OrderDto>>
                 {
                     IsSuccess = false,
@@ -473,7 +460,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing order {OrderId}", orderId);
                 return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
