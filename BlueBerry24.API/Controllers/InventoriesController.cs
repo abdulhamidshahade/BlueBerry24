@@ -13,14 +13,11 @@ namespace BlueBerry24.API.Controllers
     public class InventoriesController : BaseController
     {
         private readonly IInventoryService _inventoryService;
-        private readonly ILogger<InventoriesController> _logger;
 
         public InventoriesController(
-            IInventoryService inventoryService,
-            ILogger<InventoriesController> logger) : base(logger)
+            IInventoryService inventoryService)
         {
             _inventoryService = inventoryService;
-            _logger = logger;
         }
 
         [HttpGet("check-stock/{productId}/{quantity}")]
@@ -41,7 +38,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking stock for product {ProductId} with quantity {Quantity}", productId, quantity);
                 return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
@@ -71,7 +67,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking stock for product {ProductId}", productId);
                 return BadRequest(new ResponseDto<object>
                 {
                     IsSuccess = false,
@@ -116,7 +111,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error reserving stock for product {ProductId}", request.ProductId);
                 return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
@@ -150,7 +144,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error releasing reserved stock for product {ProductId}", request.ProductId);
                 return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
@@ -184,7 +177,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error confirming stock deduction for product {ProductId}", request.ProductId);
                 return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
@@ -218,7 +210,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error adding stock for product {ProductId}", request.ProductId);
                 return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
@@ -252,7 +243,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error adjusting stock for product {ProductId}", request.ProductId);
                 return BadRequest(new ResponseDto<bool>
                 {
                     IsSuccess = false,
@@ -292,7 +282,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving product with stock info {ProductId}", productId);
                 return BadRequest(new ResponseDto<Product>
                 {
                     IsSuccess = false,
@@ -321,7 +310,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving low stock products");
                 return BadRequest(new ResponseDto<List<Product>>
                 {
                     IsSuccess = false,
@@ -350,7 +338,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving inventory history for product {ProductId}", productId);
                 return BadRequest(new ResponseDto<List<InventoryLog>>
                 {
                     IsSuccess = false,
@@ -378,7 +365,6 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing stock notifications");
                 return BadRequest(new ResponseDto<object>
                 {
                     IsSuccess = false,
