@@ -21,6 +21,7 @@ using BlueBerry24.Application.Services.Interfaces.WishlistServiceInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
@@ -76,9 +77,17 @@ namespace BlueBerry24.Application.DI
                     tracing.AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation();
 
-                    tracing.AddOtlpExporter(); 
+                    tracing.AddOtlpExporter();
+                })
+                .WithMetrics(metrics =>
+                {
+                    metrics.AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation();
+
+                    metrics.AddOtlpExporter()
+                    .AddPrometheusExporter();
                 });
-          
+
 
             return serviceDescriptors;
         }
