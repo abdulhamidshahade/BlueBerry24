@@ -18,7 +18,10 @@ using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ShopServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.WishlistServiceInterfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 
 // TODO: Use here Microsoft.Extensions.DependencyInjection namespace
 
@@ -26,7 +29,10 @@ namespace BlueBerry24.Application.DI
 {
     public static class ApplicationLayerRegistration
     {
-        public static IServiceCollection AddApplicationServices(this IServiceCollection serviceDescriptors)
+        public static IServiceCollection AddApplicationServices(
+            this IServiceCollection serviceDescriptors, 
+            IHostBuilder hostBuilder,
+            IConfiguration configuration)
         {
             serviceDescriptors.AddScoped<IAuthService, AuthService>();
             serviceDescriptors.AddScoped<ITokenService, TokenService>();
@@ -53,6 +59,13 @@ namespace BlueBerry24.Application.DI
             serviceDescriptors.AddScoped<IPaymentService, PaymentService>();
 
             serviceDescriptors.AddScoped<IMailService, GmailService>();
+
+
+            hostBuilder.UseSerilog((context, loggerConfig) =>
+            {
+                loggerConfig.ReadFrom.Configuration(configuration);
+            });
+          
 
             return serviceDescriptors;
         }
