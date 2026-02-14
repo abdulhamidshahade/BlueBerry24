@@ -21,6 +21,8 @@ using BlueBerry24.Application.Services.Interfaces.WishlistServiceInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 
 // TODO: Use here Microsoft.Extensions.DependencyInjection namespace
@@ -65,6 +67,17 @@ namespace BlueBerry24.Application.DI
             {
                 loggerConfig.ReadFrom.Configuration(configuration);
             });
+
+
+            serviceDescriptors.AddOpenTelemetry()
+                .ConfigureResource(res => res.AddService("backend"))
+                .WithTracing(tracing =>
+                {
+                    tracing.AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation();
+
+                    tracing.AddOtlpExporter(); 
+                });
           
 
             return serviceDescriptors;
