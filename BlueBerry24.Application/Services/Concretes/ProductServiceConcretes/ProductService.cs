@@ -6,6 +6,7 @@ using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
 using BlueBerry24.Domain.Entities.ProductEntities;
 using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.ProductInterfaces;
+using Microsoft.Extensions.Logging;
 
 namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
 {
@@ -15,20 +16,26 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
         private readonly IMapper _mapper;
         private readonly IProductCategoryService _productCategoryService;
         private readonly IUnitOfWork _unitOfWork;
-
+        private readonly ILogger<ProductService> _logger;
 
         public ProductService(IProductRepository productRepository,
                               IMapper mapper,
                               IProductCategoryService productCategoryService,
-                              IUnitOfWork unitOfWork
+                              IUnitOfWork unitOfWork,
+                              ILogger<ProductService> logger
         )
         {
             _productRepository = productRepository;
             _mapper = mapper;
             _productCategoryService = productCategoryService;
             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task<IReadOnlyList<ProductDto>> GetAllAsync()
         {
             var products = await _productRepository.GetAllAsync();
@@ -65,7 +72,17 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
         }
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="productDto"></param>
+        /// <param name="categories"></param>
+        /// <returns></returns> <summary>
+        /// 
+        /// </summary>
+        /// <param name="productDto"></param>
+        /// <param name="categories"></param>
+        /// <returns></returns>
         public async Task<ProductDto> CreateAsync(CreateProductDto productDto, List<int> categories)
         {
             if (productDto == null)
@@ -96,7 +113,12 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
             return _mapper.Map<ProductDto>(await _productRepository.GetByIdAsync(createdProduct.Id));
         }
 
-
+        /// <summary>
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="productDto"></param>
+        /// <param name="categories"></param>
+        /// <returns></returns>
         public async Task<ProductDto> UpdateAsync(int id, UpdateProductDto productDto, List<int> categories)
         {
             if (productDto == null)
@@ -167,7 +189,7 @@ namespace BlueBerry24.Application.Services.Concretes.ProductServiceConcretes
 
         public async Task<PaginationDto<ProductDto>> GetPaginatedAsync(ProductFilterDto filter)
         {
-
+            _logger.LogInformation("Getting paginated products with filter: {MaxPrice}", filter.MaxPrice);
             var products = await _productRepository.GetFilteredAsync(
                 filter.SearchTerm,
                 filter.Category,

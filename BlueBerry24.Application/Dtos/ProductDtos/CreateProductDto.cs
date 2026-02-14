@@ -3,5 +3,6 @@
     public class CreateProductDto : ProductBaseDto
     {
         public Guid Id { get; set; }
+
     }
 }
