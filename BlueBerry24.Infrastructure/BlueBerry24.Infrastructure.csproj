@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BlueBerry24.Domain\BlueBerry24.Domain.csproj" />
+    <ProjectReference Include="..\BlueBerry24.Application\BlueBerry24.Application.csproj" />
   </ItemGroup>
 
 </Project>
