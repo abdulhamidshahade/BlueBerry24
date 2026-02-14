@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBerry24.Application", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBerry24.Tests", "BlueBerry24.Tests\BlueBerry24.Tests.csproj", "{E4AAFC13-2C7E-45FB-83D4-006096FC22E0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blueberry24.Contracts", "Blueberry24.Contracts\Blueberry24.Contracts.csproj", "{10D1C891-D32A-489A-82E7-4CED8C65DBF7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{E4AAFC13-2C7E-45FB-83D4-006096FC22E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4AAFC13-2C7E-45FB-83D4-006096FC22E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4AAFC13-2C7E-45FB-83D4-006096FC22E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10D1C891-D32A-489A-82E7-4CED8C65DBF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10D1C891-D32A-489A-82E7-4CED8C65DBF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10D1C891-D32A-489A-82E7-4CED8C65DBF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10D1C891-D32A-489A-82E7-4CED8C65DBF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
