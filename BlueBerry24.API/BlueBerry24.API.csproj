@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -25,7 +25,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BlueBerry24.Application\BlueBerry24.Application.csproj" />
-    <ProjectReference Include="..\Blueberry24.Contracts\Blueberry24.Contracts.csproj" />
     <ProjectReference Include="..\BlueBerry24.Infrastructure\BlueBerry24.Infrastructure.csproj" />
   </ItemGroup>
 
