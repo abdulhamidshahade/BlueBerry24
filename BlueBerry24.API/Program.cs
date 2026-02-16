@@ -40,6 +40,7 @@ builder.Services.AddOpenApi(options =>
 });
 
 
+
 builder.Services.AddAutoMapper(typeof(BlueBerry24.Application.Mapping.AssemblyMarker));
 
 builder.Services.AddApplicationServices(builder.Host, builder.Configuration);
@@ -211,18 +212,21 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
-// Map OpenAPI endpoint
-app.MapOpenApi();
-
-// Map Scalar UI
-app.MapScalarApiReference(options =>
+if(app.Environment.IsDevelopment())
 {
-    options
-        .WithTitle("BlueBerry24 API")
-        .WithTheme(Scalar.AspNetCore.ScalarTheme.Purple)
-        .WithDefaultHttpClient(Scalar.AspNetCore.ScalarTarget.CSharp, Scalar.AspNetCore.ScalarClient.HttpClient);
-});
+    // Configure the HTTP request pipeline.
+    // Map OpenAPI endpoint
+    app.MapOpenApi();
+
+    // Map Scalar UI
+    app.MapScalarApiReference(options =>
+    {
+        options
+            .WithTitle("BlueBerry24 API")
+            .WithTheme(Scalar.AspNetCore.ScalarTheme.Purple)
+            .WithDefaultHttpClient(Scalar.AspNetCore.ScalarTarget.CSharp, Scalar.AspNetCore.ScalarClient.HttpClient);
+    });
+}
 
 //var jwtOptions = app.Services.GetRequiredService<IOptions<JwtOptions>>().Value;
 
