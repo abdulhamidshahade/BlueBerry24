@@ -16,7 +16,7 @@ COPY . ./
 RUN dotnet publish BlueBerry24.API/BlueBerry24.API.csproj -c Release -o /app/out
 
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 
 WORKDIR /app
 
