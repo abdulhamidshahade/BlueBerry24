@@ -17,7 +17,7 @@
     "next": "15.1.8",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.10",
-    "react-dom": "^19.0.0",
+    "react-dom": "^19.2.4",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
