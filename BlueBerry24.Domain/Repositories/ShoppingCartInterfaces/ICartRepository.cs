@@ -21,5 +21,6 @@ namespace BlueBerry24.Domain.Repositories.ShoppingCartInterfaces
         Task<Cart> GetCartByIdAsync(int cartId, CartStatus status);
 
         Task<bool> UpdateItemsAsync(List<CartItem> items);
+        Task<bool> DeleteCartById(int Id);
     }
 }
