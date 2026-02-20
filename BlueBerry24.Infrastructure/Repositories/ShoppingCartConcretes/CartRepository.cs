@@ -278,5 +278,20 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
 
             return await _unitOfWork.SaveDbChangesAsync();
         }
+
+        public async Task<bool> DeleteCartById(int Id)
+        {
+            Cart? shoppingCart = null;
+
+            if (Id > 0)
+            {
+                shoppingCart = await _context.ShoppingCarts
+                    .Where(i => i.Id == Id && i.Status == CartStatus.Active)
+                    .FirstOrDefaultAsync();
+            }
+
+            _context.ShoppingCarts.Remove(shoppingCart);
+            return await _unitOfWork.SaveDbChangesAsync();
+        }
     }
 }
