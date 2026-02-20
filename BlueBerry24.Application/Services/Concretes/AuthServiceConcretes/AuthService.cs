@@ -100,7 +100,7 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
                 };
             }
 
-            if(_signupPasswordValidator.CheckPasswordLength() == PasswordStrength.Weak)
+            if(_signupPasswordValidator.CheckPasswordLength(requestDto.Password) == PasswordStrength.Weak)
             {
                 return new RegisterResponseDto
                 {
@@ -109,7 +109,7 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
                 };
             }
 
-            if (!IsContainSpecialChar(requestDto.Password))
+            if (!_signupPasswordValidator.IsContainSpecialChar(requestDto.Password))
             {
                 return new RegisterResponseDto
                 {
@@ -127,7 +127,7 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
                 };
             }
 
-            if(!IsContainUpperCase(requestDto.Password))
+            if(!_signupPasswordValidator.IsContainUpperCase(requestDto.Password))
             {
                 return new RegisterResponseDto
                 {
@@ -136,7 +136,7 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
                 };
             }
 
-            if (!IsContainDigit(requestDto.Password))
+            if (!_signupPasswordValidator.IsContainDigit(requestDto.Password))
             {
                 return new RegisterResponseDto
                 {
