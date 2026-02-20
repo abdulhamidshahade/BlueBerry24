@@ -21,6 +21,7 @@ namespace BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfa
         Task<CartDto> RefreshCartAsync(int cartId);
         Task<CartDto> ApplyCouponAsync(int cartId, int? userId, string couponCode);
         Task<CartDto> RemoveCouponAsync(int cartId, int? userId, string? sessionId, int couponId);
-        Task<CartDto> MergeCartAsync(int userId, string sessionId);
+        Task MergeCartAsync(int userId, string sessionId);
+        
     }
 }
