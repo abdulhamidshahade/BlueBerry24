@@ -85,36 +85,54 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
             return mappedCart;
         }
 
-        public async Task<CartDto> MergeCartAsync(int userId, string sessionId)
+        public async Task MergeCartAsync(int userId, string sessionId)
         {
 
             var cartById = await _cartRepository.GetCartByUserIdAsync(userId, CartStatus.Active);
 
-            if(cartById != null)
-            {
-                return null;
-            }
+            //if(cartById != null)
+            //{
+            //    return null;
+            //}
 
 
             var cart = await _cartRepository.GetCartBySessionIdAsync(sessionId);
 
-            cart.SessionId = null;
-            cart.UserId = userId;
 
-            var cartItems = cart.CartItems.Where(i => i.ShoppingCartId == cart.Id).ToList();
-
-            foreach(var item in cartItems)
+            if(cart.CartItems.Count != 0)
             {
-                item.SessionId = null;
-                item.UserId = userId;
+                //await CreateCartAsync(null, sessionId);
+                //cart = await _cartRepository.GetCartBySessionIdAsync(sessionId);
+            
+
+                cart.SessionId = null;
+                cart.UserId = userId;
+
+                var cartItems = cart.CartItems.Where(i => i.ShoppingCartId == cart.Id).ToList();
+
+                foreach(var item in cartItems)
+                {
+                    item.SessionId = null;
+                    if(cartById != null)
+                    {
+                        item.ShoppingCartId = cartById.Id;
+                    }
+                    item.UserId = userId;
+                }
+
+                if(cartById != null)
+                {
+                    await _cartRepository.DeleteCartById(cart.Id);
+                }
+
+                //var updatedItems = await _cartRepository.UpdateItemsAsync(cartItems);
+
+                //TODO here the shopping cart's items will update successfully because the cart has navigation property for items List<CartItem>
+                //var updatedCart = await _cartRepository.UpdateCartAsync(cart);
+                
+
             }
 
-            //var updatedItems = await _cartRepository.UpdateItemsAsync(cartItems);
-
-            //TODO here the shopping cart's items will update successfully because the cart has navigation property for items List<CartItem>
-            var updatedCart = await _cartRepository.UpdateCartAsync(cart);
-            
-            return _mapper.Map<CartDto>(updatedCart);
         }
 
         public async Task<CartDto> GetCartByIdAsync(int cartId, CartStatus status)
