@@ -2,10 +2,12 @@
 using BlueBerry24.Application.Halpers;
 using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.EmailServiceInterfaces;
+using BlueBerry24.Application.Utils;
 using BlueBerry24.Domain.Entities.AuthEntities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.Eventing.Reader;
 
 namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
 {
@@ -17,13 +19,15 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
         private readonly IRoleManagementService _roleService;
         private readonly IMailService _mailService;
         private readonly IConfiguration _configuration;
+        private readonly SignupPasswordValidator _signupPasswordValidator;
 
         public AuthService(UserManager<ApplicationUser> userManager,
                            ILogger<AuthService> logger,
                            ITokenService tokenService,
                            IRoleManagementService roleService,
                            IMailService mailService,
-                           IConfiguration configuration)
+                           IConfiguration configuration,
+                           SignupPasswordValidator signupPasswordValidator)
         {
             _userManager = userManager;
             _logger = logger;
@@ -31,7 +35,41 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
             _roleService = roleService;
             _mailService = mailService;
             _configuration = configuration;
+            _signupPasswordValidator = signupPasswordValidator;
         }
+        //to be handled with user repository
+        private async Task<bool> IsEmailExisting(string email)
+        {
+            return await _userManager.FindByEmailAsync(email) != null;
+        }
+
+        private async Task<bool> IsUsernameExisting(string username)
+        {
+            return await _userManager.FindByNameAsync(username) != null;
+        }
+
+        
+
+        private bool IsValidEmail(string email)
+        {
+            string part2 = "";
+            try
+            {
+                part2 = email.Split('@')[1];
+            }
+            catch
+            {
+                return false;
+            }
+
+            return email.Contains('@') && 
+                   part2.Contains('.') && 
+                   !email.StartsWith('@') && 
+                   !email.EndsWith('@') && 
+                   !part2.StartsWith('.') && 
+                   !part2.EndsWith('.');
+        }
+
 
         public async Task<RegisterResponseDto> Register(RegisterRequestDto requestDto)
         {
@@ -41,6 +79,69 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
                 {
                     IsSuccess = false,
                     ErrorMessage = "Invalid registration request."
+                };
+            }
+
+            if (await IsUsernameExisting(requestDto.UserName))
+            {
+                return new RegisterResponseDto
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "The provided username is already in use."
+                };
+            }
+
+            if (await IsEmailExisting(requestDto.Email))
+            {
+                return new RegisterResponseDto
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "The provided email is already in use."
+                };
+            }
+
+            if(_signupPasswordValidator.CheckPasswordLength() == PasswordStrength.Weak)
+            {
+                return new RegisterResponseDto
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "The provided password is too weak. It must be at least 6 characters long."
+                };
+            }
+
+            if (!IsContainSpecialChar(requestDto.Password))
+            {
+                return new RegisterResponseDto
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "The provided password must contain at least one special character."
+                };
+            }
+
+            if (!IsValidEmail(requestDto.Email))
+            {
+                return new RegisterResponseDto
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "The provided email is not in a valid format."
+                };
+            }
+
+            if(!IsContainUpperCase(requestDto.Password))
+            {
+                return new RegisterResponseDto
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "The provided password must contain at least one uppercase letter."
+                };
+            }
+
+            if (!IsContainDigit(requestDto.Password))
+            {
+                return new RegisterResponseDto
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "The provided password must contain at least one digit."
                 };
             }
 
