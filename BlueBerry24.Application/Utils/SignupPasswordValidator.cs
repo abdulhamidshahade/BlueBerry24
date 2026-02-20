@@ -1,25 +1,16 @@
 ﻿using BlueBerry24.Application.Services.Concretes.AuthServiceConcretes;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlueBerry24.Application.Utils
 {
     public class SignupPasswordValidator
     {
-        private readonly string _password;
-
-        public SignupPasswordValidator(string password)
+        public SignupPasswordValidator()
         {
-            _password = password;
         }
 
-        public PasswordStrength CheckPasswordLength()
+        public PasswordStrength CheckPasswordLength(string password)
         {
-            switch (_password.Length)
+            switch (password.Length)
             {
                 case < 6:
                     return PasswordStrength.Weak;
@@ -30,19 +21,19 @@ namespace BlueBerry24.Application.Utils
             }
         }
 
-        public bool IsContainSpecialChar()
+        public bool IsContainSpecialChar(string password)
         {
-            return _password.Any(ch => !char.IsLetterOrDigit(ch) && !char.IsWhiteSpace(ch));
+            return password.Any(ch => !char.IsLetterOrDigit(ch) && !char.IsWhiteSpace(ch));
         }
 
-        public bool IsContainUpperCase()
+        public bool IsContainUpperCase(string password)
         {
-            return _password.Any(ch => char.IsUpper(ch));
+            return password.Any(ch => char.IsUpper(ch));
         }
 
-        public bool IsContainDigit()
+        public bool IsContainDigit(string password)
         {
-            return _password.Any(ch => char.IsDigit(ch));
+            return password.Any(ch => char.IsDigit(ch));
         }
     }
 }
