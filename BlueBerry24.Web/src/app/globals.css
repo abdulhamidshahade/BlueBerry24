@@ -68,3 +68,32 @@ a {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* User menu dropdown - show all items without truncation */
+.dropdown-menu-user {
+  max-height: none !important;
+}
+
+/* Ensure user dropdown appears above sticky cart summary or other positioned elements */
+.dropdown-menu-user,
+.dropdown-menu {
+  z-index: 3000 !important;
+}
+
+/* Ensure dropdowns inside cards/containers are not clipped by ancestor overflow */
+.card .dropdown,
+.container .dropdown,
+.dropdown {
+  overflow: visible !important;
+}
+
+/* Filter card - ensure dropdowns can extend beyond card bounds */
+.card.overflow-visible,
+.card.overflow-visible .card-body {
+  overflow: visible !important;
+}
+
+.dropdown-menu {
+  max-height: none !important;
+  overflow: visible !important;
+}
