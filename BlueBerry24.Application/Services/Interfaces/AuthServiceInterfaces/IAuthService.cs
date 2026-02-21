@@ -1,4 +1,5 @@
-﻿using BlueBerry24.Application.Dtos.AuthDtos;
+﻿using BlueBerry24.Application.Dtos;
+using BlueBerry24.Application.Dtos.AuthDtos;
 
 namespace BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces
 {
