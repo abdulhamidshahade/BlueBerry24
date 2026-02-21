@@ -52,12 +52,13 @@ namespace BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes
 
             var inventoryLog = new InventoryLog
             {
-
                 ProductId = productId,
                 CurrentStockQuantity = product.StockQuantity,
                 QuantityChanged = quantity,
                 ChangeType = InventoryChangeType.Restock,
                 Notes = notes,
+                ReferenceId = 1409,
+                ReferenceType = "Stock Addition",
                 CreatedAt = DateTime.UtcNow,
                 PerformedByUserId = performedByUserId
             };
