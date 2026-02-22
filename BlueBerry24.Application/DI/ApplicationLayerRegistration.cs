@@ -1,4 +1,5 @@
-﻿using BlueBerry24.Application.Services.Concretes.AuthServiceConcretes;
+﻿using BlueBerry24.Application.Dtos.AuthDtos.AuthValidations;
+using BlueBerry24.Application.Services.Concretes.AuthServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.CouponServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.EmailServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes;
@@ -18,7 +19,9 @@ using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ShopServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.WishlistServiceInterfaces;
-using BlueBerry24.Application.Utils;
+using BlueBerry24.Application.Utils.Auth;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -91,6 +94,9 @@ namespace BlueBerry24.Application.DI
 
             serviceDescriptors.AddScoped<SignupPasswordValidator>();
 
+            serviceDescriptors.AddFluentValidationAutoValidation();
+
+            serviceDescriptors.AddValidatorsFromAssemblyContaining<RegisterRequestDtoValidator>();
 
             return serviceDescriptors;
         }
