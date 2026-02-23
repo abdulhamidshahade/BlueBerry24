@@ -20,7 +20,7 @@ export default function UserMenu({ user }: UserMenuProps) {
         <i className="bi bi-person-circle me-1"></i>
         <span className="d-none d-md-inline">{user.userName}</span>
       </button>
-      <ul className="dropdown-menu dropdown-menu-end">
+      <ul className="dropdown-menu dropdown-menu-end dropdown-menu-user">
         <li>
           <div className="dropdown-header">
             <div className="fw-bold">{user.userName}</div>
