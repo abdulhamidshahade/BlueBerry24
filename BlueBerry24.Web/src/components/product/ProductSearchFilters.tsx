@@ -55,8 +55,8 @@ export default function ProductSearchFilters({
   ];
 
   return (
-    <div className="card shadow-sm mb-4">
-      <div className="card-body">
+    <div className="card shadow-sm mb-4 overflow-visible">
+      <div className="card-body overflow-visible">
         <div className="row g-3">
           <div className="col-12">
             <form action="/products" method="GET" className="d-flex">
