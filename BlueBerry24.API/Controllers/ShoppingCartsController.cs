@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Application.Authorization.Attributes;
+using BlueBerry24.Application.Authorization.Attributes;
 using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.ShoppingCartDtos;
 using BlueBerry24.Application.Services.Interfaces.CouponServiceInterfaces;
@@ -643,7 +643,7 @@ namespace BlueBerry24.API.Controllers
                     ShippingCity = request.ShippingCity,
                     ShippingState = request.ShippingState,
                     ShippingPostalCode = request.ShippingPostalCode,
-                    ShippingCountry = request.ShippingCity ?? "US",
+                    ShippingCountry = request.ShippingCountry ?? "US",
                 };
 
                 var order = await _orderService.CreateOrderFromCartAsync(cartId, createOrderDto);
