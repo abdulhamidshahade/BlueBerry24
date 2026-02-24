@@ -1,4 +1,9 @@
-﻿using FluentValidation;
+﻿using BlueBerry24.Application.Services.Concretes.AuthServiceConcretes;
+using BlueBerry24.Domain.Entities.AuthEntities;
+using FluentValidation;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Query.Internal;
+using System.Security.Cryptography.X509Certificates;
 
 namespace BlueBerry24.Application.Dtos.AuthDtos.AuthValidations
 {
@@ -36,7 +41,23 @@ namespace BlueBerry24.Application.Dtos.AuthDtos.AuthValidations
                 .NotNull().WithMessage("Password is required.")
                 .NotEmpty().WithMessage("Password is required.")
                 .MinimumLength(2).WithMessage("Password must be at least 2 characters long.")
-                .MaximumLength(50).WithMessage("Password must be at most 50 characters long.");
+                .MaximumLength(50).WithMessage("Password must be at most 50 characters long.")
+                .Must(pass => ContainsUpperCase(pass)).WithMessage("Password should contains at least one uppercase letter.")
+                .Must(pass => ContainsDigits(pass)).WithMessage("Password should contains at least one digit.")
+                .Must(pass => ContainsSpecial(pass)).WithMessage("Password should contains at least one special character.");
+        }
+
+        private bool ContainsUpperCase(string password)
+        {
+            return password.Any(ch => char.IsUpper(ch));
+        }
+        private bool ContainsDigits(string password)
+        {
+            return password.Any(ch => char.IsDigit(ch));
+        }
+        private bool ContainsSpecial(string password)
+        {
+            return password.Any(ch => !char.IsLetterOrDigit(ch) && !char.IsWhiteSpace(ch));
         }
     }
 }
