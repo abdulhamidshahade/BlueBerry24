@@ -19,7 +19,6 @@ using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ShopServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.WishlistServiceInterfaces;
-using BlueBerry24.Application.Utils.Auth;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Configuration;
@@ -91,8 +90,6 @@ namespace BlueBerry24.Application.DI
                     metrics.AddOtlpExporter()
                     .AddPrometheusExporter();
                 });
-
-            serviceDescriptors.AddScoped<SignupPasswordValidator>();
 
             serviceDescriptors.AddFluentValidationAutoValidation();
 
