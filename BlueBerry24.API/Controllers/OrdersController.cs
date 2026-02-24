@@ -85,7 +85,7 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                var order = await _orderService.GetOrderByIdAsync(id, OrderStatus.Pending);
+                var order = await _orderService.GetOrderByIdAsync(id);
                 if (order == null)
                 {
                     return NotFound(new ResponseDto<object>
