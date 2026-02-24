@@ -16,5 +16,6 @@ namespace BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces
         Task<bool> UpdateUserAsync(int userId, UpdateUserDto updateUserDto);
         Task<ApplicationUserDto> CreateUserAsync(CreateUserDto createUserDto);
         Task<bool> DeleteUserAsync(int userId);
+        Task<bool> IsUsernameTaken(string username);
     }
 }
