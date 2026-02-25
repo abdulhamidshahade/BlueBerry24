@@ -289,5 +289,10 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
 
             return _mapper.Map<ApplicationUserDto>(user);
         }
+
+        public async Task<bool> IsUsernameTaken(string username)
+        {
+            return await _userManager.Users.AnyAsync(u => u.UserName == username);
+        }
     }
 }
