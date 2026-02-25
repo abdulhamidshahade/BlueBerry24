@@ -5,7 +5,7 @@ namespace BlueBerry24.Domain.Repositories.OrderInterfaces
 {
     public interface IOrderRepository
     {
-        Task<Order?> GetOrderByIdAsync(int orderId, OrderStatus? orderStatus = OrderStatus.Pending);
+        Task<Order?> GetOrderByIdAsync(int orderId);
         Task<List<Order>> GetUserOrdersAsync(int userId, int page = 1, int pageSize = 10);
         Task<List<Order>> GetAllOrdersAsync(int page = 1, int pageSize = 50);
         Task<bool> UpdateOrderStatusAsync(int orderId, OrderStatus newStatus);
