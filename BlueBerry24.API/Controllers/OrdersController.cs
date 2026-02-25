@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using BlueBerry24.Application.Authorization.Attributes;
 using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.OrderDtos;
@@ -6,7 +6,6 @@ using BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces;
 using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Entities.OrderEntities;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace BlueBerry24.API.Controllers
 {
@@ -15,17 +14,13 @@ namespace BlueBerry24.API.Controllers
     public class OrdersController : BaseController
     {
         private readonly IOrderService _orderService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly int? _userId;
         private readonly IMapper _mapper;
 
-        public OrdersController(IOrderService orderService,
-                                IHttpContextAccessor httpContextAccessor,
-                                IMapper mapper)
+        public OrdersController(
+            IOrderService orderService,
+            IMapper mapper)
         {
             _orderService = orderService;
-            _httpContextAccessor = httpContextAccessor;
-            _userId = Convert.ToInt32(_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             _mapper = mapper;
         }
 
@@ -41,25 +36,22 @@ namespace BlueBerry24.API.Controllers
                     {
                         IsSuccess = false,
                         StatusCode = 400,
-                        StatusMessage = "Invalid request data",
-                        Errors = new List<string> { "Order data is required" }
+                        StatusMessage = "Invalid request data"
                     });
                 }
 
                 var order = await _orderService.CreateOrderFromCartAsync(request.CartId, request);
-
                 if (order == null)
                 {
-                    return BadRequest(new ResponseDto<Order>
+                    return StatusCode(500, new ResponseDto<Order>
                     {
                         IsSuccess = false,
-                        StatusCode = 400,
-                        StatusMessage = "Order could not be created",
-                        Errors = new List<string> { "Cart not found or invalid" }
+                        StatusCode = 500,
+                        StatusMessage = "Order could not be created"
                     });
                 }
 
-                return Ok(new ResponseDto<Order>
+                return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, new ResponseDto<Order>
                 {
                     Data = order,
                     IsSuccess = true,
@@ -69,7 +61,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<Order>
+                return StatusCode(500, new ResponseDto<Order>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -81,23 +73,20 @@ namespace BlueBerry24.API.Controllers
 
         [HttpGet("{id}")]
         [UserAndAbove]
-        public async Task<ActionResult<ResponseDto<object>>> GetOrderById(int id)
+        public async Task<ActionResult<ResponseDto<OrderDto>>> GetOrderById(int id)
         {
             try
             {
                 var order = await _orderService.GetOrderByIdAsync(id);
                 if (order == null)
                 {
-                    return NotFound(new ResponseDto<object>
+                    return NotFound(new ResponseDto<OrderDto>
                     {
                         IsSuccess = false,
                         StatusCode = 404,
-                        StatusMessage = "Order not found",
-                        Data = null
+                        StatusMessage = "Order not found"
                     });
                 }
-
-
 
                 return Ok(new ResponseDto<OrderDto>
                 {
@@ -109,7 +98,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<object>
+                return StatusCode(500, new ResponseDto<OrderDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -137,7 +126,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<List<OrderDto>>
+                return StatusCode(500, new ResponseDto<List<OrderDto>>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -166,12 +155,11 @@ namespace BlueBerry24.API.Controllers
                 var result = await _orderService.CancelOrderAsync(orderId, request.Reason);
                 if (!result)
                 {
-                    return BadRequest(new ResponseDto<bool>
+                    return StatusCode(500, new ResponseDto<bool>
                     {
                         IsSuccess = false,
-                        StatusCode = 400,
-                        StatusMessage = "Could not cancel the order",
-                        Errors = new List<string> { "Order may not exist or is not in a cancellable state" }
+                        StatusCode = 500,
+                        StatusMessage = "Could not cancel the order"
                     });
                 }
 
@@ -179,12 +167,13 @@ namespace BlueBerry24.API.Controllers
                 {
                     IsSuccess = true,
                     StatusCode = 200,
-                    StatusMessage = "Order cancelled successfully"
+                    StatusMessage = "Order cancelled successfully",
+                    Data = true
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<bool>
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -213,12 +202,11 @@ namespace BlueBerry24.API.Controllers
                 var result = await _orderService.RefundOrderAsync(orderId, request.Reason);
                 if (!result)
                 {
-                    return BadRequest(new ResponseDto<bool>
+                    return StatusCode(500, new ResponseDto<bool>
                     {
                         IsSuccess = false,
-                        StatusCode = 400,
-                        StatusMessage = "Could not refund the order",
-                        Errors = new List<string> { "Order may not exist or is not in a refundable state" }
+                        StatusCode = 500,
+                        StatusMessage = "Could not refund the order"
                     });
                 }
 
@@ -226,12 +214,13 @@ namespace BlueBerry24.API.Controllers
                 {
                     IsSuccess = true,
                     StatusCode = 200,
-                    StatusMessage = "Order refunded successfully"
+                    StatusMessage = "Order refunded successfully",
+                    Data = true
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<bool>
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -240,8 +229,6 @@ namespace BlueBerry24.API.Controllers
                 });
             }
         }
-
-        
 
         [HttpGet("calculate-totals")]
         [UserAndAbove]
@@ -270,7 +257,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<OrderTotal>
+                return StatusCode(500, new ResponseDto<OrderTotal>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -298,16 +285,14 @@ namespace BlueBerry24.API.Controllers
                 }
 
                 var mappedOrder = _mapper.Map<Order>(order);
-
                 var result = await _orderService.UpdateOrderStatusAsync(mappedOrder, request.NewStatus);
                 if (!result)
                 {
-                    return BadRequest(new ResponseDto<OrderDto>
+                    return StatusCode(500, new ResponseDto<OrderDto>
                     {
                         IsSuccess = false,
-                        StatusCode = 400,
-                        StatusMessage = "Failed to update order status",
-                        Errors = new List<string> { "Invalid status transition or order state" }
+                        StatusCode = 500,
+                        StatusMessage = "Failed to update order status"
                     });
                 }
 
@@ -315,12 +300,13 @@ namespace BlueBerry24.API.Controllers
                 {
                     IsSuccess = true,
                     StatusCode = 200,
-                    StatusMessage = "Order status updated successfully"
+                    StatusMessage = "Order status updated successfully",
+                    Data = order
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<OrderDto>
+                return StatusCode(500, new ResponseDto<OrderDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -367,7 +353,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<Order>
+                return StatusCode(500, new ResponseDto<Order>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -395,7 +381,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<List<Order>>
+                return StatusCode(500, new ResponseDto<List<Order>>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -423,7 +409,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<List<OrderDto>>
+                return StatusCode(500, new ResponseDto<List<OrderDto>>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -442,12 +428,11 @@ namespace BlueBerry24.API.Controllers
                 var result = await _orderService.ProcessOrderAsync(orderId);
                 if (!result)
                 {
-                    return BadRequest(new ResponseDto<bool>
+                    return StatusCode(500, new ResponseDto<bool>
                     {
                         IsSuccess = false,
-                        StatusCode = 400,
-                        StatusMessage = "Could not process the order",
-                        Errors = new List<string> { "Order may not exist or is not in a processable state" }
+                        StatusCode = 500,
+                        StatusMessage = "Could not process the order"
                     });
                 }
 
@@ -455,12 +440,13 @@ namespace BlueBerry24.API.Controllers
                 {
                     IsSuccess = true,
                     StatusCode = 200,
-                    StatusMessage = "Order processed successfully"
+                    StatusMessage = "Order processed successfully",
+                    Data = true
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<bool>
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
