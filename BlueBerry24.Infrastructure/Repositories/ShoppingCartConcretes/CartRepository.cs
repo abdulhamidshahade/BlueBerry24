@@ -293,5 +293,21 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
             _context.ShoppingCarts.Remove(shoppingCart);
             return await _unitOfWork.SaveDbChangesAsync();
         }
+
+        public async Task<CartItem> IsItemExistingByRealCart(int cartId, int productId, int userId)
+        {
+            return await _context.CartItems.FirstOrDefaultAsync(i => i.ShoppingCartId != cartId && i.ProductId == productId && i.UserId == userId && i.ShoppingCartId != null);
+        }
+
+        public Task<bool> RemoveItemAsync(int cartId, int userId, int productId)
+        {
+            var itemToRemove = _context.CartItems.Where(i => i.ShoppingCartId == cartId && i.ProductId == productId && i.UserId == userId).FirstOrDefault();
+            if (itemToRemove == null)
+            {
+                return Task.FromResult(false);
+            }
+            _context.CartItems.Remove(itemToRemove);
+            return Task.FromResult(_unitOfWork.SaveDbChangesAsync().Result);
+        }
     }
 }
