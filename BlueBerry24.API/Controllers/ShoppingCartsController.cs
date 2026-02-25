@@ -7,7 +7,6 @@ using BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
 using BlueBerry24.Domain.Constants;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace BlueBerry24.API.Controllers
 {
@@ -15,22 +14,17 @@ namespace BlueBerry24.API.Controllers
     [ApiController]
     public class ShoppingCartsController : BaseController
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly int? _userId;
         private readonly IUserCouponService _userCouponService;
         private readonly ICartService _cartService;
         private readonly IInventoryService _inventoryService;
         private readonly IOrderService _orderService;
 
         public ShoppingCartsController(
-            IHttpContextAccessor httpContextAccessor,
             IUserCouponService userCouponService,
             ICartService cartService,
             IInventoryService inventoryService,
             IOrderService orderService)
         {
-            _httpContextAccessor = httpContextAccessor;
-            _userId = Convert.ToInt32(_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             _userCouponService = userCouponService;
             _cartService = cartService;
             _inventoryService = inventoryService;
@@ -42,22 +36,30 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                //TODO to fix
-                var cart = await _cartService.GetCartByUserIdAsync(GetCurrentUserId().Value);
+                var userId = GetCurrentUserId();
+                if (!userId.HasValue)
+                {
+                    return Unauthorized(new ResponseDto<CartDto>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 401,
+                        StatusMessage = "User not authenticated"
+                    });
+                }
+
+                var cart = await _cartService.GetCartByUserIdAsync(userId.Value);
                 if (cart == null)
                 {
-                    cart = await _cartService.CreateCartAsync(GetCurrentUserId(), null);
-
+                    cart = await _cartService.CreateCartAsync(userId, null);
                     if (cart == null)
                     {
-                        return NotFound(new ResponseDto<CartDto>
+                        return StatusCode(500, new ResponseDto<CartDto>
                         {
                             IsSuccess = false,
-                            StatusCode = 404,
-                            StatusMessage = "Cart not found"
+                            StatusCode = 500,
+                            StatusMessage = "Failed to create cart"
                         });
                     }
-
                 }
 
                 return Ok(new ResponseDto<CartDto>
@@ -70,7 +72,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<CartDto>
+                return StatusCode(500, new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -81,12 +83,12 @@ namespace BlueBerry24.API.Controllers
         }
 
         [HttpGet("session-id")]
-
         public async Task<ActionResult<ResponseDto<CartDto>>> GetCartBySessionId()
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(GetSessionId()))
+                var sessionId = GetSessionId();
+                if (string.IsNullOrWhiteSpace(sessionId))
                 {
                     return BadRequest(new ResponseDto<CartDto>
                     {
@@ -96,24 +98,19 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                int? userId = GetCurrentUserId();
-                string? sessionIdd = GetSessionId();
-
-                var cart = await _cartService.GetCartBySessionIdAsync(GetSessionId(), CartStatus.Active);
+                var cart = await _cartService.GetCartBySessionIdAsync(sessionId, CartStatus.Active);
                 if (cart == null)
                 {
-                    cart = await _cartService.CreateCartAsync(null, GetSessionId());
-
+                    cart = await _cartService.CreateCartAsync(null, sessionId);
                     if (cart == null)
                     {
-                        return NotFound(new ResponseDto<CartDto>
+                        return StatusCode(500, new ResponseDto<CartDto>
                         {
                             IsSuccess = false,
-                            StatusCode = 404,
-                            StatusMessage = "Cart not found for session"
+                            StatusCode = 500,
+                            StatusMessage = "Failed to create cart"
                         });
                     }
-
                 }
 
                 return Ok(new ResponseDto<CartDto>
@@ -126,7 +123,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<CartDto>
+                return StatusCode(500, new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -149,7 +146,7 @@ namespace BlueBerry24.API.Controllers
                     {
                         IsSuccess = false,
                         StatusCode = 404,
-                        StatusMessage = "Cart not found for id"
+                        StatusMessage = "Cart not found"
                     });
                 }
 
@@ -163,7 +160,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<CartDto>
+                return StatusCode(500, new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -174,12 +171,14 @@ namespace BlueBerry24.API.Controllers
         }
 
         [HttpPost("create")]
-
         public async Task<ActionResult<ResponseDto<CartDto>>> CreateCart()
         {
             try
             {
-                if (_userId == null && string.IsNullOrWhiteSpace(GetSessionId()))
+                var userId = GetCurrentUserId();
+                var sessionId = GetSessionId();
+
+                if (!userId.HasValue && string.IsNullOrWhiteSpace(sessionId))
                 {
                     return BadRequest(new ResponseDto<CartDto>
                     {
@@ -189,18 +188,18 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                var cart = await _cartService.CreateCartAsync(GetCurrentUserId(), GetSessionId());
+                var cart = await _cartService.CreateCartAsync(userId, sessionId);
                 if (cart == null)
                 {
-                    return BadRequest(new ResponseDto<CartDto>
+                    return StatusCode(500, new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
-                        StatusCode = 400,
-                        StatusMessage = "Cart could not be created"
+                        StatusCode = 500,
+                        StatusMessage = "Failed to create cart"
                     });
                 }
 
-                return Ok(new ResponseDto<CartDto>
+                return CreatedAtAction(nameof(GetCartByCartId), new { id = cart.Id }, new ResponseDto<CartDto>
                 {
                     IsSuccess = true,
                     StatusCode = 201,
@@ -210,7 +209,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<CartDto>
+                return StatusCode(500, new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -242,20 +241,24 @@ namespace BlueBerry24.API.Controllers
                     {
                         IsSuccess = false,
                         StatusCode = 400,
-                        StatusMessage = "Insufficient stock for the requested quantity",
-                        Errors = new List<string> { $"Product {itemRequest.ProductId} does not have {itemRequest.Quantity} items in stock" }
+                        StatusMessage = "Insufficient stock for the requested quantity"
                     });
                 }
 
-                var updatedCart = await _cartService.AddItemAsync(itemRequest.CartId, GetCurrentUserId(), itemRequest.SessionId, itemRequest.ProductId, itemRequest.Quantity);
+                var updatedCart = await _cartService.AddItemAsync(
+                    itemRequest.CartId, 
+                    GetCurrentUserId(), 
+                    itemRequest.SessionId, 
+                    itemRequest.ProductId, 
+                    itemRequest.Quantity);
+
                 if (updatedCart == null)
                 {
-                    return BadRequest(new ResponseDto<CartDto>
+                    return StatusCode(500, new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
-                        StatusCode = 400,
-                        StatusMessage = "Failed to add item to cart",
-                        Errors = new List<string> { "Cart not found or product invalid" }
+                        StatusCode = 500,
+                        StatusMessage = "Failed to add item to cart"
                     });
                 }
 
@@ -269,7 +272,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<CartDto>
+                return StatusCode(500, new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -296,13 +299,12 @@ namespace BlueBerry24.API.Controllers
 
                 if (itemRequest.Quantity == 0)
                 {
-                    var removeResult = await RemoveItemFromCart(itemRequest.CartId, itemRequest.ProductId);
+                    await RemoveItemFromCart(itemRequest.CartId, itemRequest.ProductId);
                     return Ok(new ResponseDto<CartDto>
                     {
                         IsSuccess = true,
                         StatusCode = 200,
-                        StatusMessage = "Item quantity updated successfully",
-                        Data = new CartDto()
+                        StatusMessage = "Item removed successfully"
                     });
                 }
 
@@ -313,20 +315,24 @@ namespace BlueBerry24.API.Controllers
                     {
                         IsSuccess = false,
                         StatusCode = 400,
-                        StatusMessage = "Insufficient stock for the requested quantity",
-                        Errors = new List<string> { $"Product {itemRequest.ProductId} does not have {itemRequest.Quantity} items in stock" }
+                        StatusMessage = "Insufficient stock for the requested quantity"
                     });
                 }
 
-                var updatedCart = await _cartService.UpdateItemQuantityAsync(itemRequest.CartId, itemRequest.UserId, itemRequest.SessionId, itemRequest.ProductId, itemRequest.Quantity);
+                var updatedCart = await _cartService.UpdateItemQuantityAsync(
+                    itemRequest.CartId, 
+                    itemRequest.UserId, 
+                    itemRequest.SessionId, 
+                    itemRequest.ProductId, 
+                    itemRequest.Quantity);
+
                 if (updatedCart == null)
                 {
-                    return BadRequest(new ResponseDto<CartDto>
+                    return StatusCode(500, new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
-                        StatusCode = 400,
-                        StatusMessage = "Failed to update item quantity",
-                        Errors = new List<string> { "Cart or item not found" }
+                        StatusCode = 500,
+                        StatusMessage = "Failed to update item quantity"
                     });
                 }
 
@@ -340,7 +346,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<CartDto>
+                return StatusCode(500, new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -370,12 +376,13 @@ namespace BlueBerry24.API.Controllers
                 {
                     IsSuccess = true,
                     StatusCode = 200,
-                    StatusMessage = "Item removed from cart successfully"
+                    StatusMessage = "Item removed from cart successfully",
+                    Data = true
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<bool>
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -393,12 +400,11 @@ namespace BlueBerry24.API.Controllers
                 var success = await _cartService.ClearCartAsync(cartId, GetCurrentUserId(), GetSessionId());
                 if (!success)
                 {
-                    return BadRequest(new ResponseDto<bool>
+                    return StatusCode(500, new ResponseDto<bool>
                     {
                         IsSuccess = false,
-                        StatusCode = 400,
-                        StatusMessage = "Failed to clear the cart",
-                        Errors = new List<string> { "Cart not found or already empty" }
+                        StatusCode = 500,
+                        StatusMessage = "Failed to clear the cart"
                     });
                 }
 
@@ -406,12 +412,13 @@ namespace BlueBerry24.API.Controllers
                 {
                     IsSuccess = true,
                     StatusCode = 200,
-                    StatusMessage = "Cart cleared successfully"
+                    StatusMessage = "Cart cleared successfully",
+                    Data = true
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<bool>
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -429,12 +436,11 @@ namespace BlueBerry24.API.Controllers
                 var success = await _cartService.CompleteCartAsync(cartId, GetCurrentUserId());
                 if (!success)
                 {
-                    return BadRequest(new ResponseDto<bool>
+                    return StatusCode(500, new ResponseDto<bool>
                     {
                         IsSuccess = false,
-                        StatusCode = 400,
-                        StatusMessage = "Failed to complete the cart",
-                        Errors = new List<string> { "Cart not found or cannot be completed" }
+                        StatusCode = 500,
+                        StatusMessage = "Failed to complete the cart"
                     });
                 }
 
@@ -442,12 +448,13 @@ namespace BlueBerry24.API.Controllers
                 {
                     IsSuccess = true,
                     StatusCode = 200,
-                    StatusMessage = "Cart completed successfully"
+                    StatusMessage = "Cart completed successfully",
+                    Data = true
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<bool>
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -485,7 +492,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<CartItemDto>
+                return StatusCode(500, new ResponseDto<CartItemDto>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -518,8 +525,7 @@ namespace BlueBerry24.API.Controllers
                     {
                         IsSuccess = false,
                         StatusCode = 400,
-                        StatusMessage = "Failed to apply coupon",
-                        Errors = new List<string> { "Invalid coupon code or cart not found" }
+                        StatusMessage = "Failed to apply coupon"
                     });
                 }
 
@@ -533,10 +539,10 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<CartDto>
+                return StatusCode(500, new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
-                    StatusCode = 400,
+                    StatusCode = 500,
                     StatusMessage = "Error applying coupon",
                     Errors = new List<string> { ex.Message }
                 });
@@ -551,12 +557,11 @@ namespace BlueBerry24.API.Controllers
                 var cart = await _cartService.RemoveCouponAsync(cartId, GetCurrentUserId(), GetSessionId(), couponId);
                 if (cart == null)
                 {
-                    return BadRequest(new ResponseDto<CartDto>
+                    return StatusCode(500, new ResponseDto<CartDto>
                     {
                         IsSuccess = false,
-                        StatusCode = 400,
-                        StatusMessage = "Failed to remove coupon",
-                        Errors = new List<string> { "Coupon not found in cart or cart not found" }
+                        StatusCode = 500,
+                        StatusMessage = "Failed to remove coupon"
                     });
                 }
 
@@ -570,10 +575,10 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<CartDto>
+                return StatusCode(500, new ResponseDto<CartDto>
                 {
                     IsSuccess = false,
-                    StatusCode = 400,
+                    StatusCode = 500,
                     StatusMessage = "Error removing coupon",
                     Errors = new List<string> { ex.Message }
                 });
@@ -616,7 +621,6 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                // Validate stock for all items before proceeding
                 foreach (var item in cart.CartItems)
                 {
                     var isInStock = await _inventoryService.IsInStockAsync(item.ProductId, item.Quantity);
@@ -626,7 +630,7 @@ namespace BlueBerry24.API.Controllers
                         {
                             IsSuccess = false,
                             StatusCode = 400,
-                            StatusMessage = $"Insufficient stock for product ID {item.ProductId}. Requested: {item.Quantity}"
+                            StatusMessage = $"Insufficient stock for product ID {item.ProductId}"
                         });
                     }
                 }
@@ -637,7 +641,7 @@ namespace BlueBerry24.API.Controllers
                     CartId = cartId,
                     CustomerEmail = request.CustomerEmail,
                     CustomerPhone = request.CustomerPhone,
-                    ShippingName = $"{request.ShippingName}",
+                    ShippingName = request.ShippingName,
                     ShippingAddressLine1 = request.ShippingAddressLine1,
                     ShippingAddressLine2 = request.ShippingAddressLine2,
                     ShippingCity = request.ShippingCity,
@@ -647,20 +651,19 @@ namespace BlueBerry24.API.Controllers
                 };
 
                 var order = await _orderService.CreateOrderFromCartAsync(cartId, createOrderDto);
-
                 if (order == null)
                 {
-                    return BadRequest(new ResponseDto<object>
+                    return StatusCode(500, new ResponseDto<object>
                     {
                         IsSuccess = false,
-                        StatusCode = 400,
+                        StatusCode = 500,
                         StatusMessage = "Failed to create order"
                     });
                 }
 
                 await _cartService.CompleteCartAsync(cartId, GetCurrentUserId());
 
-                return Ok(new ResponseDto<object>
+                return CreatedAtAction("GetOrderById", "Orders", new { id = order.Id }, new ResponseDto<object>
                 {
                     IsSuccess = true,
                     StatusCode = 201,
@@ -668,15 +671,15 @@ namespace BlueBerry24.API.Controllers
                     Data = new
                     {
                         id = order.Id,
-                        orderNumber = "11",
-                        total = 10,
-                        status = "yes"
+                        orderNumber = order.ReferenceNumber,
+                        total = order.TotalAmount,
+                        status = order.Status.ToString()
                     }
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<object>
+                return StatusCode(500, new ResponseDto<object>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
