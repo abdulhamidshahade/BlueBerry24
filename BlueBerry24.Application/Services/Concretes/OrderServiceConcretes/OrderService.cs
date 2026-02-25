@@ -194,6 +194,11 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
 
         public async Task<bool> UpdateOrderStatusAsync(Order order, OrderStatus newStatus)
         {
+            if((int)newStatus < 0 || (int)newStatus > 6)
+            {
+                return false;
+            }
+
             if (order == null)
             {
                 return false;
@@ -251,9 +256,9 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
             return referenceNumber;
         }
 
-        public async Task<OrderDto?> GetOrderByIdAsync(int orderId, OrderStatus? orderStatus = OrderStatus.Pending)
+        public async Task<OrderDto?> GetOrderByIdAsync(int orderId)
         {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId, orderStatus);
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
 
             return _mapper.Map<OrderDto>(order);
         }
