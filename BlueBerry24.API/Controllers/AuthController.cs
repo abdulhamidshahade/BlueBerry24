@@ -1,4 +1,5 @@
-﻿using BlueBerry24.Application.Authorization.Attributes;
+using BlueBerry24.Application.Authorization.Attributes;
+using BlueBerry24.Application.Constants;
 using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.AuthDtos;
 using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
@@ -29,44 +30,68 @@ namespace BlueBerry24.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto requestDto)
         {
-            if (requestDto == null || !ModelState.IsValid)
-            {
-                return StatusCode(400, new ResponseDto<RegisterResponseDto>
-                {
-                    IsSuccess = false,
-                    StatusCode = 400,
-                    StatusMessage = "Invalid request data.",
-                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList(),
-                    Data = null
-                });
-            }
             var registerResult = await _authService.Register(requestDto);
 
-            if (registerResult.IsSuccess)
+            switch (registerResult)
             {
-                return StatusCode(201, new ResponseDto<object>
-                {
-                    IsSuccess = true,
-                    StatusCode = 201,
-                    StatusMessage = "User registered successfully.",
-                    Data = registerResult.User
-                });
+                case Result<RegisterResponseDto> success when success.Status == ResultStatus.Success:
+                    return StatusCode(201, new ResponseDto<RegisterResponseDto>
+                    {
+                        IsSuccess = true,
+                        StatusCode = 201,
+                        StatusMessage = "User registered successfully. Please check your email to confirm your account.",
+                        Data = success.Value
+                    });
+
+                case Result<RegisterResponseDto> validationError when validationError.Status == ResultStatus.ValidationError:
+                    return BadRequest(new ResponseDto<RegisterResponseDto>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = validationError.Error,
+                    });
+
+                case Result<RegisterResponseDto> failure when failure.Status == ResultStatus.Failure:
+                    return StatusCode(500, new ResponseDto<RegisterResponseDto>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 500,
+                        StatusMessage = failure.Error,
+                    });
+                case Result<RegisterResponseDto> conflict when conflict.Status == ResultStatus.Conflict:
+                    return Conflict(new ResponseDto<RegisterResponseDto>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 409,
+                        StatusMessage = conflict.Error,
+                    });
+                case Result<RegisterResponseDto> verificationRequired when verificationRequired.Status == ResultStatus.VerificationRequired:
+                    return StatusCode(403, new ResponseDto<RegisterResponseDto>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 403,
+                        StatusMessage = verificationRequired.Error,
+                    });
+                default:
+                    return Result<RegisterResponseDto>.NoContent() is Result<RegisterResponseDto> noContent
+                        ? StatusCode(204, new ResponseDto<RegisterResponseDto>
+                        {
+                            IsSuccess = false,
+                            StatusCode = 204,
+                            StatusMessage = "No content to return."
+                        })
+                        : StatusCode(500, new ResponseDto<RegisterResponseDto>
+                        {
+                            IsSuccess = false,
+                            StatusCode = 500,
+                            StatusMessage = "An unexpected error occurred."
+                        });
             }
-
-            return StatusCode(400, new ResponseDto<object>
-            {
-                IsSuccess = false,
-                StatusCode = 400,
-                StatusMessage = "Registration failed.",
-                Errors = new List<string> { registerResult.ErrorMessage }
-            });
         }
-
 
         [HttpPost]
         [Route("login")]
         [AllowAnonymous]
-
         public async Task<IActionResult> Login(LoginRequestDto requestDto)
         {
             if (requestDto == null || !ModelState.IsValid)
@@ -261,7 +286,7 @@ namespace BlueBerry24.API.Controllers
         [HttpPost]
         [Route("reset-password")]
         [AllowAnonymous]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto requestDto)
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto requestDto)
         {
             if (requestDto == null || !ModelState.IsValid)
             {
@@ -333,7 +358,7 @@ namespace BlueBerry24.API.Controllers
 
 
         [HttpGet]
-        [AdminAndAbove]
+        [AllowAnonymous]
         [Route("exists/email-address/{emailAddress}")]
         public async Task<IActionResult> IsUserExistsByEmail(string emailAddress)
         {
@@ -354,6 +379,31 @@ namespace BlueBerry24.API.Controllers
                 IsSuccess = true,
                 StatusCode = 200,
                 StatusMessage = "The user is exists by Email"
+            });
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("exists/username/{username}")]
+        public async Task<IActionResult> IsUserExistsByUsername(string username)
+        {
+            var exists = await _userService.IsUsernameTaken(username);
+
+            if (!exists)
+            {
+                return NotFound(new ResponseDto<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = 404,
+                    StatusMessage = "The user is not exists by Username"
+                });
+            }
+
+            return Ok(new ResponseDto<object>
+            {
+                IsSuccess = true,
+                StatusCode = 200,
+                StatusMessage = "The user is exists by Username"
             });
         }
 
