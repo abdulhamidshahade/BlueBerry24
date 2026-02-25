@@ -1,9 +1,8 @@
-﻿using AutoMapper;
+using AutoMapper;
 using BlueBerry24.Application.Authorization.Attributes;
 using BlueBerry24.Application.Dtos.PaymentDtos;
 using BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.PaymentServiceInterfaces;
-using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
 using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Entities.OrderEntities;
 using Microsoft.AspNetCore.Mvc;
@@ -15,14 +14,15 @@ namespace BlueBerry24.API.Controllers
     public class PaymentsController : BaseController
     {
         private readonly IPaymentService _paymentService;
-        private readonly ICartService _cartService;
         private readonly IOrderService _orderService;
         private readonly IMapper _mapper;
 
-        public PaymentsController(ILogger<PaymentsController> logger, IPaymentService paymentService, ICartService cartService, IOrderService orderService, IMapper mapper)
+        public PaymentsController(
+            IPaymentService paymentService, 
+            IOrderService orderService, 
+            IMapper mapper)
         {
             _paymentService = paymentService;
-            _cartService = cartService;
             _orderService = orderService;
             _mapper = mapper;
         }
@@ -42,26 +42,27 @@ namespace BlueBerry24.API.Controllers
                 var sessionId = GetSessionId();
 
                 var result = await _paymentService.ProcessPaymentAsync(createPaymentDto, userId, sessionId);
-
                 if (!result.IsSuccess)
                 {
                     return BadRequest(result);
                 }
 
-                var cart = await _cartService.GetCartByUserIdAsync(userId.Value);
-
-                var order = await _orderService.GetOrderByIdAsync(createPaymentDto.OrderId.Value);
-
-                var mappedOrder = _mapper.Map<Order>(order);
-
-                await _orderService.UpdateOrderStatusAsync(mappedOrder, OrderStatus.Completed);
-                await _orderService.UpdateOrderPaymentStatusAsync(mappedOrder, PaymentStatus.Completed);
+                if (createPaymentDto.OrderId.HasValue)
+                {
+                    var order = await _orderService.GetOrderByIdAsync(createPaymentDto.OrderId.Value);
+                    if (order != null)
+                    {
+                        var mappedOrder = _mapper.Map<Order>(order);
+                        await _orderService.UpdateOrderStatusAsync(mappedOrder, OrderStatus.Completed);
+                        await _orderService.UpdateOrderPaymentStatusAsync(mappedOrder, PaymentStatus.Completed);
+                    }
+                }
 
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while processing payment");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while processing payment", Errors = new[] { ex.Message } });
             }
         }
 
@@ -71,7 +72,6 @@ namespace BlueBerry24.API.Controllers
             try
             {
                 var result = await _paymentService.GetPaymentByIdAsync(id);
-
                 if (!result.IsSuccess)
                 {
                     return NotFound(result);
@@ -81,7 +81,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while retrieving payment");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while retrieving payment", Errors = new[] { ex.Message } });
             }
         }
 
@@ -91,7 +91,6 @@ namespace BlueBerry24.API.Controllers
             try
             {
                 var result = await _paymentService.GetPaymentByTransactionIdAsync(transactionId);
-
                 if (!result.IsSuccess)
                 {
                     return NotFound(result);
@@ -101,7 +100,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while retrieving payment");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while retrieving payment", Errors = new[] { ex.Message } });
             }
         }
 
@@ -111,7 +110,6 @@ namespace BlueBerry24.API.Controllers
             try
             {
                 var result = await _paymentService.GetPaymentByOrderIdAsync(orderId);
-
                 if (!result.IsSuccess)
                 {
                     return NotFound(result);
@@ -121,7 +119,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while retrieving payment");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while retrieving payment", Errors = new[] { ex.Message } });
             }
         }
 
@@ -132,7 +130,6 @@ namespace BlueBerry24.API.Controllers
             try
             {
                 var result = await _paymentService.GetAllPaymentsAsync();
-
                 if (!result.IsSuccess)
                 {
                     return BadRequest(result);
@@ -142,7 +139,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while retrieving payments");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while retrieving payments", Errors = new[] { ex.Message } });
             }
         }
 
@@ -153,15 +150,12 @@ namespace BlueBerry24.API.Controllers
             try
             {
                 var currentUserId = GetCurrentUserId();
-
-                // Users can only access their own payments unless they're admin
-                if (currentUserId != userId && !User.IsInRole("User"))
+                if (currentUserId != userId && !User.IsInRole("Admin"))
                 {
                     return Forbid("You can only access your own payments");
                 }
 
                 var result = await _paymentService.GetPaymentsByUserIdAsync(userId);
-
                 if (!result.IsSuccess)
                 {
                     return BadRequest(result);
@@ -171,7 +165,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while retrieving user payments");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while retrieving user payments", Errors = new[] { ex.Message } });
             }
         }
 
@@ -184,11 +178,10 @@ namespace BlueBerry24.API.Controllers
                 var userId = GetCurrentUserId();
                 if (!userId.HasValue)
                 {
-                    return Unauthorized("User not authenticated");
+                    return Unauthorized(new { IsSuccess = false, StatusCode = 401, StatusMessage = "User not authenticated" });
                 }
 
                 var result = await _paymentService.GetPaginatedPaymentsByUserIdAsync(userId.Value, page, pageSize);
-
                 if (!result.IsSuccess)
                 {
                     return BadRequest(result);
@@ -198,7 +191,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while retrieving your payments");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while retrieving your payments", Errors = new[] { ex.Message } });
             }
         }
 
@@ -209,7 +202,6 @@ namespace BlueBerry24.API.Controllers
             try
             {
                 var result = await _paymentService.GetPaymentsByStatusAsync(status);
-
                 if (!result.IsSuccess)
                 {
                     return BadRequest(result);
@@ -219,7 +211,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while retrieving payments by status");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while retrieving payments by status", Errors = new[] { ex.Message } });
             }
         }
 
@@ -230,7 +222,6 @@ namespace BlueBerry24.API.Controllers
             try
             {
                 var result = await _paymentService.GetPaymentsByDateRangeAsync(startDate, endDate);
-
                 if (!result.IsSuccess)
                 {
                     return BadRequest(result);
@@ -240,7 +231,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while retrieving payments by date range");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while retrieving payments by date range", Errors = new[] { ex.Message } });
             }
         }
 
@@ -251,7 +242,6 @@ namespace BlueBerry24.API.Controllers
             try
             {
                 var result = await _paymentService.GetPaginatedPaymentsAsync(page, pageSize);
-
                 if (!result.IsSuccess)
                 {
                     return BadRequest(result);
@@ -261,7 +251,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while retrieving paginated payments");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while retrieving paginated payments", Errors = new[] { ex.Message } });
             }
         }
 
@@ -277,7 +267,6 @@ namespace BlueBerry24.API.Controllers
                 }
 
                 var result = await _paymentService.UpdatePaymentStatusAsync(id, updateDto.Status, updateDto.Notes);
-
                 if (!result.IsSuccess)
                 {
                     return BadRequest(result);
@@ -287,7 +276,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while updating payment status");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while updating payment status", Errors = new[] { ex.Message } });
             }
         }
 
@@ -303,7 +292,6 @@ namespace BlueBerry24.API.Controllers
                 }
 
                 var result = await _paymentService.RefundPaymentAsync(id, refundDto.RefundAmount, refundDto.Reason);
-
                 if (!result.IsSuccess)
                 {
                     return BadRequest(result);
@@ -313,7 +301,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while processing refund");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while processing refund", Errors = new[] { ex.Message } });
             }
         }
 
@@ -324,7 +312,6 @@ namespace BlueBerry24.API.Controllers
             try
             {
                 var result = await _paymentService.DeletePaymentAsync(id);
-
                 if (!result.IsSuccess)
                 {
                     return BadRequest(result);
@@ -334,7 +321,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while deleting payment");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while deleting payment", Errors = new[] { ex.Message } });
             }
         }
 
@@ -345,7 +332,6 @@ namespace BlueBerry24.API.Controllers
             try
             {
                 var result = await _paymentService.GetTotalPaymentCountAsync();
-
                 if (!result.IsSuccess)
                 {
                     return BadRequest(result);
@@ -355,7 +341,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while retrieving payment count");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while retrieving payment count", Errors = new[] { ex.Message } });
             }
         }
 
@@ -366,7 +352,6 @@ namespace BlueBerry24.API.Controllers
             try
             {
                 var result = await _paymentService.GetTotalAmountByDateRangeAsync(startDate, endDate);
-
                 if (!result.IsSuccess)
                 {
                     return BadRequest(result);
@@ -376,7 +361,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while retrieving total amount");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while retrieving total amount", Errors = new[] { ex.Message } });
             }
         }
 
@@ -387,7 +372,6 @@ namespace BlueBerry24.API.Controllers
             try
             {
                 var result = await _paymentService.SearchPaymentsAsync(searchTerm, page, pageSize);
-
                 if (!result.IsSuccess)
                 {
                     return BadRequest(result);
@@ -397,7 +381,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while searching payments");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while searching payments", Errors = new[] { ex.Message } });
             }
         }
 
@@ -408,7 +392,6 @@ namespace BlueBerry24.API.Controllers
             try
             {
                 var result = await _paymentService.VerifyPaymentWithProviderAsync(transactionId);
-
                 if (!result.IsSuccess)
                 {
                     return BadRequest(result);
@@ -418,7 +401,7 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while verifying payment");
+                return StatusCode(500, new { IsSuccess = false, StatusCode = 500, StatusMessage = "An error occurred while verifying payment", Errors = new[] { ex.Message } });
             }
         }
     }
