@@ -5,7 +5,7 @@ namespace BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces
 {
     public interface IOrderService
     {
-        Task<OrderDto?> GetOrderByIdAsync(int orderId, OrderStatus? orderStatus = OrderStatus.Pending);
+        Task<OrderDto?> GetOrderByIdAsync(int orderId);
 
         Task<List<OrderDto>> GetUserOrdersAsync(int userId, int page = 1, int pageSize = 10);
         Task<List<OrderDto>> GetAllOrdersAsync(int page = 1, int pageSize = 50);
