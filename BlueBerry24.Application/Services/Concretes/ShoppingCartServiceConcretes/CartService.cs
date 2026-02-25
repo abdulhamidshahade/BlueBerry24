@@ -112,12 +112,21 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
 
                 foreach(var item in cartItems)
                 {
-                    item.SessionId = null;
-                    if(cartById != null)
+                    var isExistsingItem = await _cartRepository.IsItemExistingByRealCart(cart.Id, item.ProductId, userId);
+                    if (isExistsingItem != null)
                     {
-                        item.ShoppingCartId = cartById.Id;
+                        await _cartRepository.UpdateItemQuantityAsync(userId, null, item.ProductId, item.Quantity + isExistsingItem.Quantity);
+                        await _cartRepository.RemoveItemAsync(cart.Id, userId, item.ProductId);
                     }
-                    item.UserId = userId;
+                    else
+                    {
+                        item.SessionId = null;
+                        if (cartById != null)
+                        {
+                            item.ShoppingCartId = cartById.Id;
+                        }
+                        item.UserId = userId;
+                    }
                 }
 
                 if(cartById != null)
