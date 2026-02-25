@@ -19,10 +19,9 @@ namespace BlueBerry24.Infrastructure.Repositories.OrderConcretes
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Order?> GetOrderByIdAsync(int orderId, OrderStatus? orderStatus = OrderStatus.Pending)
+        public async Task<Order?> GetOrderByIdAsync(int orderId)
         {
             return await _context.Orders
-                .Where(o => o.Status == orderStatus)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
