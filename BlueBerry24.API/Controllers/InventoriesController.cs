@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Application.Authorization.Attributes;
+using BlueBerry24.Application.Authorization.Attributes;
 using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.InventoryDtos;
 using BlueBerry24.Application.Services.Interfaces.InventoryServiceInterfaces;
@@ -38,10 +38,10 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<bool>
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
-                    StatusCode = 400,
+                    StatusCode = 500,
                     StatusMessage = "Error checking stock",
                     Errors = new List<string> { ex.Message },
                     Data = false
@@ -67,10 +67,10 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<object>
+                return StatusCode(500, new ResponseDto<object>
                 {
                     IsSuccess = false,
-                    StatusCode = 400,
+                    StatusCode = 500,
                     StatusMessage = "Error checking stock",
                     Errors = new List<string> { ex.Message }
                 });
@@ -96,7 +96,6 @@ namespace BlueBerry24.API.Controllers
                         IsSuccess = false,
                         StatusCode = 400,
                         StatusMessage = "Failed to reserve stock",
-                        Errors = new List<string> { "Insufficient stock or product not found" },
                         Data = false
                     });
                 }
@@ -111,10 +110,10 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<bool>
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
-                    StatusCode = 400,
+                    StatusCode = 500,
                     StatusMessage = "Error reserving stock",
                     Errors = new List<string> { ex.Message },
                     Data = false
@@ -139,15 +138,15 @@ namespace BlueBerry24.API.Controllers
                     IsSuccess = success,
                     StatusCode = success ? 200 : 400,
                     StatusMessage = success ? "Reserved stock released successfully" : "Failed to release reserved stock",
-                    Data = true
+                    Data = success
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<bool>
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
-                    StatusCode = 400,
+                    StatusCode = 500,
                     StatusMessage = "Error releasing reserved stock",
                     Errors = new List<string> { ex.Message },
                     Data = false
@@ -172,15 +171,15 @@ namespace BlueBerry24.API.Controllers
                     IsSuccess = success,
                     StatusCode = success ? 200 : 400,
                     StatusMessage = success ? "Stock deduction confirmed successfully" : "Failed to confirm stock deduction",
-                    Data = true
+                    Data = success
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<bool>
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
-                    StatusCode = 400,
+                    StatusCode = 500,
                     StatusMessage = "Error confirming stock deduction",
                     Errors = new List<string> { ex.Message },
                     Data = false
@@ -205,18 +204,18 @@ namespace BlueBerry24.API.Controllers
                     IsSuccess = success,
                     StatusCode = success ? 200 : 400,
                     StatusMessage = success ? "Stock added successfully" : "Failed to add stock",
-                    Data = true
+                    Data = success
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<bool>
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
-                    StatusCode = 400,
+                    StatusCode = 500,
                     StatusMessage = "Error adding stock",
                     Errors = new List<string> { ex.Message },
-                    Data = true
+                    Data = false
                 });
             }
         }
@@ -237,16 +236,16 @@ namespace BlueBerry24.API.Controllers
                 {
                     IsSuccess = success,
                     StatusCode = success ? 200 : 400,
-                    StatusMessage = success ? "Stock adjusted successfully" : "Failed to adjust stock"
-                    ,Data = true
+                    StatusMessage = success ? "Stock adjusted successfully" : "Failed to adjust stock",
+                    Data = success
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<bool>
+                return StatusCode(500, new ResponseDto<bool>
                 {
                     IsSuccess = false,
-                    StatusCode = 400,
+                    StatusCode = 500,
                     StatusMessage = "Error adjusting stock",
                     Errors = new List<string> { ex.Message },
                     Data = false
@@ -261,14 +260,13 @@ namespace BlueBerry24.API.Controllers
             try
             {
                 var product = await _inventoryService.GetProductWithStockInfoAsync(productId);
-
                 if (product == null)
                 {
                     return NotFound(new ResponseDto<Product>
                     {
                         IsSuccess = false,
                         StatusCode = 404,
-                        StatusMessage = "Product not found",
+                        StatusMessage = "Product not found"
                     });
                 }
 
@@ -282,10 +280,10 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<Product>
+                return StatusCode(500, new ResponseDto<Product>
                 {
                     IsSuccess = false,
-                    StatusCode = 400,
+                    StatusCode = 500,
                     StatusMessage = "Error retrieving product",
                     Errors = new List<string> { ex.Message }
                 });
@@ -310,10 +308,10 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<List<Product>>
+                return StatusCode(500, new ResponseDto<List<Product>>
                 {
                     IsSuccess = false,
-                    StatusCode = 400,
+                    StatusCode = 500,
                     StatusMessage = "Error retrieving low stock products",
                     Errors = new List<string> { ex.Message }
                 });
@@ -338,10 +336,10 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<List<InventoryLog>>
+                return StatusCode(500, new ResponseDto<List<InventoryLog>>
                 {
                     IsSuccess = false,
-                    StatusCode = 400,
+                    StatusCode = 500,
                     StatusMessage = "Error retrieving inventory history",
                     Errors = new List<string> { ex.Message }
                 });
@@ -365,10 +363,10 @@ namespace BlueBerry24.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseDto<object>
+                return StatusCode(500, new ResponseDto<object>
                 {
                     IsSuccess = false,
-                    StatusCode = 400,
+                    StatusCode = 500,
                     StatusMessage = "Error processing stock notifications",
                     Errors = new List<string> { ex.Message }
                 });
