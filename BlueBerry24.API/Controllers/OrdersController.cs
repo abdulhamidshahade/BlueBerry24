@@ -3,6 +3,7 @@ using BlueBerry24.Application.Authorization.Attributes;
 using BlueBerry24.Application.Dtos;
 using BlueBerry24.Application.Dtos.OrderDtos;
 using BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces;
+using BlueBerry24.Application.Services.Interfaces.OrchestrationServiceInterfaces;
 using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Entities.OrderEntities;
 using Microsoft.AspNetCore.Mvc;
@@ -138,13 +139,13 @@ namespace BlueBerry24.API.Controllers
 
         [HttpPut("{orderId}/cancel")]
         [AdminAndAbove]
-        public async Task<ActionResult<ResponseDto<bool>>> CancelOrder(int orderId, [FromBody] CancelOrderRequest request)
+        public async Task<ActionResult<ResponseDto<CancellationResult>>> CancelOrder(int orderId, [FromBody] CancelOrderRequest request)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(request?.Reason))
                 {
-                    return BadRequest(new ResponseDto<bool>
+                    return BadRequest(new ResponseDto<CancellationResult>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -155,7 +156,7 @@ namespace BlueBerry24.API.Controllers
                 var result = await _orderService.CancelOrderAsync(orderId, request.Reason);
                 if (!result)
                 {
-                    return StatusCode(500, new ResponseDto<bool>
+                    return StatusCode(500, new ResponseDto<CancellationResult>
                     {
                         IsSuccess = false,
                         StatusCode = 500,
@@ -163,17 +164,22 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto<bool>
+                return Ok(new ResponseDto<CancellationResult>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
                     StatusMessage = "Order cancelled successfully",
-                    Data = true
+                    Data = new CancellationResult
+                    {
+                        IsSuccess = true,
+                        InventoryRestored = true,
+                        CouponsReverted = true
+                    }
                 });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new ResponseDto<bool>
+                return StatusCode(500, new ResponseDto<CancellationResult>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
@@ -185,13 +191,13 @@ namespace BlueBerry24.API.Controllers
 
         [HttpPut("{orderId}/refund")]
         [AdminAndAbove]
-        public async Task<ActionResult<ResponseDto<bool>>> RefundOrder(int orderId, [FromBody] RefundOrderRequest request)
+        public async Task<ActionResult<ResponseDto<RefundResult>>> RefundOrder(int orderId, [FromBody] RefundOrderRequest request)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(request?.Reason))
                 {
-                    return BadRequest(new ResponseDto<bool>
+                    return BadRequest(new ResponseDto<RefundResult>
                     {
                         IsSuccess = false,
                         StatusCode = 400,
@@ -202,7 +208,7 @@ namespace BlueBerry24.API.Controllers
                 var result = await _orderService.RefundOrderAsync(orderId, request.Reason);
                 if (!result)
                 {
-                    return StatusCode(500, new ResponseDto<bool>
+                    return StatusCode(500, new ResponseDto<RefundResult>
                     {
                         IsSuccess = false,
                         StatusCode = 500,
@@ -210,17 +216,23 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                return Ok(new ResponseDto<bool>
+                return Ok(new ResponseDto<RefundResult>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
                     StatusMessage = "Order refunded successfully",
-                    Data = true
+                    Data = new RefundResult
+                    {
+                        IsSuccess = true,
+                        PaymentRefunded = true,
+                        InventoryRestored = true,
+                        CouponsReverted = true
+                    }
                 });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new ResponseDto<bool>
+                return StatusCode(500, new ResponseDto<RefundResult>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
