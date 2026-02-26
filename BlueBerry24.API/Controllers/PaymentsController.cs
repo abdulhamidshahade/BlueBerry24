@@ -3,6 +3,7 @@ using BlueBerry24.Application.Authorization.Attributes;
 using BlueBerry24.Application.Dtos.PaymentDtos;
 using BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.PaymentServiceInterfaces;
+using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
 using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Entities.OrderEntities;
 using Microsoft.AspNetCore.Mvc;
@@ -15,15 +16,18 @@ namespace BlueBerry24.API.Controllers
     {
         private readonly IPaymentService _paymentService;
         private readonly IOrderService _orderService;
+        private readonly ICartService _cartService;
         private readonly IMapper _mapper;
 
         public PaymentsController(
             IPaymentService paymentService, 
-            IOrderService orderService, 
+            IOrderService orderService,
+            ICartService cartService,
             IMapper mapper)
         {
             _paymentService = paymentService;
             _orderService = orderService;
+            _cartService = cartService;
             _mapper = mapper;
         }
 
@@ -53,8 +57,21 @@ namespace BlueBerry24.API.Controllers
                     if (order != null)
                     {
                         var mappedOrder = _mapper.Map<Order>(order);
-                        await _orderService.UpdateOrderStatusAsync(mappedOrder, OrderStatus.Completed);
-                        await _orderService.UpdateOrderPaymentStatusAsync(mappedOrder, PaymentStatus.Completed);
+                        
+                        if (result.Data?.Success == true)
+                        {
+                            await _orderService.UpdateOrderStatusAsync(mappedOrder, OrderStatus.Completed);
+                            await _orderService.UpdateOrderPaymentStatusAsync(mappedOrder, PaymentStatus.Completed);
+
+                            if (order.CartId > 0 && userId.HasValue)
+                            {
+                                await _cartService.ClearCartAsync(order.CartId, userId, null);
+                            }
+                        }
+                        else
+                        {
+                            await _orderService.UpdateOrderPaymentStatusAsync(mappedOrder, PaymentStatus.Failed);
+                        }
                     }
                 }
 
