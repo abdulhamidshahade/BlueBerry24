@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using BlueBerry24.Application.Dtos.AuthDtos;
 using BlueBerry24.Application.Dtos.CouponDtos;
 using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
@@ -172,6 +172,52 @@ namespace BlueBerry24.Application.Services.Concretes.CouponServiceConcretes
             var isCouponUsed = await _userCouponRepository.IsCouponUsedByUserAsync(userId, couponCode);
 
             return isCouponUsed;
+        }
+
+        public async Task<bool> MarkCouponAsUsedAsync(int userId, int couponId, int orderId)
+        {
+            if (userId <= 0 || couponId <= 0 || orderId <= 0)
+            {
+                return false;
+            }
+
+            var userExists = await _userService.IsUserExistsByIdAsync(userId);
+            var couponExists = await _couponService.ExistsByIdAsync(couponId);
+
+            if (!userExists || !couponExists)
+            {
+                return false;
+            }
+
+            return await _userCouponRepository.MarkCouponAsUsedAsync(userId, couponId, orderId);
+        }
+
+        public async Task<bool> RevertCouponUsageAsync(int userId, int couponId, int orderId)
+        {
+            if (userId <= 0 || couponId <= 0 || orderId <= 0)
+            {
+                return false;
+            }
+
+            var userExists = await _userService.IsUserExistsByIdAsync(userId);
+            var couponExists = await _couponService.ExistsByIdAsync(couponId);
+
+            if (!userExists || !couponExists)
+            {
+                return false;
+            }
+
+            return await _userCouponRepository.RevertCouponUsageAsync(userId, couponId, orderId);
+        }
+
+        public async Task<List<int>> GetCouponIdsUsedInOrderAsync(int orderId)
+        {
+            if (orderId <= 0)
+            {
+                return new List<int>();
+            }
+
+            return await _userCouponRepository.GetCouponIdsUsedInOrderAsync(orderId);
         }
     }
 }
