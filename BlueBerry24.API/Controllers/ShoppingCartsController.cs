@@ -4,6 +4,7 @@ using BlueBerry24.Application.Dtos.ShoppingCartDtos;
 using BlueBerry24.Application.Services.Interfaces.CouponServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.InventoryServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces;
+using BlueBerry24.Application.Services.Interfaces.OrchestrationServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
 using BlueBerry24.Domain.Constants;
 using Microsoft.AspNetCore.Mvc;
@@ -18,17 +19,20 @@ namespace BlueBerry24.API.Controllers
         private readonly ICartService _cartService;
         private readonly IInventoryService _inventoryService;
         private readonly IOrderService _orderService;
+        private readonly ICheckoutOrchestrationService _checkoutOrchestrationService;
 
         public ShoppingCartsController(
             IUserCouponService userCouponService,
             ICartService cartService,
             IInventoryService inventoryService,
-            IOrderService orderService)
+            IOrderService orderService,
+            ICheckoutOrchestrationService checkoutOrchestrationService)
         {
             _userCouponService = userCouponService;
             _cartService = cartService;
             _inventoryService = inventoryService;
             _orderService = orderService;
+            _checkoutOrchestrationService = checkoutOrchestrationService;
         }
 
         [HttpGet("user-id")]
@@ -621,20 +625,6 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                foreach (var item in cart.CartItems)
-                {
-                    var isInStock = await _inventoryService.IsInStockAsync(item.ProductId, item.Quantity);
-                    if (!isInStock)
-                    {
-                        return BadRequest(new ResponseDto<object>
-                        {
-                            IsSuccess = false,
-                            StatusCode = 400,
-                            StatusMessage = $"Insufficient stock for product ID {item.ProductId}"
-                        });
-                    }
-                }
-
                 var createOrderDto = new Application.Dtos.OrderDtos.CreateOrderDto
                 {
                     UserId = GetCurrentUserId() ?? 0,
@@ -650,30 +640,34 @@ namespace BlueBerry24.API.Controllers
                     ShippingCountry = request.ShippingCountry ?? "US",
                 };
 
-                var order = await _orderService.CreateOrderFromCartAsync(cartId, createOrderDto);
-                if (order == null)
+                var checkoutResult = await _checkoutOrchestrationService.ProcessCheckoutAsync(
+                    cartId, 
+                    createOrderDto, 
+                    GetCurrentUserId());
+
+                if (!checkoutResult.IsSuccess)
                 {
                     return StatusCode(500, new ResponseDto<object>
                     {
                         IsSuccess = false,
                         StatusCode = 500,
-                        StatusMessage = "Failed to create order"
+                        StatusMessage = checkoutResult.ErrorMessage ?? "Failed to process checkout",
+                        Errors = checkoutResult.Warnings
                     });
                 }
 
-                await _cartService.CompleteCartAsync(cartId, GetCurrentUserId());
-
-                return CreatedAtAction("GetOrderById", "Orders", new { id = order.Id }, new ResponseDto<object>
+                return CreatedAtAction("GetOrderById", "Orders", new { id = checkoutResult.Order.Id }, new ResponseDto<object>
                 {
                     IsSuccess = true,
                     StatusCode = 201,
                     StatusMessage = "Order created successfully",
                     Data = new
                     {
-                        id = order.Id,
-                        orderNumber = order.ReferenceNumber,
-                        total = order.TotalAmount,
-                        status = order.Status.ToString()
+                        id = checkoutResult.Order.Id,
+                        orderNumber = checkoutResult.Order.ReferenceNumber,
+                        total = checkoutResult.Order.Total,
+                        status = checkoutResult.Order.Status.ToString(),
+                        warnings = checkoutResult.Warnings
                     }
                 });
             }
