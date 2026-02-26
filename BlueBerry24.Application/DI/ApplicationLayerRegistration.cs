@@ -1,9 +1,10 @@
-﻿using BlueBerry24.Application.Dtos.AuthDtos.AuthValidations;
+using BlueBerry24.Application.Dtos.AuthDtos.AuthValidations;
 using BlueBerry24.Application.Services.Concretes.AuthServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.CouponServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.EmailServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.OrderServiceConcretes;
+using BlueBerry24.Application.Services.Concretes.OrchestrationServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.PaymentConcretes;
 using BlueBerry24.Application.Services.Concretes.ProductServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcretes;
@@ -14,6 +15,7 @@ using BlueBerry24.Application.Services.Interfaces.CouponServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.EmailServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.InventoryServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces;
+using BlueBerry24.Application.Services.Interfaces.OrchestrationServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.PaymentServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ProductServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
@@ -65,6 +67,10 @@ namespace BlueBerry24.Application.DI
             serviceDescriptors.AddScoped<IPaymentService, PaymentService>();
 
             serviceDescriptors.AddScoped<IMailService, GmailService>();
+
+            serviceDescriptors.AddScoped<ICheckoutOrchestrationService, CheckoutOrchestrationService>();
+            serviceDescriptors.AddScoped<IOrderCancellationService, OrderCancellationService>();
+            serviceDescriptors.AddScoped<IRefundOrchestrationService, RefundOrchestrationService>();
 
 
             hostBuilder.UseSerilog((context, loggerConfig) =>
