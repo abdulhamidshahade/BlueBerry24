@@ -1,4 +1,4 @@
-﻿
+
 using BlueBerry24.Domain.Entities.AuthEntities;
 using BlueBerry24.Domain.Entities.Base;
 using System;
@@ -18,6 +18,8 @@ namespace BlueBerry24.Domain.Entities.CouponEntities
         public int CouponId { get; set; }
         public Coupon Coupon { get; set; }
         public bool IsUsed { get; set; }
+        public DateTime? UsedAt { get; set; }
+        public int? OrderId { get; set; }
 
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
