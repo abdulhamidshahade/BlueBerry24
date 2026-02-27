@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Domain.Constants;
+using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Entities.OrderEntities;
 
 namespace BlueBerry24.Domain.Repositories.OrderInterfaces
@@ -14,5 +14,8 @@ namespace BlueBerry24.Domain.Repositories.OrderInterfaces
         Task<Order?> GetOrderByReferenceNumberAsync(string referenceNumber);
         Task<List<Order>> GetOrdersByStatusAsync(OrderStatus status, int page = 1, int pageSize = 10);
         Task<bool> UpdateOrderPaymentStatusAsync(int orderId, PaymentStatus paymentStatus);
+        Task<Order?> GetOrderByCartIdAsync(int cartId);
+        Task<bool> UpdateOrderAsync(Order order);
+        Task<bool> DeleteOrderItemsAsync(int orderId);
     }
 }
