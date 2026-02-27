@@ -24,5 +24,6 @@ namespace BlueBerry24.Domain.Repositories.ShoppingCartInterfaces
         Task<bool> DeleteCartById(int Id);
         Task<CartItem> IsItemExistingByRealCart(int cartId, int productId, int userId);
         Task<bool> RemoveItemAsync(int cartId, int userId, int productId);
+        Task<bool> IsConverted(int cartId);
     }
 }
