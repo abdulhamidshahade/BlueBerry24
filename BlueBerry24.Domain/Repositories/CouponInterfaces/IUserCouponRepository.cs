@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Domain.Entities.AuthEntities;
+using BlueBerry24.Domain.Entities.AuthEntities;
 using BlueBerry24.Domain.Entities.CouponEntities;
 namespace BlueBerry24.Domain.Repositories.CouponInterfaces
 {
@@ -9,5 +9,8 @@ namespace BlueBerry24.Domain.Repositories.CouponInterfaces
         Task<IReadOnlyList<Coupon>> GetCouponsByUserIdAsync(int userId);
         Task<IReadOnlyList<ApplicationUser>> GetUsersByCouponIdAsync(int couponId);
         Task<bool> IsCouponUsedByUserAsync(int userId, string couponCode);
+        Task<bool> MarkCouponAsUsedAsync(int userId, int couponId, int orderId);
+        Task<bool> RevertCouponUsageAsync(int userId, int couponId, int orderId);
+        Task<List<int>> GetCouponIdsUsedInOrderAsync(int orderId);
     }
 }
