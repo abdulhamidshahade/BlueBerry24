@@ -1,5 +1,6 @@
-﻿using BlueBerry24.Domain.Entities.AuthEntities;
+using BlueBerry24.Domain.Entities.AuthEntities;
 using BlueBerry24.Domain.Entities.Base;
+using BlueBerry24.Domain.Entities.CheckoutEntities;
 using BlueBerry24.Domain.Entities.CouponEntities;
 using BlueBerry24.Domain.Entities.InventoryEntities;
 using BlueBerry24.Domain.Entities.OrderEntities;
@@ -33,6 +34,7 @@ namespace BlueBerry24.Infrastructure.Data
 
         public DbSet<Payment> Payments { get; set; }
         public DbSet<InventoryLog> InventoryLogs { get; set; }
+        public DbSet<UserCheckoutInfo> UserCheckoutInfos { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
 
