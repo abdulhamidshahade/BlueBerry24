@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Application.Dtos.ShoppingCartDtos;
+using BlueBerry24.Application.Dtos.ShoppingCartDtos;
 using BlueBerry24.Domain.Constants;
 
 namespace BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces
@@ -16,6 +16,8 @@ namespace BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfa
         Task<bool> ClearCartAsync(int cartId, int? userId, string? sessionId);
         Task<bool> CompleteCartAsync(int cartId, int? userId);
         Task<bool> ConvertCartAsync(int cartId);
+        Task<bool> UpdateCartStatusAsync(int cartId, CartStatus status);
+        Task<bool> ReactivateCartAsync(int cartId, int orderId);
         Task<bool> HandleAbandonedCartAsync(int cartId);
         Task<int> CleanupExpiredCartsAsync();
         Task<CartDto> RefreshCartAsync(int cartId);
