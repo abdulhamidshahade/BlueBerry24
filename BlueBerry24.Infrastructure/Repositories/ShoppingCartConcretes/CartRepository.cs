@@ -1,9 +1,10 @@
-﻿using BlueBerry24.Domain.Constants;
+using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Entities.ShoppingCartEntities;
 using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.ShoppingCartInterfaces;
 using BlueBerry24.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Trace;
 
 namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
 {
@@ -131,7 +132,7 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
             if (userId.HasValue)
             {
                 shoppingCart = await _context.ShoppingCarts
-                    .Where(c => c.UserId == userId && c.Status == CartStatus.Active)
+                    .Where(c => c.UserId == userId && (c.Status == CartStatus.Active || c.Status == CartStatus.PendingPayment))
                     .Include(c => c.CartItems)
                     .ThenInclude(p => p.Product)
                     .Include(c => c.CartCoupons)
@@ -141,7 +142,7 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
             else if (!string.IsNullOrEmpty(sessionId))
             {
                 shoppingCart = await _context.ShoppingCarts
-                    .Where(c => c.SessionId == sessionId && c.Status == CartStatus.Active)
+                    .Where(c => c.SessionId == sessionId && (c.Status == CartStatus.Active || c.Status == CartStatus.PendingPayment))
                     .Include(c => c.CartItems)
                     .ThenInclude(p => p.Product)
                     .Include(c => c.CartCoupons)
@@ -231,14 +232,14 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
             if (userId.HasValue)
             {
                 cart = await _context.ShoppingCarts
-                    .Where(c => c.UserId == userId && c.Status == CartStatus.Active)
+                    .Where(c => c.UserId == userId && (c.Status == CartStatus.Active || c.Status == CartStatus.PendingPayment))
                     .Include(c => c.CartItems)
                     .FirstOrDefaultAsync();
             }
             else if (!string.IsNullOrEmpty(sessionId))
             {
                 cart = await _context.ShoppingCarts
-                    .Where(c => c.SessionId == sessionId && c.Status == CartStatus.Active)
+                    .Where(c => c.SessionId == sessionId && (c.Status == CartStatus.Active || c.Status == CartStatus.PendingPayment))
                     .Include(c => c.CartItems)
                     .FirstOrDefaultAsync();
             }
@@ -308,6 +309,14 @@ namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
             }
             _context.CartItems.Remove(itemToRemove);
             return Task.FromResult(_unitOfWork.SaveDbChangesAsync().Result);
+        }
+
+        public async Task<bool> IsConverted(int cartId)
+        {
+            var shoppingCart = await _context.ShoppingCarts
+                .Where(i => i.Id == cartId).FirstOrDefaultAsync();
+
+            return shoppingCart != null;
         }
     }
 }
