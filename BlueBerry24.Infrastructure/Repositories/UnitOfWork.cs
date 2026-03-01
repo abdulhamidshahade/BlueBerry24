@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Infrastructure.Data;
+using BlueBerry24.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace BlueBerry24.Domain.Repositories
@@ -16,6 +16,10 @@ namespace BlueBerry24.Domain.Repositories
 
         public async Task BeginTransactionAsync()
         {
+            if (_currentTransaction != null)
+            {
+                return;
+            }
             _currentTransaction = await _context.Database.BeginTransactionAsync();
         }
 
@@ -23,18 +27,41 @@ namespace BlueBerry24.Domain.Repositories
 
         public async Task<bool> CommitTransactionAsync()
         {
-            await _currentTransaction.CommitAsync();
-            await _currentTransaction.DisposeAsync();
+            if (_currentTransaction == null)
+            {
+                return false;
+            }
 
-            return true;
+            try
+            {
+                await _currentTransaction.CommitAsync();
+                return true;
+            }
+            finally
+            {
+                await _currentTransaction.DisposeAsync();
+                _currentTransaction = null;
+            }
         }
 
         
 
         public async Task RollbackTransactionAsync()
         {
-            await _currentTransaction.RollbackAsync();
-            await _currentTransaction.DisposeAsync();
+            if (_currentTransaction == null)
+            {
+                return;
+            }
+
+            try
+            {
+                await _currentTransaction.RollbackAsync();
+            }
+            finally
+            {
+                await _currentTransaction.DisposeAsync();
+                _currentTransaction = null;
+            }
         }
 
         public async Task<bool> SaveDbChangesAsync()
