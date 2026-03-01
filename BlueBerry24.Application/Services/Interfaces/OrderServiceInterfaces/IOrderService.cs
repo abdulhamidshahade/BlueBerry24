@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Application.Dtos.OrderDtos;
+using BlueBerry24.Application.Dtos.OrderDtos;
 using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Entities.OrderEntities;
 namespace BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces
@@ -19,5 +19,7 @@ namespace BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces
         Task<string> GenerateUniqueReferenceNumberAsync();
         Task<List<Order>> GetOrdersByStatusAsync(OrderStatus status, int page = 1, int pageSize = 10);
         Task<Order?> GetOrderByReferenceNumberAsync(string referenceNumber);
+        Task<Order?> GetOrderByCartIdAsync(int cartId);
+        Task<bool> SyncOrderWithCartAsync(int orderId, int cartId);
     }
 }
