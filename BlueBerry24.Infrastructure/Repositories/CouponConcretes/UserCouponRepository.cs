@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Domain.Entities.AuthEntities;
+using BlueBerry24.Domain.Entities.AuthEntities;
 using BlueBerry24.Domain.Entities.CouponEntities;
 using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.CouponInterfaces;
@@ -90,6 +90,48 @@ namespace BlueBerry24.Infrastructure.Repositories.CouponConcretes
             }
 
             return coupon.IsUsed;
+        }
+
+        public async Task<bool> MarkCouponAsUsedAsync(int userId, int couponId, int orderId)
+        {
+            var userCoupon = await _context.UserCoupons
+                .FirstOrDefaultAsync(uc => uc.UserId == userId && uc.CouponId == couponId);
+
+            if (userCoupon == null)
+            {
+                return false;
+            }
+
+            userCoupon.IsUsed = true;
+            userCoupon.UsedAt = DateTime.UtcNow;
+            userCoupon.OrderId = orderId;
+
+            return await _unifOfWork.SaveDbChangesAsync();
+        }
+
+        public async Task<bool> RevertCouponUsageAsync(int userId, int couponId, int orderId)
+        {
+            var userCoupon = await _context.UserCoupons
+                .FirstOrDefaultAsync(uc => uc.UserId == userId && uc.CouponId == couponId && uc.OrderId == orderId);
+
+            if (userCoupon == null)
+            {
+                return false;
+            }
+
+            userCoupon.IsUsed = false;
+            userCoupon.UsedAt = null;
+            userCoupon.OrderId = null;
+
+            return await _unifOfWork.SaveDbChangesAsync();
+        }
+
+        public async Task<List<int>> GetCouponIdsUsedInOrderAsync(int orderId)
+        {
+            return await _context.UserCoupons
+                .Where(uc => uc.OrderId == orderId && uc.IsUsed)
+                .Select(uc => uc.CouponId)
+                .ToListAsync();
         }
     }
 }
