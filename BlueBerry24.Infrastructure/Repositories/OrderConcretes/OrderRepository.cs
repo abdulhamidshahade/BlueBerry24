@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Domain.Constants;
+using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Entities.OrderEntities;
 using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.OrderInterfaces;
@@ -148,6 +148,37 @@ namespace BlueBerry24.Infrastructure.Repositories.OrderConcretes
 
             _context.Orders.Update(order);
             return await _unitOfWork.SaveDbChangesAsync();
+        }
+
+        public async Task<Order?> GetOrderByCartIdAsync(int cartId)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .Where(o => o.CartId == cartId && o.Status == OrderStatus.Pending)
+                .OrderByDescending(o => o.CreatedAt)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> UpdateOrderAsync(Order order)
+        {
+            _context.Orders.Update(order);
+            return await _unitOfWork.SaveDbChangesAsync();
+        }
+
+        public async Task<bool> DeleteOrderItemsAsync(int orderId)
+        {
+            var orderItems = await _context.OrderItems
+                .Where(oi => oi.OrderId == orderId)
+                .ToListAsync();
+            
+            if (orderItems.Any())
+            {
+                _context.OrderItems.RemoveRange(orderItems);
+                return await _unitOfWork.SaveDbChangesAsync();
+            }
+            
+            return true;
         }
     }
 }
