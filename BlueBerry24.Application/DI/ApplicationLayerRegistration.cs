@@ -1,5 +1,6 @@
 using BlueBerry24.Application.Dtos.AuthDtos.AuthValidations;
 using BlueBerry24.Application.Services.Concretes.AuthServiceConcretes;
+using BlueBerry24.Application.Services.Concretes.CheckoutServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.CouponServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.EmailServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes;
@@ -11,6 +12,7 @@ using BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.ShopServiceConcretes;
 using BlueBerry24.Application.Services.Concretes.WishlistServiceConcretes;
 using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
+using BlueBerry24.Application.Services.Interfaces.CheckoutServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.CouponServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.EmailServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.InventoryServiceInterfaces;
@@ -54,6 +56,7 @@ namespace BlueBerry24.Application.DI
             serviceDescriptors.AddScoped<IProductService, ProductService>();
 
             serviceDescriptors.AddScoped<ICartService, CartService>();
+            serviceDescriptors.AddScoped<IUserCheckoutInfoService, UserCheckoutInfoService>();
             serviceDescriptors.AddScoped<IShopService, ShopService>();
 
             serviceDescriptors.AddScoped<IInventoryService, InventoryService>();
