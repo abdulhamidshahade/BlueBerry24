@@ -1,7 +1,8 @@
-﻿using AutoMapper;
+using AutoMapper;
 using BlueBerry24.Application.Dtos.OrderDtos;
 using BlueBerry24.Application.Services.Interfaces.InventoryServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces;
+using BlueBerry24.Application.Services.Interfaces.OrchestrationServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
 using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Entities.OrderEntities;
@@ -15,16 +16,22 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
         private readonly IMapper _mapper;
         private readonly IOrderRepository _orderRepository;
         private readonly IInventoryService _inventoryService;
+        private readonly IOrderCancellationService _orderCancellationService;
+        private readonly IRefundOrchestrationService _refundOrchestrationService;
 
         public OrderService(ICartService cartService,
                             IMapper mapper,
                             IOrderRepository orderRepository,
-                            IInventoryService inventoryService)
+                            IInventoryService inventoryService,
+                            IOrderCancellationService orderCancellationService,
+                            IRefundOrchestrationService refundOrchestrationService)
         {
             _cartService = cartService;
             _mapper = mapper;
             _orderRepository = orderRepository;
             _inventoryService = inventoryService;
+            _orderCancellationService = orderCancellationService;
+            _refundOrchestrationService = refundOrchestrationService;
         }
 
 
@@ -54,33 +61,8 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
 
         public async Task<bool> CancelOrderAsync(int orderId, string reason)
         {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
-
-            if (order == null)
-            {
-                return false;
-            }
-
-            if (order.Status != OrderStatus.Pending && order.Status != OrderStatus.Processing)
-            {
-                return false;
-            }
-
-            foreach (var item in order.OrderItems)
-            {
-                await _inventoryService.AddStockAsync(
-                    item.ProductId,
-                    item.Quantity,
-                    $"Stock returned from cancelled order {order.ReferenceNumber}: {reason}",
-                    null);
-            }
-
-            order.Status = OrderStatus.Cancelled;
-
-
-            var orderStatusUpdated = await UpdateOrderStatusAsync(order, order.Status);
-
-            return orderStatusUpdated;
+            var result = await _orderCancellationService.CancelOrderAsync(orderId, reason);
+            return result.IsSuccess;
         }
 
         public async Task<Order?> CreateOrderFromCartAsync(int cartId, CreateOrderDto orderDto)
@@ -152,10 +134,10 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
                 await _orderRepository.CreateOrderItemAsync(orderItem);
             }
 
-            var cartConverted = await _cartService.ConvertCartAsync(cartId);
-            if (!cartConverted)
+            var cartStatusUpdated = await _cartService.UpdateCartStatusAsync(cartId, CartStatus.PendingPayment);
+            if (!cartStatusUpdated)
             {
-                throw new InvalidOperationException($"Failed to convert cart {cartId} to order. Order creation aborted.");
+                throw new InvalidOperationException($"Failed to update cart {cartId} status to PendingPayment. Order creation aborted.");
             }
 
             return order;
@@ -163,33 +145,8 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
 
         public async Task<bool> RefundOrderAsync(int orderId, string reason)
         {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
-
-            if (order == null)
-            {
-                return false;
-            }
-
-            if (order.Status != OrderStatus.Completed && order.Status != OrderStatus.Delivered)
-            {
-                return false;
-            }
-
-            foreach (var item in order.OrderItems)
-            {
-                await _inventoryService.AddStockAsync(
-                    item.ProductId,
-                    item.Quantity,
-                    $"Stock returned from refunded order {order.ReferenceNumber}: {reason}",
-                    null);
-            }
-
-            order.Status = OrderStatus.Refunded;
-            order.UpdatedAt = DateTime.UtcNow;
-
-            var orderStatusUpdated = await UpdateOrderStatusAsync(order, order.Status);
-
-            return orderStatusUpdated;
+            var result = await _refundOrchestrationService.ProcessRefundAsync(orderId, reason);
+            return result.IsSuccess;
         }
 
         public async Task<bool> UpdateOrderStatusAsync(Order order, OrderStatus newStatus)
@@ -317,6 +274,65 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
         public Task<bool> UpdateOrderPaymentStatusAsync(Order order, PaymentStatus paymentStatus)
         {
             return _orderRepository.UpdateOrderPaymentStatusAsync(order.Id, paymentStatus);
+        }
+
+        public async Task<Order?> GetOrderByCartIdAsync(int cartId)
+        {
+            var order = await _orderRepository.GetOrderByCartIdAsync(cartId);
+            return order;
+        }
+
+        public async Task<bool> SyncOrderWithCartAsync(int orderId, int cartId)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order == null || order.Status != OrderStatus.Pending)
+            {
+                return false;
+            }
+
+            var cart = await _cartService.GetCartByIdAsync(cartId, CartStatus.Active);
+            if (cart == null)
+            {
+                cart = await _cartService.GetCartByIdAsync(cartId, CartStatus.PendingPayment);
+            }
+
+            if (cart == null || cart.CartItems == null || !cart.CartItems.Any())
+            {
+                return false;
+            }
+
+            decimal subTotal = cart.CartItems.Sum(item => item.UnitPrice * item.Quantity);
+            decimal discountTotal = cart.CartCoupons?.Sum(coupon => coupon.DiscountAmount) ?? 0;
+            decimal taxAmount = (subTotal - discountTotal) * 0.1m;
+            decimal shippingAmount = subTotal > 100 ? 0 : 10;
+            decimal total = subTotal - discountTotal + taxAmount + shippingAmount;
+
+            order.SubTotal = subTotal;
+            order.DiscountTotal = discountTotal;
+            order.TaxAmount = taxAmount;
+            order.ShippingAmount = shippingAmount;
+            order.Total = total;
+            order.UpdatedAt = DateTime.UtcNow;
+
+            await _orderRepository.DeleteOrderItemsAsync(orderId);
+
+            foreach (var cartItem in cart.CartItems)
+            {
+                var orderItem = new OrderItem
+                {
+                    OrderId = order.Id,
+                    ProductId = cartItem.ProductId,
+                    ProductName = cartItem.Product?.Name ?? "Unknown Product",
+                    Quantity = cartItem.Quantity,
+                    UnitPrice = cartItem.UnitPrice,
+                    TotalPrice = cartItem.UnitPrice * cartItem.Quantity,
+                    DiscountAmount = 0
+                };
+
+                await _orderRepository.CreateOrderItemAsync(orderItem);
+            }
+
+            return await _orderRepository.UpdateOrderAsync(order);
         }
     }
 }
