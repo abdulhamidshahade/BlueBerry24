@@ -2,6 +2,9 @@ import { getCart } from '../../lib/actions/cart-actions';
 import CheckoutForm from '../../components/checkout/CheckoutForm';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { getCheckoutData } from '../../lib/utils/checkout-storage';
+import { CartStatus } from '../../types/cart';
+import { OrderService } from '../../lib/services/order/service';
 
 interface CheckoutPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -17,6 +20,67 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
   }
 
   var resolvedSearchParams = await searchParams;
+
+  // Try to get saved checkout data from cookies
+  const savedData = await getCheckoutData();
+  
+  // If cart is in PendingPayment status, try to get data from existing order
+  let orderData: any = null;
+  if (cart.status === CartStatus.PendingPayment) {
+    try {
+      const orderService = new OrderService();
+      const orders = await orderService.getUserOrders(cart.userId || 0, 1, 5);
+      if (orders && orders.length > 0) {
+        const recentOrder = orders.find(o => o.cartId === cart.id);
+        if (recentOrder) {
+          orderData = recentOrder;
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching order data:', error);
+    }
+  }
+
+  // Merge data: URL params > Order data > Saved cookie data
+  const mergedParams: Record<string, string> = {};
+  
+  // Start with saved cookie data
+  if (savedData) {
+    mergedParams.firstName = savedData.firstName;
+    mergedParams.lastName = savedData.lastName;
+    mergedParams.email = savedData.email;
+    mergedParams.phone = savedData.phone || '';
+    mergedParams.address = savedData.address;
+    mergedParams.address2 = savedData.address2 || '';
+    mergedParams.city = savedData.city;
+    mergedParams.state = savedData.state;
+    mergedParams.zipCode = savedData.zipCode;
+    mergedParams.country = savedData.country || 'US';
+  }
+
+  // Override with order data if available
+  if (orderData) {
+    const nameParts = orderData.shippingName?.split(' ') || [];
+    if (nameParts.length >= 2) {
+      mergedParams.firstName = nameParts[0];
+      mergedParams.lastName = nameParts.slice(1).join(' ');
+    }
+    if (orderData.customerEmail) mergedParams.email = orderData.customerEmail;
+    if (orderData.customerPhone) mergedParams.phone = orderData.customerPhone;
+    if (orderData.shippingAddress1) mergedParams.address = orderData.shippingAddress1;
+    if (orderData.shippingAddress2) mergedParams.address2 = orderData.shippingAddress2;
+    if (orderData.shippingCity) mergedParams.city = orderData.shippingCity;
+    if (orderData.shippingState) mergedParams.state = orderData.shippingState;
+    if (orderData.shippingPostalCode) mergedParams.zipCode = orderData.shippingPostalCode;
+    if (orderData.shippingCountry) mergedParams.country = orderData.shippingCountry;
+  }
+
+  // Finally, URL search params take highest priority (including validation errors)
+  Object.keys(resolvedSearchParams).forEach(key => {
+    if (resolvedSearchParams[key]) {
+      mergedParams[key] = resolvedSearchParams[key] as string;
+    }
+  });
 
   const error = resolvedSearchParams?.error as string;
 
@@ -52,6 +116,19 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
         </div>
       </div>
 
+      {(savedData || orderData) && !error && (
+        <div className="row">
+          <div className="col-12">
+            <div className="alert alert-info d-flex align-items-center mb-4" role="alert">
+              <i className="bi bi-info-circle-fill me-2"></i>
+              <div>
+                Your previous checkout information has been restored. You can modify any field before continuing.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {error && (
         <div className="row">
           <div className="col-12">
@@ -70,7 +147,7 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
         </div>
       )}
 
-      <CheckoutForm cart={cart} searchParams={resolvedSearchParams} />
+      <CheckoutForm cart={cart} searchParams={mergedParams} />
     </div>
   );
 } 
