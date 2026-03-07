@@ -47,6 +47,8 @@ export default async function CartPage({
     const showClearConfirm =  search.confirm_clear === 'true';
     const errorMessage = search.error;
     const isActiveCart = cart.status === CartStatus.Active;
+    const isPendingPayment = cart.status === CartStatus.PendingPayment;
+    const isEditable = isActiveCart || isPendingPayment; // Can edit both Active and PendingPayment carts
 
     return (
       <div className="container py-4">
@@ -138,13 +140,13 @@ export default async function CartPage({
                       key={item.id}
                       item={item}
                       product={product}
-                      disabled={!isActiveCart}
+                      disabled={!isEditable}
                     />
                   );
                 })}
               </div>
 
-              {isActiveCart && (
+              {isEditable && (
                 <CouponSection appliedCoupons={cart.cartCoupons || []} code={search.code} />
               )}
             </div>
@@ -152,12 +154,12 @@ export default async function CartPage({
             <div className="col-lg-4">
               <CartSummary cart={cart} />
               
-              {!isActiveCart && (
+              {!isEditable && (
                 <div className="card mt-3">
                   <div className="card-body text-center">
                     <i className="bi bi-info-circle text-muted fs-4 mb-2 d-block"></i>
                     <p className="text-muted mb-0">
-                      This cart is no longer active and cannot be modified.
+                      This cart has been completed and cannot be modified.
                     </p>
                   </div>
                 </div>
