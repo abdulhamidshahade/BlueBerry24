@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { processPayment } from '../../lib/actions/payment-actions';
 import { OrderService } from '../../lib/services/order/service';
+import { getPaymentBillingData } from '../../lib/utils/payment-storage';
+import { getCheckoutData } from '../../lib/utils/checkout-storage';
 
 interface PaymentPageProps {
   searchParams: Promise<{
@@ -17,6 +19,7 @@ interface PaymentPageProps {
     error_billingCity?: string;
     error_billingState?: string;
     error_billingPostalCode?: string;
+    [key: string]: string | undefined;
   }>;
 }
 
@@ -37,9 +40,57 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
     }
   }
 
-  // if (!amount) {
-  //   redirect('/cart?error=' + encodeURIComponent('Payment amount is required.'));
-  // }
+  // Get saved payment billing data
+  const savedPaymentData = await getPaymentBillingData();
+  
+  // Get saved checkout data (for billing info fallback)
+  const savedCheckoutData = await getCheckoutData();
+
+  // Merge billing data: URL params > Saved payment data > Order data > Checkout data
+  const billingData: Record<string, string> = {};
+  
+  // Start with checkout data as fallback
+  if (savedCheckoutData) {
+    billingData.payerName = `${savedCheckoutData.firstName} ${savedCheckoutData.lastName}`;
+    billingData.payerEmail = savedCheckoutData.email;
+    billingData.billingAddress1 = savedCheckoutData.address;
+    billingData.billingAddress2 = savedCheckoutData.address2 || '';
+    billingData.billingCity = savedCheckoutData.city;
+    billingData.billingState = savedCheckoutData.state;
+    billingData.billingPostalCode = savedCheckoutData.zipCode;
+    billingData.billingCountry = savedCheckoutData.country || 'US';
+  }
+
+  // Override with order data if available
+  if (order) {
+    billingData.payerName = order.shippingName || billingData.payerName;
+    billingData.payerEmail = order.customerEmail || billingData.payerEmail;
+    billingData.billingAddress1 = order.shippingAddress1 || billingData.billingAddress1;
+    billingData.billingAddress2 = order.shippingAddress2 || billingData.billingAddress2 || '';
+    billingData.billingCity = order.shippingCity || billingData.billingCity;
+    billingData.billingState = order.shippingState || billingData.billingState;
+    billingData.billingPostalCode = order.shippingPostalCode || billingData.billingPostalCode;
+    billingData.billingCountry = order.shippingCountry || billingData.billingCountry || 'US';
+  }
+
+  // Override with saved payment data if available
+  if (savedPaymentData) {
+    billingData.payerName = savedPaymentData.payerName;
+    billingData.payerEmail = savedPaymentData.payerEmail;
+    billingData.billingAddress1 = savedPaymentData.billingAddress1;
+    billingData.billingAddress2 = savedPaymentData.billingAddress2 || '';
+    billingData.billingCity = savedPaymentData.billingCity;
+    billingData.billingState = savedPaymentData.billingState;
+    billingData.billingPostalCode = savedPaymentData.billingPostalCode;
+    billingData.billingCountry = savedPaymentData.billingCountry || 'US';
+  }
+
+  // Finally, URL search params take highest priority
+  Object.keys(params).forEach(key => {
+    if (params[key] && !key.startsWith('error_')) {
+      billingData[key] = params[key] as string;
+    }
+  });
 
   const validation = {
     paymentMethod: params.error_paymentMethod || '',
@@ -54,9 +105,11 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
     billingPostalCode: params.error_billingPostalCode || '',
   };
 
-  const orderAmount = parseFloat(amount || '0');
+  const orderAmount = order?.total || parseFloat(amount || '0');
   const processingFee = orderAmount * 0.029 + 0.30;
   const total = orderAmount + processingFee;
+
+  const hasSavedData = !!(savedPaymentData || savedCheckoutData || order);
 
   return (
     <div className="min-vh-100 bg-light">
@@ -84,6 +137,18 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
             <li className="breadcrumb-item active" aria-current="page">Payment</li>
           </ol>
         </nav>
+
+        <div className="alert alert-info mb-4">
+          <div className="d-flex align-items-center">
+            <i className="bi bi-info-circle-fill me-2"></i>
+            <div className="flex-grow-1">
+              <strong>Need to make changes?</strong> You can still modify your cart items before completing payment.
+            </div>
+            <Link href="/cart" className="btn btn-sm btn-outline-primary ms-2">
+              <i className="bi bi-cart me-1"></i> Edit Cart
+            </Link>
+          </div>
+        </div>
 
         <div className="mb-4">
           <div className="d-flex justify-content-center">
@@ -114,6 +179,17 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
           <h1 className="display-5 fw-bold text-dark">Secure Payment</h1>
           <p className="text-muted">Complete your purchase securely</p>
         </div>
+
+        {hasSavedData && !error && (
+          <div className="mb-4">
+            <div className="alert alert-info d-flex align-items-center" role="alert">
+              <i className="bi bi-info-circle-fill me-3"></i>
+              <div>
+                Your billing information has been pre-filled from your checkout details. You can modify any field before proceeding.
+              </div>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="mb-4">
@@ -260,6 +336,7 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
                           id="payerName"
                           name="payerName"
                           placeholder="John Doe"
+                          defaultValue={billingData.payerName || ''}
                           required
                         />
                         {validation.payerName && (
@@ -276,6 +353,7 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
                           id="payerEmail"
                           name="payerEmail"
                           placeholder="john@example.com"
+                          defaultValue={billingData.payerEmail || ''}
                           required
                         />
                         {validation.payerEmail && (
@@ -294,6 +372,7 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
                         id="billingAddress1"
                         name="billingAddress1"
                         placeholder="123 Main Street"
+                        defaultValue={billingData.billingAddress1 || ''}
                         required
                       />
                       {validation.billingAddress1 && (
@@ -311,6 +390,7 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
                         id="billingAddress2"
                         name="billingAddress2"
                         placeholder="Apartment, suite, etc."
+                        defaultValue={billingData.billingAddress2 || ''}
                       />
                     </div>
 
@@ -325,6 +405,7 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
                           id="billingCity"
                           name="billingCity"
                           placeholder="New York"
+                          defaultValue={billingData.billingCity || ''}
                           required
                         />
                         {validation.billingCity && (
@@ -341,6 +422,7 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
                           id="billingState"
                           name="billingState"
                           placeholder="NY"
+                          defaultValue={billingData.billingState || ''}
                           required
                         />
                         {validation.billingState && (
@@ -357,6 +439,7 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
                           id="billingPostalCode"
                           name="billingPostalCode"
                           placeholder="10001"
+                          defaultValue={billingData.billingPostalCode || ''}
                           required
                         />
                         {validation.billingPostalCode && (
