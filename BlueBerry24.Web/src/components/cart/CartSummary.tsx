@@ -1,6 +1,7 @@
 import { CartDto, CartStatus } from "../../types/cart";
 import { proceedToCheckout } from "../../lib/actions/cart-actions";
 import ClearCartButton from "./ClearCartButton";
+import Link from "next/link";
 
 interface CartSummaryProps {
   cart: CartDto;
@@ -10,6 +11,7 @@ export default function CartSummary({ cart }: CartSummaryProps) {
   const hasItems = cart.cartItems && cart.cartItems.length > 0;
   const itemCount = cart.cartItems?.reduce((sum, item) => sum + item.quantity, 0) || 0;
   const isActiveCart = cart.status === CartStatus.Active;
+  const isPendingPayment = cart.status === CartStatus.PendingPayment;
 
   return (
     <div className="card sticky-top">
@@ -57,14 +59,28 @@ export default function CartSummary({ cart }: CartSummaryProps) {
                 
                 <ClearCartButton />
               </>
+            ) : isPendingPayment ? (
+              <>
+                <Link 
+                  href="/checkout"
+                  className="btn btn-success btn-lg w-100 text-white text-decoration-none d-flex align-items-center justify-content-center"
+                >
+                  <i className="bi bi-arrow-right-circle me-2"></i>
+                  Continue to Payment
+                </Link>
+                <div className="alert alert-info mb-0 py-2 px-3 small">
+                  <i className="bi bi-info-circle me-1"></i>
+                  Your order is awaiting payment. You can still modify items.
+                </div>
+              </>
             ) : (
               <div className="text-center">
                 <button type="button" className="btn btn-secondary btn-lg w-100" disabled>
                   <i className="bi bi-lock me-2"></i>
-                  Cart Not Active
+                  Cart Completed
                 </button>
                 <small className="text-muted mt-2 d-block">
-                  This cart cannot be modified or checked out
+                  This cart has been completed
                 </small>
               </div>
             )}
