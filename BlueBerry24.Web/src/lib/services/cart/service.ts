@@ -15,6 +15,32 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const API_BASE = process.env.API_BASE_SHOPPING_CART;
 
 export class CartService implements ICartService {
+  async getCurrent(): Promise<CartDto> {
+    console.log("CartService.getCurrent called - fetching current cart");
+
+    const url = `${API_BASE}/current`;
+    console.log("Making API call to:", url);
+
+    try {
+      const json: ResponseDto<CartDto> = await apiRequest(url, {
+        requireAuth: true,
+      });
+
+      console.log("Cart API response:", json);
+
+      if (!json.isSuccess || !json.data) {
+        console.error("Cart API returned unsuccessful response:", json);
+        return json.data;
+      }
+
+      console.log("Retrieved current cart:", json.data);
+      return json.data;
+    } catch (error) {
+      console.error("Failed to fetch current cart:", error);
+      throw new Error("Failed to fetch cart");
+    }
+  }
+
   async getByUserId(): Promise<CartDto> {
     console.log("CartService.getBySessionId called with sessionId:");
 
