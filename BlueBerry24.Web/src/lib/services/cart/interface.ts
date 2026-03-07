@@ -14,6 +14,7 @@ export interface ICartService {
   completeCart(cartId: number): Promise<boolean>;
   applyCoupon(cartId: number, data: ApplyCouponDto): Promise<CartDto>;
   removeCoupon(cartId: number, couponId: number): Promise<CartDto>;
+  getCurrent(): Promise<CartDto>; // NEW: Get current cart (PendingPayment or Active)
   getByUserId(): Promise<CartDto>;
   getBySessionId(sessionId: string): Promise<CartDto | null>;
   getById(id: number): Promise<CartDto>;
