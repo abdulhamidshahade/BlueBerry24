@@ -15,6 +15,13 @@ export default function CartStatusIndicator({ status, className = '' }: CartStat
           icon: 'bi-cart-check',
           description: 'Your cart is ready for checkout'
         };
+      case CartStatus.PendingPayment:
+        return {
+          label: 'Awaiting Payment',
+          color: 'info',
+          icon: 'bi-clock-fill',
+          description: 'Order created, awaiting payment completion'
+        };
       case CartStatus.Abandoned:
         return {
           label: 'Abandoned',
@@ -73,6 +80,13 @@ export function CartStatusMessage({ status, className = '' }: CartStatusMessageP
 
   const getStatusMessage = (status: CartStatus) => {
     switch (status) {
+      case CartStatus.PendingPayment:
+        return {
+          type: 'info',
+          icon: 'bi-info-circle-fill',
+          title: 'Order Created - Awaiting Payment',
+          message: 'Your order has been created and is awaiting payment. You can still modify your cart items before completing payment.'
+        };
       case CartStatus.Abandoned:
         return {
           type: 'warning',
