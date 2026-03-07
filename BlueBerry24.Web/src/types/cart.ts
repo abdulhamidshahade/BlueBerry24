@@ -97,5 +97,6 @@ export enum CartStatus {
   Active = 0,
   Abandoned = 1,
   Converted = 2,
-  Expired = 3
+  Expired = 3,
+  PendingPayment = 4
 }
