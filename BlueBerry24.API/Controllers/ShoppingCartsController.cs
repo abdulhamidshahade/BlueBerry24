@@ -36,7 +36,7 @@ namespace BlueBerry24.API.Controllers
         }
 
         [HttpGet("user-id")]
-        public async Task<ActionResult<ResponseDto<CartDto>>> GetCartByUserId()
+        public async Task<ActionResult<ResponseDto<CartDto>>> GetCartByUserId([FromQuery] CartStatus? status = null)
         {
             try
             {
@@ -51,7 +51,23 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
-                var cart = await _cartService.GetCartByUserIdAsync(userId.Value);
+                CartDto cart = null;
+                
+                if (status.HasValue)
+                {
+                    // If specific status requested, get that cart
+                    cart = await _cartService.GetCartByUserIdAsync(userId.Value, status);
+                }
+                else
+                {
+                    // If no status specified, check for PendingPayment first, then Active
+                    cart = await _cartService.GetCartByUserIdAsync(userId.Value, CartStatus.PendingPayment);
+                    if (cart == null)
+                    {
+                        cart = await _cartService.GetCartByUserIdAsync(userId.Value, CartStatus.Active);
+                    }
+                }
+                
                 if (cart == null)
                 {
                     cart = await _cartService.CreateCartAsync(userId, null);
@@ -81,6 +97,63 @@ namespace BlueBerry24.API.Controllers
                     IsSuccess = false,
                     StatusCode = 500,
                     StatusMessage = "Error retrieving cart",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
+        }
+
+        [HttpGet("current")]
+        public async Task<ActionResult<ResponseDto<CartDto>>> GetCurrentCart()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                if (!userId.HasValue)
+                {
+                    return Unauthorized(new ResponseDto<CartDto>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 401,
+                        StatusMessage = "User not authenticated"
+                    });
+                }
+
+                // Priority: PendingPayment > Active > Create new
+                var cart = await _cartService.GetCartByUserIdAsync(userId.Value, CartStatus.PendingPayment);
+                if (cart == null)
+                {
+                    cart = await _cartService.GetCartByUserIdAsync(userId.Value, CartStatus.Active);
+                }
+                
+                if (cart == null)
+                {
+                    cart = await _cartService.CreateCartAsync(userId, null);
+                    if (cart == null)
+                    {
+                        return StatusCode(500, new ResponseDto<CartDto>
+                        {
+                            IsSuccess = false,
+                            StatusCode = 500,
+                            StatusMessage = "Failed to create cart"
+                        });
+                    }
+                }
+
+                return Ok(new ResponseDto<CartDto>
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    StatusMessage = "Current cart retrieved successfully",
+                    Data = cart
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ResponseDto<CartDto>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "Error retrieving current cart",
                     Errors = new List<string> { ex.Message }
                 });
             }
@@ -139,11 +212,25 @@ namespace BlueBerry24.API.Controllers
 
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<ResponseDto<CartDto>>> GetCartByCartId(int id)
+        public async Task<ActionResult<ResponseDto<CartDto>>> GetCartByCartId(int id, [FromQuery] CartStatus? status = null)
         {
             try
             {
-                var cart = await _cartService.GetCartByIdAsync(id, CartStatus.Active);
+                CartDto cart = null;
+                
+                if (status.HasValue)
+                {
+                    cart = await _cartService.GetCartByIdAsync(id, status.Value);
+                }
+                else
+                {
+                    cart = await _cartService.GetCartByIdAsync(id, CartStatus.Active);
+                    if (cart == null)
+                    {
+                        cart = await _cartService.GetCartByIdAsync(id, CartStatus.PendingPayment);
+                    }
+                }
+                
                 if (cart == null)
                 {
                     return NotFound(new ResponseDto<CartDto>
@@ -604,14 +691,20 @@ namespace BlueBerry24.API.Controllers
                     });
                 }
 
+                // Try Active status first, then PendingPayment
                 var cart = await _cartService.GetCartByIdAsync(cartId, CartStatus.Active);
+                if (cart == null)
+                {
+                    cart = await _cartService.GetCartByIdAsync(cartId, CartStatus.PendingPayment);
+                }
+                
                 if (cart == null)
                 {
                     return NotFound(new ResponseDto<object>
                     {
                         IsSuccess = false,
                         StatusCode = 404,
-                        StatusMessage = "Cart not found"
+                        StatusMessage = "Cart not found or already completed"
                     });
                 }
 
@@ -678,6 +771,82 @@ namespace BlueBerry24.API.Controllers
                     IsSuccess = false,
                     StatusCode = 500,
                     StatusMessage = "Error processing checkout",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
+        }
+
+        [HttpPost("{cartId}/reactivate")]
+        [UserAndAbove]
+        public async Task<ActionResult<ResponseDto<CartDto>>> ReactivateCart(int cartId, [FromQuery] int orderId)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                if (!userId.HasValue)
+                {
+                    return Unauthorized(new ResponseDto<CartDto>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 401,
+                        StatusMessage = "User not authenticated"
+                    });
+                }
+
+                var order = await _orderService.GetOrderByIdAsync(orderId);
+                if (order == null)
+                {
+                    return NotFound(new ResponseDto<CartDto>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 404,
+                        StatusMessage = "Order not found"
+                    });
+                }
+
+                if (order.UserId != userId.Value)
+                {
+                    return Forbid("You can only reactivate your own carts");
+                }
+
+                if (order.CartId != cartId)
+                {
+                    return BadRequest(new ResponseDto<CartDto>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Cart ID does not match order's cart ID"
+                    });
+                }
+
+                var success = await _cartService.ReactivateCartAsync(cartId, orderId);
+                if (!success)
+                {
+                    return StatusCode(500, new ResponseDto<CartDto>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 500,
+                        StatusMessage = "Failed to reactivate cart"
+                    });
+                }
+
+                var cart = await _cartService.GetCartByIdAsync(cartId, CartStatus.Active);
+                
+                return Ok(new ResponseDto<CartDto>
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    StatusMessage = "Cart reactivated successfully. You can now modify your cart.",
+                    Data = cart
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ResponseDto<CartDto>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "Error reactivating cart",
                     Errors = new List<string> { ex.Message }
                 });
             }
