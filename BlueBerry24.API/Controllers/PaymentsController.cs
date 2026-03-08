@@ -60,12 +60,20 @@ namespace BlueBerry24.API.Controllers
                         
                         if (result.Data?.Success == true)
                         {
-                            await _orderService.UpdateOrderStatusAsync(mappedOrder, OrderStatus.Completed);
+                            await _orderService.UpdateOrderStatusAsync(mappedOrder, OrderStatus.Processing);
                             await _orderService.UpdateOrderPaymentStatusAsync(mappedOrder, PaymentStatus.Completed);
 
-                            if (order.CartId > 0 && userId.HasValue)
+                            if (order.CartId > 0)
                             {
-                                await _cartService.ClearCartAsync(order.CartId, userId, null);
+                                var cart = await _cartService.GetCartByIdAsync(order.CartId, CartStatus.PendingPayment);
+                                if (cart != null)
+                                {
+                                    var cartConverted = await _cartService.ConvertCartAsync(order.CartId);
+                                    if (cartConverted)
+                                    {
+                                        await _cartService.ClearCartAsync(order.CartId, userId, null);
+                                    }
+                                }
                             }
                         }
                         else
