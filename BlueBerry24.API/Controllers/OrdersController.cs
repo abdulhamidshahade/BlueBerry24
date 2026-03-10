@@ -467,6 +467,71 @@ namespace BlueBerry24.API.Controllers
                 });
             }
         }
+        [HttpPut("{orderId}/sync-with-cart")]
+        [UserAndAbove]
+        public async Task<ActionResult<ResponseDto<OrderDto>>> SyncOrderWithCart(int orderId)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var order = await _orderService.GetOrderByIdAsync(orderId);
+                
+                if (order == null)
+                {
+                    return NotFound(new ResponseDto<OrderDto>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 404,
+                        StatusMessage = "Order not found"
+                    });
+                }
+
+                if (order.UserId != userId && !User.IsInRole("Admin"))
+                {
+                    return Forbid("You can only sync your own orders");
+                }
+
+                if (order.CartId <= 0)
+                {
+                    return BadRequest(new ResponseDto<OrderDto>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        StatusMessage = "Order does not have an associated cart"
+                    });
+                }
+
+                var result = await _orderService.SyncOrderWithCartAsync(orderId, order.CartId);
+                if (!result)
+                {
+                    return StatusCode(500, new ResponseDto<OrderDto>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 500,
+                        StatusMessage = "Failed to sync order with cart"
+                    });
+                }
+
+                var updatedOrder = await _orderService.GetOrderByIdAsync(orderId);
+                return Ok(new ResponseDto<OrderDto>
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    StatusMessage = "Order synced with cart successfully",
+                    Data = updatedOrder
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ResponseDto<OrderDto>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    StatusMessage = "Error syncing order with cart",
+                    Errors = new List<string> { ex.Message }
+                });
+            }
+        }
     }
 
 }
