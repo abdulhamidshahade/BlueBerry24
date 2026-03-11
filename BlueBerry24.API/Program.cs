@@ -16,6 +16,7 @@ using Scalar.AspNetCore;
 using Serilog;
 using System.Text;
 using System.Text.Json.Serialization;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +42,8 @@ builder.Services.AddOpenApi(options =>
 
 
 
-builder.Services.AddAutoMapper(typeof(BlueBerry24.Application.Mapping.AssemblyMarker));
+builder.Services.AddAutoMapper(cfg => { }, typeof(BlueBerry24.Application.Mapping.AssemblyMarker));
+
 
 builder.Services.AddApplicationServices(builder.Host, builder.Configuration);
 builder.Services.AddInfrastructureServices();
@@ -186,10 +188,10 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("Database connection verified. Starting seeding...");
 
         // Seed initial data
-        var dataSeeder = new BlueBerry24.Infrastructure.Data.DataSeeder(context, userManager, roleManager);
-        await dataSeeder.SeedDataAsync();
+        //var dataSeeder = new BlueBerry24.Infrastructure.Data.DataSeeder(context, userManager, roleManager);
+        //await dataSeeder.SeedDataAsync();
 
-        Console.WriteLine("All seeding operations completed successfully!");
+        //Console.WriteLine("All seeding operations completed successfully!");
     }
     catch (Exception ex)
     {
