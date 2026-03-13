@@ -21,8 +21,10 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
 
   var resolvedSearchParams = await searchParams;
 
-  // Try to get saved checkout data from cookies
+  // Try to get saved checkout data from database
+  console.log('🔍 Checkout page loading - fetching saved data...');
   const savedData = await getCheckoutData();
+  console.log('📊 Saved data retrieved:', savedData ? 'Data found' : 'No data', savedData);
   
   // If cart is in PendingPayment status, try to get data from existing order
   let orderData: any = null;
@@ -41,11 +43,14 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
     }
   }
 
-  // Merge data: URL params > Order data > Saved cookie data
+  // Merge data: URL params > Order data > Saved database data
   const mergedParams: Record<string, string> = {};
   
-  // Start with saved cookie data
+  console.log('🔄 Merging data - savedData exists:', !!savedData);
+  
+  // Start with saved database data
   if (savedData) {
+    console.log('✅ Using saved data from database');
     mergedParams.firstName = savedData.firstName;
     mergedParams.lastName = savedData.lastName;
     mergedParams.email = savedData.email;
@@ -56,7 +61,11 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
     mergedParams.state = savedData.state;
     mergedParams.zipCode = savedData.zipCode;
     mergedParams.country = savedData.country || 'US';
+  } else {
+    console.log('ℹ️ No saved data available');
   }
+  
+  console.log('📋 Merged params:', mergedParams);
 
   // Override with order data if available
   if (orderData) {
