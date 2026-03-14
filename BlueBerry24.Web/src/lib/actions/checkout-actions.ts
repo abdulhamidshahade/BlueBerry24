@@ -1,7 +1,6 @@
 'use server'
 
 import { redirect } from 'next/navigation';
-import { OrderService } from '../services/order/service';
 import { CheckoutRequest } from '../../types/cart';
 import { getOrCreateCart } from './cart-actions';
 import { CartService } from '../services/cart/service';
@@ -149,7 +148,7 @@ export async function createOrderForPayment(formData: FormData) {
     
     console.log('Getting cart...');
     const cart = await getOrCreateCart();
-    console.log('Cart retrieved:', { id: cart?.id, itemCount: cart?.cartItems?.length });
+    console.log('Cart retrieved:', { id: cart?.id, itemCount: cart?.cartItems?.length, status: cart?.status });
     
     if (!cart || !cart.cartItems || cart.cartItems.length === 0) {
       console.error('Cart validation failed:', { cart: cart ? 'exists' : 'null', items: cart?.cartItems?.length });
@@ -157,17 +156,28 @@ export async function createOrderForPayment(formData: FormData) {
     }
 
     console.log('Extracting form data...');
+    const firstName = formData.get('firstName') as string;
+    const lastName = formData.get('lastName') as string;
+    const email = formData.get('email') as string;
+    const phone = formData.get('phone') as string;
+    const address = formData.get('address') as string;
+    const address2 = formData.get('address2') as string;
+    const city = formData.get('city') as string;
+    const state = formData.get('state') as string;
+    const zipCode = formData.get('zip') as string;
+    const country = formData.get('country') as string || 'US';
+
     const checkoutData: CheckoutRequest = {
       cartId: cart.id,
-      customerEmail: formData.get('email') as string,
-      customerPhone: formData.get('phone') as string || undefined,
-      shippingName: `${formData.get('firstName')} ${formData.get('lastName')}`,
-      shippingAddressLine1: formData.get('address') as string,
-      shippingAddressLine2: formData.get('address2') as string || undefined,
-      shippingCity: formData.get('city') as string,
-      shippingState: formData.get('state') as string,
-      shippingPostalCode: formData.get('zip') as string,
-      shippingCountry: formData.get('country') as string || 'US',
+      customerEmail: email,
+      customerPhone: phone || undefined,
+      shippingName: `${firstName} ${lastName}`,
+      shippingAddressLine1: address,
+      shippingAddressLine2: address2 || undefined,
+      shippingCity: city,
+      shippingState: state,
+      shippingPostalCode: zipCode,
+      shippingCountry: country,
       paymentProvider: 'Pending',
       paymentTransactionId: 0,
       isPaid: false
@@ -180,9 +190,6 @@ export async function createOrderForPayment(formData: FormData) {
     });
 
     const errors: Record<string, string> = {};
-    
-    const firstName = formData.get('firstName') as string;
-    const lastName = formData.get('lastName') as string;
     
     if (!firstName?.trim()) {
       errors.firstName = 'First name is required';
