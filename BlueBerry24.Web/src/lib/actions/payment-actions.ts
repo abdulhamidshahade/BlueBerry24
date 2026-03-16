@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { PaymentService } from '../services/payment/service';
 import { IPaymentService } from '../services/payment/interface';
 import { CreatePayment, PaymentMethod, PaymentStatus } from '../../types/payment';
+import { savePaymentBillingData } from '../utils/payment-storage';
 
 const paymentService: IPaymentService = new PaymentService();
 
@@ -92,6 +93,19 @@ export async function processPayment(formData: FormData) {
       cardLast4: cardLast4 || undefined,
       cardBrand: cardBrand || undefined
     };
+
+    // Save payment billing data to cookies for future use (excluding card details for security)
+    console.log('Saving payment billing data to cookies...');
+    await savePaymentBillingData({
+      payerName,
+      payerEmail,
+      billingAddress1,
+      billingAddress2,
+      billingCity,
+      billingState,
+      billingPostalCode,
+      billingCountry
+    });
 
     const result = await paymentService.processPayment(paymentData);
 
