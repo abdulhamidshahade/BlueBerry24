@@ -33,6 +33,7 @@ export async function apiRequest<T>(
     const response = await fetch(url, {
       ...fetchOptions,
       headers: defaultHeaders,
+      credentials: 'include', // Include cookies in the request
     });
 
     if (!response.ok) {
@@ -46,17 +47,32 @@ export async function apiRequest<T>(
       }
       
       let errorDetails = '';
+      let parsedError: any = null;
       try {
         const errorText = await response.text();
         if (errorText) {
           try {
-            const errorJson = JSON.parse(errorText);
-            errorDetails = errorJson.message || errorJson.statusMessage || errorJson.title || errorText;
+            parsedError = JSON.parse(errorText);
+            errorDetails = parsedError.message || parsedError.statusMessage || parsedError.title || errorText;
           } catch {
             errorDetails = errorText;
           }
         }
       } catch {
+      }
+      
+      // Handle 404 gracefully for GET requests - return the API's error response structure
+      if (response.status === 404 && (!options.method || options.method === 'GET')) {
+        // Return the API's response format (which includes isSuccess: false)
+        if (parsedError) {
+          return parsedError as T;
+        }
+        return {
+          isSuccess: false,
+          statusCode: 404,
+          statusMessage: errorDetails || 'Not found',
+          data: null
+        } as T;
       }
       
       const errorMessage = `HTTP error! status: ${response.status}${errorDetails ? ` - ${errorDetails}` : ''}`;
