@@ -44,10 +44,16 @@ namespace BlueBerry24.Application.Services.Concretes.OrchestrationServiceConcret
             {
                 _logger.LogInformation("Starting checkout process for cart {CartId}", cartId);
 
+                // Try Active status first, then PendingPayment
                 var cart = await _cartService.GetCartByIdAsync(cartId, CartStatus.Active);
                 if (cart == null)
                 {
-                    result.ErrorMessage = "Cart not found or inactive";
+                    cart = await _cartService.GetCartByIdAsync(cartId, CartStatus.PendingPayment);
+                }
+                
+                if (cart == null)
+                {
+                    result.ErrorMessage = "Cart not found or already completed";
                     return result;
                 }
 
@@ -55,6 +61,23 @@ namespace BlueBerry24.Application.Services.Concretes.OrchestrationServiceConcret
                 {
                     result.ErrorMessage = "Cart is empty";
                     return result;
+                }
+
+                // If cart is already PendingPayment, check if order exists
+                if (cart.Status == CartStatus.PendingPayment)
+                {
+                    _logger.LogInformation("Cart {CartId} is already in PendingPayment status, checking for existing order", cartId);
+                    var existingOrder = await _orderService.GetOrderByCartIdAsync(cartId);
+                    if (existingOrder != null)
+                    {
+                        _logger.LogInformation("Found existing order {OrderId} for cart {CartId}, syncing and returning it", existingOrder.Id, cartId);
+                        // Sync the order with current cart state (in case items were modified)
+                        await _orderService.SyncOrderWithCartAsync(existingOrder.Id, cartId);
+                        result.Order = existingOrder;
+                        result.IsSuccess = true;
+                        return result;
+                    }
+                    _logger.LogInformation("No existing order found for PendingPayment cart {CartId}, will create new order", cartId);
                 }
 
                 foreach (var item in cart.CartItems)
@@ -84,47 +107,6 @@ namespace BlueBerry24.Application.Services.Concretes.OrchestrationServiceConcret
                         }
 
                         result.Order = order;
-
-                        _logger.LogDebug("Deducting inventory for order {OrderId}", order.Id);
-                        foreach (var item in cart.CartItems)
-                        {
-                            var deductionConfirmed = await _inventoryService.ConfirmStockDeductionAsync(
-                                item.ProductId,
-                                item.Quantity,
-                                order.Id,
-                                "Order");
-
-                            if (!deductionConfirmed)
-                            {
-                                await _unitOfWork.RollbackTransactionAsync();
-                                result.ErrorMessage = $"Failed to deduct inventory for product {item.ProductId}";
-                                return false;
-                            }
-                        }
-
-                        _logger.LogDebug("Marking coupons as used for order {OrderId}", order.Id);
-                        if (userId.HasValue && cart.CartCoupons != null && cart.CartCoupons.Any())
-                        {
-                            foreach (var cartCoupon in cart.CartCoupons)
-                            {
-                                var couponMarked = await _userCouponService.MarkCouponAsUsedAsync(
-                                    userId.Value,
-                                    cartCoupon.CouponId,
-                                    order.Id);
-
-                                if (!couponMarked)
-                                {
-                                    result.Warnings.Add($"Failed to mark coupon {cartCoupon.CouponId} as used");
-                                }
-                            }
-                        }
-
-                        _logger.LogDebug("Clearing cart {CartId}", cartId);
-                        var cartCleared = await _cartService.ClearCartAsync(cartId, userId, null);
-                        if (!cartCleared)
-                        {
-                            result.Warnings.Add("Failed to clear cart after checkout");
-                        }
 
                         var committed = await _unitOfWork.CommitTransactionAsync();
                         if (!committed)
