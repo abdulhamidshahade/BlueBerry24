@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.3.11505.172 d18.3
+VisualStudioVersion = 18.3.11505.172
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBerry24.API", "BlueBerry24.API\BlueBerry24.API.csproj", "{E3951A66-F330-4FA0-B2C9-CE3801E64AEF}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBerry24.Application", "BlueBerry24.Application\BlueBerry24.Application.csproj", "{32B24BC8-B08F-4A26-A729-1C3152A6C39B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBerry24.Tests", "BlueBerry24.Tests\BlueBerry24.Tests.csproj", "{E4AAFC13-2C7E-45FB-83D4-006096FC22E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blueberry24.Bot", "Blueberry24.Bot\Blueberry24.Bot.csproj", "{2651BA4C-9295-4EC6-83CD-385185A9DE30}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{E4AAFC13-2C7E-45FB-83D4-006096FC22E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4AAFC13-2C7E-45FB-83D4-006096FC22E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4AAFC13-2C7E-45FB-83D4-006096FC22E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2651BA4C-9295-4EC6-83CD-385185A9DE30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2651BA4C-9295-4EC6-83CD-385185A9DE30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2651BA4C-9295-4EC6-83CD-385185A9DE30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2651BA4C-9295-4EC6-83CD-385185A9DE30}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
