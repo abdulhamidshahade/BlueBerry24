@@ -1,13 +1,13 @@
-﻿using BlueBerry24.Application.Dtos.AuthDtos;
+using BlueBerry24.Application.Dtos;
+using BlueBerry24.Application.Dtos.AuthDtos;
 using BlueBerry24.Application.Halpers;
 using BlueBerry24.Application.Services.Interfaces.AuthServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.EmailServiceInterfaces;
-using BlueBerry24.Application.Utils;
 using BlueBerry24.Domain.Entities.AuthEntities;
+using BlueBerry24.Domain.Constants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics.Eventing.Reader;
 
 namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
 {
@@ -19,7 +19,7 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
         private readonly IRoleManagementService _roleService;
         private readonly IMailService _mailService;
         private readonly IConfiguration _configuration;
-        private readonly SignupPasswordValidator _signupPasswordValidator;
+        private readonly IUserService _userService;
 
         public AuthService(UserManager<ApplicationUser> userManager,
                            ILogger<AuthService> logger,
@@ -27,7 +27,7 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
                            IRoleManagementService roleService,
                            IMailService mailService,
                            IConfiguration configuration,
-                           SignupPasswordValidator signupPasswordValidator)
+                           IUserService userService)
         {
             _userManager = userManager;
             _logger = logger;
@@ -35,114 +35,32 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
             _roleService = roleService;
             _mailService = mailService;
             _configuration = configuration;
-            _signupPasswordValidator = signupPasswordValidator;
+            _userService = userService;
         }
-        //to be handled with user repository
-        private async Task<bool> IsEmailExisting(string email)
+        private async Task<bool> IsUsernameTaken(string userName)
         {
-            return await _userManager.FindByEmailAsync(email) != null;
+            return await _userService.IsUsernameTaken(userName);
         }
-
-        private async Task<bool> IsUsernameExisting(string username)
+        private async Task<bool> IsEmailTaken(string email)
         {
-            return await _userManager.FindByNameAsync(username) != null;
+            return await _userService.IsUserExistsByEmailAsync(email);
         }
 
-        
-
-        private bool IsValidEmail(string email)
-        {
-            string part2 = "";
-            try
-            {
-                part2 = email.Split('@')[1];
-            }
-            catch
-            {
-                return false;
-            }
-
-            return email.Contains('@') && 
-                   part2.Contains('.') && 
-                   !email.StartsWith('@') && 
-                   !email.EndsWith('@') && 
-                   !part2.StartsWith('.') && 
-                   !part2.EndsWith('.');
-        }
-
-
-        public async Task<RegisterResponseDto> Register(RegisterRequestDto requestDto)
+        public async Task<Result<RegisterResponseDto>> Register(RegisterRequestDto requestDto)
         {
             if (requestDto == null)
             {
-                return new RegisterResponseDto
-                {
-                    IsSuccess = false,
-                    ErrorMessage = "Invalid registration request."
-                };
+                return Result<RegisterResponseDto>.ValidationError("Registration data is required.");
             }
 
-            if (await IsUsernameExisting(requestDto.UserName))
+            if (await IsUsernameTaken(requestDto.UserName))
             {
-                return new RegisterResponseDto
-                {
-                    IsSuccess = false,
-                    ErrorMessage = "The provided username is already in use."
-                };
+                return Result<RegisterResponseDto>.ValidationError("Username is taken.");
             }
 
-            if (await IsEmailExisting(requestDto.Email))
+            if (await IsEmailTaken(requestDto.Email))
             {
-                return new RegisterResponseDto
-                {
-                    IsSuccess = false,
-                    ErrorMessage = "The provided email is already in use."
-                };
-            }
-
-            if(_signupPasswordValidator.CheckPasswordLength(requestDto.Password) == PasswordStrength.Weak)
-            {
-                return new RegisterResponseDto
-                {
-                    IsSuccess = false,
-                    ErrorMessage = "The provided password is too weak. It must be at least 6 characters long."
-                };
-            }
-
-            if (!_signupPasswordValidator.IsContainSpecialChar(requestDto.Password))
-            {
-                return new RegisterResponseDto
-                {
-                    IsSuccess = false,
-                    ErrorMessage = "The provided password must contain at least one special character."
-                };
-            }
-
-            if (!IsValidEmail(requestDto.Email))
-            {
-                return new RegisterResponseDto
-                {
-                    IsSuccess = false,
-                    ErrorMessage = "The provided email is not in a valid format."
-                };
-            }
-
-            if(!_signupPasswordValidator.IsContainUpperCase(requestDto.Password))
-            {
-                return new RegisterResponseDto
-                {
-                    IsSuccess = false,
-                    ErrorMessage = "The provided password must contain at least one uppercase letter."
-                };
-            }
-
-            if (!_signupPasswordValidator.IsContainDigit(requestDto.Password))
-            {
-                return new RegisterResponseDto
-                {
-                    IsSuccess = false,
-                    ErrorMessage = "The provided password must contain at least one digit."
-                };
+                return Result<RegisterResponseDto>.ValidationError("Email is already registered.");
             }
 
             try
@@ -160,18 +78,13 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
 
                 if (result.Succeeded)
                 {
-                    string defaultRole = "User";
+                    var defaultRole = RoleConstants.User;
 
+                    var isRoleAssignmentSuccess = await _roleService.AssignRoleToUserAsync(user.Id, defaultRole);
 
-                    bool IsRoleAssignmentSuccess = await _roleService.AssignRoleToUserAsync(user.Id, defaultRole);
-
-                    if (!IsRoleAssignmentSuccess)
+                    if (!isRoleAssignmentSuccess)
                     {
-                        return new RegisterResponseDto
-                        {
-                            IsSuccess = false,
-                            ErrorMessage = "Failed to assign role to the user!"
-                        };
+                        return Result<RegisterResponseDto>.Failure("User created but failed to assign default role.");
                     }
 
                     var userRoles = await _userManager.GetRolesAsync(user);
@@ -200,28 +113,20 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
                         Roles = userRoles.ToList()
                     };
 
-                    return new RegisterResponseDto
+                    return Result<RegisterResponseDto>.Success(new RegisterResponseDto
                     {
                         IsSuccess = true,
                         User = userDto
-                    };
+                    });
                 }
 
-                return new RegisterResponseDto
-                {
-                    IsSuccess = false,
-                    ErrorMessage = string.Join(", ", result.Errors.Select(e => e.Description))
-                };
+                return Result<RegisterResponseDto>.ValidationError(string.Join(", ", result.Errors.Select(e => e.Description)));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while registering the user.");
 
-                return new RegisterResponseDto
-                {
-                    IsSuccess = false,
-                    ErrorMessage = "An unexpected error occurred."
-                };
+                return Result<RegisterResponseDto>.Failure("An unexpected error occurred during registration. Please try again later.");
             }
         }
 
@@ -310,7 +215,7 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
             }
         }
 
-        public async Task<bool> ResetPasswordAsync(ResetPasswordDto requestDto)
+        public async Task<bool> ResetPasswordAsync(ResetPasswordRequestDto requestDto)
         {
             try
             {
