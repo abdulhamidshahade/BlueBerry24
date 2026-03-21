@@ -96,7 +96,7 @@ namespace BlueBerry24.Application.Services.Concretes.AuthServiceConcretes
                         var confirmationUrl = $"{baseUrl}/auth/confirm-email";
 
                         await _mailService.SendEmailConfirmationAsync(user.Email, confirmationToken, confirmationUrl, user.UserName);
-                        _logger.LogInformation("Email confirmation sent successfully to user {Email}", user.Email);
+                        _logger.LogInformation($"Email confirmation sent successfully to user", user.Email);
                     }
                     catch (Exception emailEx)
                     {
