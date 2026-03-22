@@ -1,6 +1,5 @@
 using BlueBerry24.Application.Services.Interfaces.CouponServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.InventoryServiceInterfaces;
-using BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces;
 using BlueBerry24.Application.Services.Interfaces.OrchestrationServiceInterfaces;
 using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Repositories;
