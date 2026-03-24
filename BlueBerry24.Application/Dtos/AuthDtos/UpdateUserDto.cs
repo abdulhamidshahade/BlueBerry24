@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace BlueBerry24.Application.Dtos.AuthDtos
 {
     public class UpdateUserDto
