@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace BlueBerry24.Application.Dtos.AuthDtos
+﻿namespace BlueBerry24.Application.Dtos.AuthDtos
 {
     public class EmailConfirmationDto
     {
