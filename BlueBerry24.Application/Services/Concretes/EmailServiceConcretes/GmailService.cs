@@ -117,7 +117,7 @@ namespace BlueBerry24.Application.Services.Concretes.EmailServiceConcretes
             var request = new SendEmailRequest
             {
                 Recipient = email,
-                Subject = "Reset Your BlueBerry24 Password",
+                Subject = "Reset Your BlueBerry24 account Password.",
                 Body = emailBody,
                 IsBodyHtml = true
             };
