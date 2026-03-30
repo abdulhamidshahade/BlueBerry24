@@ -13,6 +13,6 @@ namespace BlueBerry24.Application.Services.Interfaces.OrchestrationServiceInterf
         public bool IsSuccess { get; set; }
         public string ErrorMessage { get; set; }
         public Order? Order { get; set; }
-        public List<string> Warnings { get; set; } = new();
+        public List<string> Warnings { get; set; }
     }
 }
