@@ -46,7 +46,7 @@ export async function savePaymentBillingData(data: PaymentBillingData): Promise<
     console.log('💳 Saving payment billing data to database:', data);
     const response = await apiRequest(`${API_ENDPOINT}/billing`, {
       method: "POST",
-      requireAuth: false,
+      requireAuth: true,
       body: JSON.stringify(data),
     });
     console.log('✅ Payment billing data saved successfully:', response);
@@ -60,7 +60,7 @@ export async function getPaymentBillingData(): Promise<PaymentBillingData | null
   try {
     console.log('📥 Fetching payment billing data from database:', API_ENDPOINT);
     const response: any = await apiRequest(API_ENDPOINT, {
-      requireAuth: false,
+      requireAuth: true,
     });
     
     console.log('📦 Database response:', response);
@@ -101,7 +101,7 @@ export async function clearPaymentBillingData(): Promise<void> {
     console.log('🗑️ Deleting payment billing data from database');
     await apiRequest(API_ENDPOINT, {
       method: "DELETE",
-      requireAuth: false,
+      requireAuth: true,
     });
     console.log('✅ Payment billing data deleted from database');
   } catch (error) {
