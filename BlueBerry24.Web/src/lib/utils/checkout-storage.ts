@@ -48,7 +48,7 @@ export async function saveCheckoutData(data: CheckoutFormData): Promise<void> {
     console.log('💾 Saving checkout data to database:', data);
     const response = await apiRequest(`${API_ENDPOINT}/checkout`, {
       method: "POST",
-      requireAuth: false,
+      requireAuth: true,
       body: JSON.stringify(data),
     });
     console.log('✅ Checkout data saved successfully:', response);
@@ -62,7 +62,7 @@ export async function getCheckoutData(): Promise<CheckoutFormData | null> {
   try {
     console.log('📥 Fetching checkout data from database:', API_ENDPOINT);
     const response: any = await apiRequest(API_ENDPOINT, {
-      requireAuth: false,
+      requireAuth: true,
     });
     
     console.log('📦 Database response:', response);
@@ -100,7 +100,7 @@ export async function clearCheckoutData(): Promise<void> {
     console.log('🗑️ Deleting checkout data from database');
     await apiRequest(API_ENDPOINT, {
       method: "DELETE",
-      requireAuth: false,
+      requireAuth: true,
     });
     console.log('✅ Checkout data deleted from database');
   } catch (error) {
