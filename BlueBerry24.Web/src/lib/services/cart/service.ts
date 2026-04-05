@@ -11,7 +11,6 @@ import { ResponseDto } from "../../../types/responseDto";
 import { apiRequest } from "../../utils/api";
 import { cookies } from "next/headers";
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const API_BASE = process.env.API_BASE_SHOPPING_CART;
 
 export class CartService implements ICartService {
