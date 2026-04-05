@@ -46,14 +46,7 @@ export class OrderService implements IOrderService {
   }
 
   async getUserOrders(userId: number, page: number = 1, pageSize: number = 10): Promise<Order[]> {
-    const cookieStore = cookies();
-    const sessionId = (await cookieStore).get('cart_session')?.value;
-    
-    if (!sessionId) {
-      return [];
-    }
-    
-    const res: ResponseDto<Order[]> = await apiRequest(`${API_BASE_ORDER}/user/${sessionId}?page=${page}&pageSize=${pageSize}`, {
+    const res: ResponseDto<Order[]> = await apiRequest(`${API_BASE_ORDER}/user/${userId}?page=${page}&pageSize=${pageSize}`, {
       requireAuth: true,
     });
     
