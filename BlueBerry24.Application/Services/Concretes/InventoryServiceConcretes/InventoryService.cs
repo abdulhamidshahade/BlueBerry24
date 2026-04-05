@@ -25,8 +25,19 @@ namespace BlueBerry24.Application.Services.Concretes.InventoryServiceConcretes
 
         public async Task<bool> IsInStockAsync(int productId, int quantity)
         {
+            if (quantity <= 0)
+            {
+                return true;
+            }
+
             var product = await _productRepository.GetByIdAsync(productId);
-            return product != null && product.StockQuantity >= quantity;
+            if (product == null)
+            {
+                return false;
+            }
+
+            var available = product.StockQuantity - product.ReservedStock;
+            return available >= quantity;
         }
 
         public async Task<bool> AddStockAsync(int productId, int quantity, string notes, int? performedByUserId)
