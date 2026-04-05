@@ -48,7 +48,8 @@ export async function addToCart(formData: FormData) {
       throw new Error("Product not available");
     }
 
-    if (product.stockQuantity <= product.reservedStock + quantity) {
+    const available = product.stockQuantity - product.reservedStock;
+    if (available < quantity) {
       throw new Error("Insufficient stock");
     }
 
@@ -90,8 +91,8 @@ export async function updateCartItem(formData: FormData) {
       await cartService.removeItem(cart.id, productId);
     } else {
       const product = await productService.getById(productId);
-      if (product && product.stockQuantity < product.reservedStock + quantity) {
-        throw new Error("Insufficient stock");
+      if (!product || !product.isActive) {
+        throw new Error("Product not available");
       }
 
       const itemToUpdate = {
