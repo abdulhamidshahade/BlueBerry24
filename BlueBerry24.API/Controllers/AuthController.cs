@@ -35,6 +35,17 @@ namespace BlueBerry24.API.Controllers
             switch (registerResult)
             {
                 case Result<RegisterResponseDto> success when success.Status == ResultStatus.Success:
+                {
+                    var newUserId = success.Value?.User?.Id ?? 0;
+                    if (newUserId > 0)
+                    {
+                        var sessionId = GetSessionId();
+                        if (!string.IsNullOrWhiteSpace(sessionId))
+                        {
+                            await _cartService.MergeCartAsync(newUserId, sessionId);
+                        }
+                    }
+
                     return StatusCode(201, new ResponseDto<RegisterResponseDto>
                     {
                         IsSuccess = true,
@@ -42,6 +53,7 @@ namespace BlueBerry24.API.Controllers
                         StatusMessage = "User registered successfully. Please check your email to confirm your account.",
                         Data = success.Value
                     });
+                }
 
                 case Result<RegisterResponseDto> validationError when validationError.Status == ResultStatus.ValidationError:
                     return BadRequest(new ResponseDto<RegisterResponseDto>
@@ -110,7 +122,14 @@ namespace BlueBerry24.API.Controllers
             if (loginResult.Token != string.Empty)
             {
                 var user = await _userService.GetUserByEmail(requestDto.Email);
-                await _cartService.MergeCartAsync(user.Id, GetSessionId());
+                if (user != null)
+                {
+                    var sessionId = GetSessionId();
+                    if (!string.IsNullOrWhiteSpace(sessionId))
+                    {
+                        await _cartService.MergeCartAsync(user.Id, sessionId);
+                    }
+                }
 
                 return StatusCode(200, new ResponseDto<LoginResponseDto>
                 {
