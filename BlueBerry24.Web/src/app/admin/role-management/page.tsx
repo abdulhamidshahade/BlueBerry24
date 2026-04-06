@@ -25,13 +25,24 @@ interface RoleManagementPageProps {
   }>;
 }
 
+function hasSuperAdminRole(roles: string[] | undefined): boolean {
+  return (roles ?? []).some((r) => r.toLowerCase() === 'superadmin');
+}
+
 async function checkSuperAdminAccess() {
   const user = await getCurrentUser();
-  
-  if (!user || !user.roles.includes('SuperAdmin')) {
-    redirect('/auth/login?error=unauthorized&message=SuperAdmin access required');
+
+  if (!user) {
+    redirect('/auth/login?redirectTo=/admin/role-management');
   }
-  
+
+  if (!hasSuperAdminRole(user.roles)) {
+    redirect(
+      '/?error=' +
+        encodeURIComponent('SuperAdmin access is required for role management.')
+    );
+  }
+
   return user;
 }
 
