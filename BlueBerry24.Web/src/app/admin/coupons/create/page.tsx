@@ -94,34 +94,35 @@ export default async function CreateCouponPage({
                 <div className="row">
                   <div className="col-md-6">
                     <div className="mb-3">
-                      <label htmlFor="value" className="form-label">
+                      <label htmlFor="discountAmount" className="form-label">
                         <i className="bi bi-currency-dollar me-1"></i>
-                        Discount Value <span className="text-danger">*</span>
+                        Discount amount <span className="text-danger">*</span>
                       </label>
                       <div className="input-group">
                         <input
                           type="number"
                           className="form-control"
-                          id="value"
-                          name="value"
+                          id="discountAmount"
+                          name="discountAmount"
                           step="0.01"
                           min="0.01"
-                          placeholder="10"
+                          placeholder="20"
                           required
                         />
                         <span className="input-group-text">
-                          <span id="valueUnit">%</span>
+                          <span id="valueUnit">% or $</span>
                         </span>
                       </div>
                       <div className="form-text">
-                        Enter the discount value (e.g., 10 for 10% or $10)
+                        Percentage: enter whole percent (e.g. 20 for 20% off), or a decimal rate (e.g. 0.20).
+                        Fixed amount: enter dollars off (e.g. 15 for $15).
                       </div>
                     </div>
                   </div>
 
                   <div className="col-md-6">
                     <div className="mb-3">
-                      <label htmlFor="minimumAmount" className="form-label">
+                      <label htmlFor="minimumOrderAmount" className="form-label">
                         <i className="bi bi-cart me-1"></i>
                         Minimum Order Amount
                       </label>
@@ -130,8 +131,8 @@ export default async function CreateCouponPage({
                         <input
                           type="number"
                           className="form-control"
-                          id="minimumAmount"
-                          name="minimumAmount"
+                          id="minimumOrderAmount"
+                          name="minimumOrderAmount"
                           step="0.01"
                           min="0"
                           placeholder="0.00"
