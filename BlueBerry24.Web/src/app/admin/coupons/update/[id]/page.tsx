@@ -1,5 +1,6 @@
 import { getCoupon, updateCoupon } from '../../../../../lib/actions/coupon-actions';
 import { CouponTypeSelect } from '../../../../../components/coupon/CouponDisplayComponents';
+import { discountFieldValueForForm } from '../../../../../lib/coupon-amounts';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -111,34 +112,34 @@ export default async function UpdateCouponPage({ params, searchParams }: UpdateC
                 <div className="row">
                   <div className="col-md-6">
                     <div className="mb-3">
-                      <label htmlFor="value" className="form-label">
+                      <label htmlFor="discountAmount" className="form-label">
                         <i className="bi bi-currency-dollar me-1"></i>
-                        Discount Value <span className="text-danger">*</span>
+                        Discount amount <span className="text-danger">*</span>
                       </label>
                       <div className="input-group">
                         <input
                           type="number"
                           className="form-control"
-                          id="value"
-                          name="value"
-                          defaultValue={coupon.value}
+                          id="discountAmount"
+                          name="discountAmount"
+                          defaultValue={discountFieldValueForForm(coupon)}
                           step="0.01"
                           min="0.01"
                           required
                         />
                         <span className="input-group-text">
-                          <span id="valueUnit">%</span>
+                          <span id="valueUnit">% or $</span>
                         </span>
                       </div>
                       <div className="form-text">
-                        Enter the discount value (e.g., 10 for 10% or $10)
+                        Percentage: whole percent (e.g. 20) or decimal rate (e.g. 0.20). Fixed: dollars off (e.g. 15).
                       </div>
                     </div>
                   </div>
 
                   <div className="col-md-6">
                     <div className="mb-3">
-                      <label htmlFor="minimumAmount" className="form-label">
+                      <label htmlFor="minimumOrderAmount" className="form-label">
                         <i className="bi bi-cart me-1"></i>
                         Minimum Order Amount
                       </label>
@@ -147,8 +148,8 @@ export default async function UpdateCouponPage({ params, searchParams }: UpdateC
                         <input
                           type="number"
                           className="form-control"
-                          id="minimumAmount"
-                          name="minimumAmount"
+                          id="minimumOrderAmount"
+                          name="minimumOrderAmount"
                           defaultValue={coupon.minimumOrderAmount || ''}
                           step="0.01"
                           min="0"
