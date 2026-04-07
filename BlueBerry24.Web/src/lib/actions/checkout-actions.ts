@@ -5,6 +5,7 @@ import { CheckoutRequest } from '../../types/cart';
 import { getOrCreateCart } from './cart-actions';
 import { CartService } from '../services/cart/service';
 import { ICartService } from '../services/cart/interface';
+import { saveCheckoutData } from '../utils/checkout-storage';
 
 const cartService: ICartService = new CartService();
 
@@ -123,6 +124,19 @@ export async function processCheckout(formData: FormData) {
       redirect(`/checkout?${errorParams.toString()}`);
     }
 
+    await saveCheckoutData({
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: checkoutData.customerEmail.trim(),
+      phone: (formData.get('phone') as string)?.trim() || undefined,
+      address: checkoutData.shippingAddressLine1.trim(),
+      address2: checkoutData.shippingAddressLine2?.trim() || undefined,
+      city: checkoutData.shippingCity.trim(),
+      state: checkoutData.shippingState.trim(),
+      zipCode: checkoutData.shippingPostalCode.trim(),
+      country: checkoutData.shippingCountry || 'US',
+    });
+
     console.log('Calling order service checkout...');
     const result = await cartService.checkout(cart.id, checkoutData);
     console.log('Checkout result:', result);
@@ -238,6 +252,19 @@ export async function createOrderForPayment(formData: FormData) {
       redirect(`/checkout?${errorParams.toString()}`);
     }
 
+    await saveCheckoutData({
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.trim(),
+      phone: phone?.trim() || undefined,
+      address: address.trim(),
+      address2: address2?.trim() || undefined,
+      city: city.trim(),
+      state: state.trim(),
+      zipCode: zipCode.trim(),
+      country: country || 'US',
+    });
+
     console.log('Calling order service checkout...');
     const result = await cartService.checkout(cart.id, checkoutData);
     console.log('Checkout result:', result);
@@ -245,12 +272,12 @@ export async function createOrderForPayment(formData: FormData) {
     console.log('Redirecting to payment page...');
     redirect(`/checkout/order?id=${result.id}`);
   } catch (error) {
-    console.error('Error creating order for payment:', error);
-    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-    
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
       throw error;
     }
+
+    console.error('Error creating order for payment:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     
     const errorMessage = error instanceof Error ? error.message : 'Failed to create order. Please try again.';
     redirect('/checkout?error=' + encodeURIComponent(errorMessage));
