@@ -7,6 +7,7 @@ using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
 using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Entities.OrderEntities;
 using BlueBerry24.Domain.Repositories.OrderInterfaces;
+using Microsoft.Extensions.Logging;
 
 namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
 {
@@ -18,13 +19,15 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
         private readonly IInventoryService _inventoryService;
         private readonly IOrderCancellationService _orderCancellationService;
         private readonly IRefundOrchestrationService _refundOrchestrationService;
+        private readonly ILogger<OrderService> _logger;
 
         public OrderService(ICartService cartService,
                             IMapper mapper,
                             IOrderRepository orderRepository,
                             IInventoryService inventoryService,
                             IOrderCancellationService orderCancellationService,
-                            IRefundOrchestrationService refundOrchestrationService)
+                            IRefundOrchestrationService refundOrchestrationService,
+                            ILogger<OrderService> logger)
         {
             _cartService = cartService;
             _mapper = mapper;
@@ -32,6 +35,7 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
             _inventoryService = inventoryService;
             _orderCancellationService = orderCancellationService;
             _refundOrchestrationService = refundOrchestrationService;
+            _logger = logger;
         }
 
 
@@ -68,8 +72,18 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
         public async Task<Order?> CreateOrderFromCartAsync(int cartId, CreateOrderDto orderDto)
         {
             var cart = await _cartService.GetCartByIdAsync(cartId, CartStatus.Active);
+            if (cart == null)
+            {
+                cart = await _cartService.GetCartByIdAsync(cartId, CartStatus.PendingPayment);
+            }
 
             if (cart == null)
+            {
+                return null;
+            }
+
+            var existingOrder = await _orderRepository.GetOrderByCartIdAsync(cartId);
+            if (existingOrder != null)
             {
                 return null;
             }
@@ -333,6 +347,42 @@ namespace BlueBerry24.Application.Services.Concretes.OrderServiceConcretes
             }
 
             return await _orderRepository.UpdateOrderAsync(order);
+        }
+
+        public async Task<bool> DeductInventoryForPaidOrderAsync(int orderId)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order == null || order.OrderItems == null || !order.OrderItems.Any())
+            {
+                _logger.LogWarning("DeductInventoryForPaidOrderAsync: order {OrderId} missing or has no items", orderId);
+                return false;
+            }
+
+            if (order.Status != OrderStatus.Pending)
+            {
+                return true;
+            }
+
+            foreach (var item in order.OrderItems)
+            {
+                var ok = await _inventoryService.ConfirmStockDeductionAsync(
+                    item.ProductId,
+                    item.Quantity,
+                    orderId,
+                    "Order");
+
+                if (!ok)
+                {
+                    _logger.LogError(
+                        "ConfirmStockDeduction failed for order {OrderId}, product {ProductId}, qty {Quantity}",
+                        orderId,
+                        item.ProductId,
+                        item.Quantity);
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
