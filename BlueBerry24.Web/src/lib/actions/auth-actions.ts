@@ -62,6 +62,30 @@ export async function loginAction(formData: FormData) {
   }
 }
 
+/** Form action: signs in then redirects (used by client LoginForm). */
+export async function loginFormSubmitAction(formData: FormData) {
+  const redirectToRaw = formData.get('redirectTo') as string | null;
+  const redirectTo =
+    redirectToRaw && redirectToRaw.startsWith('/') && !redirectToRaw.startsWith('//')
+      ? redirectToRaw
+      : '/';
+
+  const result = await loginAction(formData);
+
+  if (result.success) {
+    redirect(redirectTo);
+  }
+
+  if (result.emailNotConfirmed) {
+    const email = formData.get('email') as string;
+    redirect(
+      `/auth/resend-confirmation?email=${encodeURIComponent(email)}&error=${encodeURIComponent(result.error || 'Email not confirmed')}`
+    );
+  }
+
+  redirect(`/auth/login?error=${encodeURIComponent(result.error || 'Login failed')}`);
+}
+
 export async function registerAction(formData: FormData) {
   const firstName = formData.get('firstName') as string;
   const lastName = formData.get('lastName') as string;
