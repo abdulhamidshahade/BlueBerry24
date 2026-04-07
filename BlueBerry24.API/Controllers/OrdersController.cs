@@ -115,6 +115,12 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
+                var currentUserId = GetCurrentUserId();
+                if (!currentUserId.HasValue || currentUserId.Value != userId)
+                {
+                    return Forbid();
+                }
+
                 var orders = await _orderService.GetUserOrdersAsync(userId, page, pageSize);
 
                 return Ok(new ResponseDto<List<OrderDto>>
