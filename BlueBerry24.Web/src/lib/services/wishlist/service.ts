@@ -11,7 +11,6 @@ import {
 import { IWishlistService } from './interface';
 import { apiRequest } from '../../utils/api';
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://localhost:7105/api';
 
 export class WishlistService implements IWishlistService {
