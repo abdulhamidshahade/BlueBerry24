@@ -18,7 +18,7 @@ async function checkAuth() {
   const user = await getCurrentUser();
   
   if (!user) {
-    redirect('/auth/login?redirectTo=/profile/wishlist');
+    redirect('/auth/login?redirectTo=/wishlist');
   }
   
   return user;
