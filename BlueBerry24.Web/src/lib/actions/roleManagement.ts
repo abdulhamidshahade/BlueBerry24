@@ -6,13 +6,24 @@ import { RoleManagementService } from '../services/roleManagement/service';
 import { getCurrentUser } from './auth-actions';
 import { Role, UserWithRoles, RoleStats } from '../../types/roleManagement';
 
+function hasSuperAdminRole(roles: string[] | undefined): boolean {
+  return (roles ?? []).some((r) => r.toLowerCase() === 'superadmin');
+}
+
 async function checkSuperAdminAccess() {
   const user = await getCurrentUser();
-  
-  if (!user || !user.roles.includes('SuperAdmin')) {
-    redirect('/auth/login?error=unauthorized');
+
+  if (!user) {
+    redirect('/auth/login?redirectTo=/admin/role-management');
   }
-  
+
+  if (!hasSuperAdminRole(user.roles)) {
+    redirect(
+      '/?error=' +
+        encodeURIComponent('SuperAdmin access is required for role management.')
+    );
+  }
+
   return user;
 }
 
