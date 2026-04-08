@@ -10,7 +10,19 @@ import {
 } from "../../../types/roleManagement"
 import { User } from "../../../types/user";
 
-const API_BASE_URL = process.env.API_BASE_ROLE_MANAGEMENT;
+/** Backend: RoleManagementsController → [Route("api/role-managements")] */
+function getRoleManagementBaseUrl(): string {
+  const explicit = process.env.API_BASE_ROLE_MANAGEMENT?.trim();
+  if (explicit) return explicit.replace(/\/$/, "");
+  const auth = process.env.API_BASE_AUTH?.trim();
+  if (auth) {
+    const apiRoot = auth.replace(/\/auth\/?$/i, "");
+    return `${apiRoot}/role-managements`;
+  }
+  return "";
+}
+
+const API_BASE_URL = getRoleManagementBaseUrl();
 
 export class RoleManagementService{
 
@@ -189,7 +201,7 @@ export class RoleManagementService{
     static async initializeDefaultRoles(): Promise<RoleManagementResponse> {
 
 
-        const response: RoleManagementResponse = await apiRequest(`${API_BASE_URL}/rolemanagement/initialize-default-roles`, {
+        const response: RoleManagementResponse = await apiRequest(`${API_BASE_URL}/initialize-default-roles`, {
             method: 'POST',
             requireAuth: true,
         });
@@ -204,7 +216,7 @@ export class RoleManagementService{
     static async bulkAssignRole(userIds: number[], roleName: string): Promise<RoleManagementResponse> {
 
 
-        const response: RoleManagementResponse = await apiRequest(`${API_BASE_URL}/rolemanagement/bulk-assign`, {
+        const response: RoleManagementResponse = await apiRequest(`${API_BASE_URL}/bulk-assign`, {
             method: 'POST',
             requireAuth: true,
             body: JSON.stringify({ userIds, roleName }),
