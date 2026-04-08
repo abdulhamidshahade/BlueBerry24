@@ -5,8 +5,6 @@ import { cookies } from 'next/headers';
 import { apiRequest } from "../../utils/api";
 
 const API_BASE_URL = process.env.API_BASE_PAYMENT;
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
 const getDefaultHeaders = async () => {
   const cookieStore = await cookies();
   const authToken = cookieStore.get('auth_token')?.value;
