@@ -56,10 +56,16 @@ const cookieStore = await cookies();
   }
 
   static async register(userData: RegisterRequest): Promise<User> {
-    var res: User = await apiRequest(`${API_BASE_URL}/register`, {
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get('cart_session')?.value;
+
+    const res: User = await apiRequest(`${API_BASE_URL}/register`, {
       method: 'POST',
       body: JSON.stringify(userData),
       isPublic: true,
+      headers: {
+        ...(sessionId ? { 'X-Session-Id': sessionId } : {}),
+      },
     });
     return res;
   }
