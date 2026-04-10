@@ -180,5 +180,15 @@ namespace BlueBerry24.Infrastructure.Repositories.OrderConcretes
             
             return true;
         }
+
+        public async Task<bool> UserHasPaidOrderAsync(int userId)
+        {
+            if (userId <= 0)
+            {
+                return false;
+            }
+
+            return await _context.Orders.AnyAsync(o => o.UserId == userId && o.isPaid);
+        }
     }
 }
