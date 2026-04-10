@@ -59,22 +59,53 @@ namespace BlueBerry24.Application.Services.Concretes.OrchestrationServiceConcret
 
                     try
                     {
-                        _logger.LogDebug("Restoring inventory for cancelled order {OrderId}", orderId);
-                        foreach (var item in order.OrderItems)
-                        {
-                            var inventoryRestored = await _inventoryService.AddStockAsync(
-                                item.ProductId,
-                                item.Quantity,
-                                $"Stock returned from cancelled order {order.ReferenceNumber}: {reason}",
-                                performedByUserId);
+                        _logger.LogDebug("Reverting inventory for cancelled order {OrderId} (status {Status})", orderId, order.Status);
 
-                            if (!inventoryRestored)
+                        if (order.Status == OrderStatus.Pending)
+                        {
+                            if (order.CartId <= 0)
                             {
-                                result.Warnings.Add($"Failed to restore inventory for product {item.ProductId}");
+                                result.Warnings.Add("Order has no cart id; reserved stock may not have been released");
                             }
                             else
                             {
-                                result.InventoryRestored = true;
+                                foreach (var item in order.OrderItems)
+                                {
+                                    var released = await _inventoryService.ReleaseReservedStockAsync(
+                                        item.ProductId,
+                                        item.Quantity,
+                                        order.CartId,
+                                        "CartItem");
+
+                                    if (!released)
+                                    {
+                                        result.Warnings.Add($"Failed to release reserved stock for product {item.ProductId}");
+                                    }
+                                    else
+                                    {
+                                        result.InventoryRestored = true;
+                                    }
+                                }
+                            }
+                        }
+                        else if (order.Status == OrderStatus.Processing)
+                        {
+                            foreach (var item in order.OrderItems)
+                            {
+                                var inventoryRestored = await _inventoryService.AddStockAsync(
+                                    item.ProductId,
+                                    item.Quantity,
+                                    $"Stock returned from cancelled order {order.ReferenceNumber}: {reason}",
+                                    performedByUserId);
+
+                                if (!inventoryRestored)
+                                {
+                                    result.Warnings.Add($"Failed to restore inventory for product {item.ProductId}");
+                                }
+                                else
+                                {
+                                    result.InventoryRestored = true;
+                                }
                             }
                         }
 
