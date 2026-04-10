@@ -21,5 +21,6 @@ namespace BlueBerry24.Application.Services.Interfaces.OrderServiceInterfaces
         Task<Order?> GetOrderByReferenceNumberAsync(string referenceNumber);
         Task<Order?> GetOrderByCartIdAsync(int cartId);
         Task<bool> SyncOrderWithCartAsync(int orderId, int cartId);
+        Task<bool> DeductInventoryForPaidOrderAsync(int orderId);
     }
 }
