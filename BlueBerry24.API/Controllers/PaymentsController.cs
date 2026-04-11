@@ -18,17 +18,20 @@ namespace BlueBerry24.API.Controllers
         private readonly IOrderService _orderService;
         private readonly ICartService _cartService;
         private readonly IMapper _mapper;
+        private readonly ILogger<PaymentsController> _logger;
 
         public PaymentsController(
             IPaymentService paymentService, 
             IOrderService orderService,
             ICartService cartService,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<PaymentsController> logger)
         {
             _paymentService = paymentService;
             _orderService = orderService;
             _cartService = cartService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpPost("process")]
@@ -60,6 +63,26 @@ namespace BlueBerry24.API.Controllers
                         
                         if (result.Data?.Success == true)
                         {
+                            if (order.Status == OrderStatus.Pending)
+                            {
+                                var inventoryOk = await _orderService.DeductInventoryForPaidOrderAsync(order.Id);
+                                if (!inventoryOk)
+                                {
+                                    _logger.LogCritical(
+                                        "Payment succeeded for order {OrderId} but inventory deduction failed. Manual reconciliation required.",
+                                        order.Id);
+                                    return StatusCode(StatusCodes.Status500InternalServerError, new
+                                    {
+                                        IsSuccess = false,
+                                        StatusCode = 500,
+                                        StatusMessage =
+                                            "Payment was captured but inventory could not be finalized. Contact support with your order ID.",
+                                        OrderId = order.Id,
+                                        Data = result.Data
+                                    });
+                                }
+                            }
+
                             await _orderService.UpdateOrderStatusAsync(mappedOrder, OrderStatus.Processing);
                             await _orderService.UpdateOrderPaymentStatusAsync(mappedOrder, PaymentStatus.Completed);
 
