@@ -1,27 +1,31 @@
-import { loginAction } from '../../lib/actions/auth-actions';
-import { redirect } from 'next/navigation';
+'use client';
+
+import { useState } from 'react';
+import { loginFormSubmitAction } from '../../lib/actions/auth-actions';
 
 interface LoginFormProps {
   redirectTo?: string;
 }
 
+const SUPER_ADMIN_EMAIL = 'shahade.abdulhamid@gmail.com';
+const SUPER_ADMIN_PASSWORD = 'lkjflajljlka@32lkjA32';
+
 export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
-  async function handleLogin(formData: FormData) {
-    'use server';
-    
-    const result = await loginAction(formData);
-    
-    if (result.success) {
-      redirect(redirectTo);
-    } else {
-      if (result.emailNotConfirmed) {
-        const email = formData.get('email') as string;
-        redirect(`/auth/resend-confirmation?email=${encodeURIComponent(email)}&error=${encodeURIComponent(result.error || 'Email not confirmed')}`);
-      } else {
-        redirect(`/auth/login?error=${encodeURIComponent(result.error || 'Login failed')}`);
-      }
-    }
-  }
+  const [mode, setMode] = useState<'user' | 'superAdmin'>('user');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const selectUser = () => {
+    setMode('user');
+    setEmail('');
+    setPassword('');
+  };
+
+  const selectSuperAdmin = () => {
+    setMode('superAdmin');
+    setEmail(SUPER_ADMIN_EMAIL);
+    setPassword(SUPER_ADMIN_PASSWORD);
+  };
 
   return (
     <div className="card shadow">
@@ -34,7 +38,38 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
           <p className="text-muted">Welcome back! Please sign in to your account.</p>
         </div>
 
-        <form action={handleLogin}>
+        <div className="mb-4">
+          <label className="form-label small text-muted mb-2 d-block text-center">
+            Sign in as
+          </label>
+          <div className="btn-group w-100" role="group" aria-label="Account type">
+            <button
+              type="button"
+              className={`btn btn-outline-primary ${mode === 'user' ? 'active' : ''}`}
+              onClick={selectUser}
+            >
+              <i className="bi bi-person me-1"></i>
+              User
+            </button>
+            <button
+              type="button"
+              className={`btn btn-outline-primary ${mode === 'superAdmin' ? 'active' : ''}`}
+              onClick={selectSuperAdmin}
+            >
+              <i className="bi bi-shield-lock me-1"></i>
+              Super Admin
+            </button>
+          </div>
+          {mode === 'superAdmin' && (
+            <p className="small text-muted mt-2 mb-0 text-center">
+              Credentials are filled in for you—press <strong>Sign In</strong> to continue.
+            </p>
+          )}
+        </div>
+
+        <form action={loginFormSubmitAction}>
+          <input type="hidden" name="redirectTo" value={redirectTo || '/'} />
+
           <div className="mb-3">
             <label htmlFor="email" className="form-label">
               <i className="bi bi-envelope me-1"></i>
@@ -46,7 +81,10 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
               id="email"
               name="email"
               placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email"
             />
           </div>
 
@@ -61,7 +99,10 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
               id="password"
               name="password"
               placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete="current-password"
             />
           </div>
 
@@ -91,7 +132,7 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
 
           <div className="text-center">
             <p className="mb-0">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <a href="/auth/register" className="text-decoration-none">
                 Sign up here
               </a>
@@ -101,4 +142,4 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
       </div>
     </div>
   );
-} 
+}
