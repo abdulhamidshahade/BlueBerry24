@@ -8,6 +8,7 @@ using BlueBerry24.Infrastructure.Data;
 using BlueBerry24.Infrastructure.DI;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -15,44 +16,35 @@ using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using Serilog;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi(options =>
 {
-    // Versioning config
     options.AddDocumentTransformer<VersionInfoTransformer>();
-
-    // Security Scheme config
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
     options.AddOperationTransformer<BearerSecuritySchemeTransformer>();
 });
 
-
-
 builder.Services.AddAutoMapper(cfg => { }, typeof(BlueBerry24.Application.Mapping.AssemblyMarker));
-
 
 builder.Services.AddApplicationServices(builder.Host, builder.Configuration);
 builder.Services.AddInfrastructureServices();
 
-// Add health checks
 builder.Services.AddHealthChecks()
     .AddCheck<BlueBerry24.Infrastructure.Data.DatabaseHealthCheck>("database");
-
-
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -65,17 +57,53 @@ builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("ApiSett
 JwtOptions jwtOptions = new JwtOptions();
 builder.Configuration.GetSection("ApiSettings:JwtOptions").Bind(jwtOptions);
 
+var corsSection = builder.Configuration.GetSection("Cors:AllowedOrigins");
+var corsOrigins = corsSection.Get<string[]>() ?? Array.Empty<string>();
+var corsOriginsOverride = builder.Configuration["Cors:Origins"];
+if (!string.IsNullOrWhiteSpace(corsOriginsOverride))
+{
+    corsOrigins = corsOriginsOverride
+        .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+}
+
+if (corsOrigins.Length == 0 && builder.Environment.IsDevelopment())
+{
+    corsOrigins =
+    [
+        "http://localhost:3000",
+        "http://localhost:30305",
+        "https://localhost:7105",
+        "http://host.docker.internal:3000",
+        "http://frontend:30305"
+    ];
+}
+else if (corsOrigins.Length == 0 && !builder.Environment.IsDevelopment())
+{
+    throw new InvalidOperationException(
+        "Configure Cors:AllowedOrigins (array) or Cors:Origins (semicolon-separated) for this environment.");
+}
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "https://localhost:7105", "http://host.docker.internal:3000", "http://frontend:30305")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
+        policy.WithOrigins(corsOrigins)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 
+var useForwardedHeaders = builder.Configuration.GetValue("Security:UseForwardedHeaders", true);
+if (useForwardedHeaders)
+{
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        options.KnownNetworks.Clear();
+        options.KnownProxies.Clear();
+    });
+}
 
 builder.Services.AddProblemDetails();
 
@@ -93,8 +121,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy(PolicyConstants.AllRoles, policy =>
         policy.RequireRole(RoleConstants.SuperAdmin, RoleConstants.Admin, RoleConstants.User));
 
-    // Specific permission policies
-    options.AddPolicy(PolicyConstants.CanManageUsers, policy => {
+    options.AddPolicy(PolicyConstants.CanManageUsers, policy =>
+    {
         policy.RequireRole(RoleConstants.SuperAdmin, RoleConstants.Admin);
         policy.RequireClaim("Permission", "ManageUsers");
     });
@@ -126,7 +154,8 @@ builder.Services.AddAuthentication(x =>
     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(x =>
 {
-    x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    x.RequireHttpsMetadata = jwtOptions.RequireHttps;
+    x.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey)),
@@ -139,88 +168,88 @@ builder.Services.AddAuthentication(x =>
 
 builder.Services.AddAuthorization();
 
-
-//builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-//builder.Services.AddScoped<IUserRepository, UserRepository>();
-
-
 builder.Services.AddRateLimiter(options =>
 {
-    options.AddFixedWindowLimiter(policyName: "DefaultPolicy", limiterOptions =>
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+    {
+        var partitionKey = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetFixedWindowLimiter(partitionKey, _ => new FixedWindowRateLimiterOptions
+        {
+            AutoReplenishment = true,
+            PermitLimit = builder.Configuration.GetValue("RateLimiting:GlobalPermitLimit", 400),
+            Window = TimeSpan.FromMinutes(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit = builder.Configuration.GetValue("RateLimiting:GlobalQueueLimit", 20),
+        });
+    });
+
+    options.AddFixedWindowLimiter("DefaultPolicy", limiterOptions =>
     {
         limiterOptions.Window = TimeSpan.FromMinutes(1);
-        limiterOptions.PermitLimit = 100;
-        limiterOptions.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
-        limiterOptions.QueueLimit = 10;
+        limiterOptions.PermitLimit = builder.Configuration.GetValue("RateLimiting:DefaultPermitLimit", 100);
+        limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        limiterOptions.QueueLimit = builder.Configuration.GetValue("RateLimiting:DefaultQueueLimit", 10);
     });
 });
 
 var app = builder.Build();
 
+if (useForwardedHeaders)
+{
+    app.UseForwardedHeaders();
+}
+
+app.UseExceptionHandler("/error");
+
+var requireHttpsRedirect = builder.Configuration.GetValue("Security:RequireHttpsRedirection", false);
+if (requireHttpsRedirect && !app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
+var useHsts = builder.Configuration.GetValue("Security:UseHsts", false);
+if (useHsts && app.Environment.IsProduction())
+{
+    app.UseHsts();
+}
+
 app.UseRateLimiter();
 
-// Ensure database is created and updated with seeded data
-// Ensure database is created and updated with seeded data
-using (var scope = app.Services.CreateScope())
+var runMigrationsOnStartup = builder.Configuration.GetValue("Database:RunMigrationsOnStartup", false);
+if (runMigrationsOnStartup)
 {
+    using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-        var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
+        Log.Information("Applying database migrations...");
+        await context.Database.MigrateAsync();
+        Log.Information("Database migrations completed.");
 
-        Console.WriteLine("Starting database migration...");
-
-        // Apply migrations
-        context.Database.Migrate();
-
-        Console.WriteLine("Database migration completed.");
-
-        // Check if database is accessible
-        var canConnect = await context.Database.CanConnectAsync();
-        if (!canConnect)
+        if (!await context.Database.CanConnectAsync())
         {
-            Console.WriteLine("Cannot connect to database!");
+            Log.Fatal("Cannot connect to database after migration.");
             return;
         }
-
-        Console.WriteLine("Database connection verified. Starting seeding...");
-
-        // Seed initial data
-        //var dataSeeder = new BlueBerry24.Infrastructure.Data.DataSeeder(context, userManager, roleManager);
-        //await dataSeeder.SeedDataAsync();
-
-        //Console.WriteLine("All seeding operations completed successfully!");
     }
     catch (Exception ex)
     {
-        // Log the error with full details
-        Console.WriteLine($"An error occurred while migrating or seeding the database:");
-        Console.WriteLine($"Message: {ex.Message}");
-        Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-
-        if (ex.InnerException != null)
-        {
-            Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
-            Console.WriteLine($"Inner Stack Trace: {ex.InnerException.StackTrace}");
-        }
-
-        // Don't continue if seeding fails in development
+        Log.Fatal(ex, "Database migration failed");
         if (app.Environment.IsDevelopment())
         {
             throw;
         }
+
+        return;
     }
 }
 
-if(app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
-    // Configure the HTTP request pipeline.
-    // Map OpenAPI endpoint
     app.MapOpenApi();
-
-    // Map Scalar UI
     app.MapScalarApiReference(options =>
     {
         options
@@ -230,30 +259,10 @@ if(app.Environment.IsDevelopment())
     });
 }
 
-//var jwtOptions = app.Services.GetRequiredService<IOptions<JwtOptions>>().Value;
-
-
-
-// Only use HTTPS redirection in production when not in Docker
-if (!app.Environment.IsDevelopment() && Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
-{
-    app.UseExceptionHandler("/error");
-    app.UseHttpsRedirection();
-}
-else
-{
-    app.UseExceptionHandler("/error-development");
-}
-
-    //app.UseHsts();
-
-
- 
 app.UseCors("AllowSpecificOrigin");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Add health check endpoint
 app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
 {
     ResponseWriter = async (context, report) =>
@@ -271,13 +280,11 @@ app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks
         };
         await context.Response.WriteAsJsonAsync(result);
     }
-});
+}).DisableRateLimiting();
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 app.UseSerilogRequestLogging();
-
-
 
 app.MapControllers();
 
