@@ -1,4 +1,4 @@
-import { OrderService } from '../../../lib/services/order/service';
+﻿import { OrderService } from '../../../lib/services/order/service';
 import { formatCurrency } from '../../../lib/utils/formatCurrency';
 import { format } from 'date-fns';
 import Link from 'next/link';
@@ -349,7 +349,7 @@ export default async function AdminOrdersPage({
             </table>
           </div>
           <div className="card-footer bg-white border-top">
-            <div className="d-flex justify-content-between align-items-center">
+            <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
               <div className="text-muted small">
                 Showing {orders.length} orders
               </div>
