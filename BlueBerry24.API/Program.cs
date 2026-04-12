@@ -232,7 +232,7 @@ if (runMigrationsOnStartup)
         if (!await context.Database.CanConnectAsync())
         {
             Log.Fatal("Cannot connect to database after migration.");
-            return;
+            Environment.Exit(1);
         }
     }
     catch (Exception ex)
@@ -243,7 +243,22 @@ if (runMigrationsOnStartup)
             throw;
         }
 
-        return;
+        Environment.Exit(1);
+    }
+}
+
+try
+{
+    using var seedScope = app.Services.CreateScope();
+    var dataSeeder = seedScope.ServiceProvider.GetRequiredService<DataSeeder>();
+    await dataSeeder.SeedDataAsync();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Database seeding failed; continuing startup (API will run without full seed data).");
+    if (app.Environment.IsDevelopment())
+    {
+        throw;
     }
 }
 
