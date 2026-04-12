@@ -1949,6 +1949,8 @@ new ProductCategory
 
             if (!await _context.Coupons.AnyAsync())
             {
+                var seedTime = new DateTime(2026, 2, 11, 23, 7, 3, 498, DateTimeKind.Utc);
+
                 var coupons = new[]
                 {
                     new Coupon
@@ -1956,117 +1958,117 @@ new ProductCategory
                         Code = "JUNESALE20",
                         Description = "20% off all orders over $75",
                         Type = CouponType.Percentage,
-                        Value = 10,
-                        MinimumOrderAmount = 50,
+                        Value = 0.20m,
+                        DiscountAmount = 20.00m,
+                        MinimumOrderAmount = 75.00m,
                         IsActive = true,
                         IsForNewUsersOnly = true,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow,
-                        DiscountAmount = null,
+                        CreatedAt = seedTime,
+                        UpdatedAt = seedTime,
                     },
                     new Coupon
                     {
                         Code = "SAVE15OFF",
-                        Description = "Get $15 off your next purchase",
+                        Description = "Get $15 off your next purchase over $100",
                         Type = CouponType.FixedAmount,
-                        Value = 20,
-                        MinimumOrderAmount = 100,
+                        Value = 15.00m,
+                        DiscountAmount = 15.00m,
+                        MinimumOrderAmount = 100.00m,
                         IsActive = true,
                         IsForNewUsersOnly = false,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow,
-                        DiscountAmount = 15.00m
+                        CreatedAt = seedTime,
+                        UpdatedAt = seedTime,
                     },
                     new Coupon
                     {
                         Code = "WKNDFLASH",
-                        Description = "10% off on electronics this weekend",
+                        Description = "10% off on electronics this weekend on orders over $75",
                         Type = CouponType.Percentage,
-                        Value = 15,
-                        MinimumOrderAmount = 75,
+                        Value = 0.10m,
+                        DiscountAmount = 10.00m,
+                        MinimumOrderAmount = 75.00m,
                         IsActive = true,
                         IsForNewUsersOnly = false,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow,
-                        DiscountAmount = null
+                        CreatedAt = seedTime,
+                        UpdatedAt = seedTime,
                     },
                     new Coupon
                     {
                         Code = "APRILDEAL",
                         Description = "Flat $50 off on orders over $250",
                         Type = CouponType.FixedAmount,
-                        Value = 0,
-                        MinimumOrderAmount = 50,
+                        Value = 50.00m,
+                        DiscountAmount = 50.00m,
+                        MinimumOrderAmount = 250.00m,
                         IsActive = true,
                         IsForNewUsersOnly = false,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow,
-                        DiscountAmount = 50.00m
+                        CreatedAt = seedTime,
+                        UpdatedAt = seedTime,
                     },
                     new Coupon
                     {
                         Code = "ECOFRIENDLY",
                         Description = "12% off sustainable products",
-                        Type = CouponType.FixedAmount,
-                        Value = 0,
-                        MinimumOrderAmount = 50,
+                        Type = CouponType.Percentage,
+                        Value = 0.12m,
+                        DiscountAmount = 12.00m,
+                        MinimumOrderAmount = 50.00m,
                         IsActive = true,
                         IsForNewUsersOnly = false,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow,
-                        DiscountAmount = null
+                        CreatedAt = seedTime,
+                        UpdatedAt = seedTime,
                     },
                     new Coupon
                     {
                         Code = "LOYALTYDISC",
                         Description = "Special 5% discount for returning customers",
-                        Type = CouponType.FixedAmount,
-                        Value = 0,
-                        MinimumOrderAmount = 50,
+                        Type = CouponType.Percentage,
+                        Value = 0.05m,
+                        DiscountAmount = 5.00m,
+                        MinimumOrderAmount = 50.00m,
                         IsActive = true,
                         IsForNewUsersOnly = false,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow,
-                        DiscountAmount = null
+                        CreatedAt = seedTime,
+                        UpdatedAt = seedTime,
                     },
                     new Coupon
                     {
                         Code = "HOLIDAY2025",
                         Description = "Flat $10 off any purchase",
                         Type = CouponType.FixedAmount,
-                        Value = 0,
-                        MinimumOrderAmount = 50,
+                        Value = 10.00m,
+                        DiscountAmount = 10.00m,
+                        MinimumOrderAmount = 0.00m,
                         IsActive = true,
                         IsForNewUsersOnly = false,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow,
-                        DiscountAmount = 10.00m
+                        CreatedAt = seedTime,
+                        UpdatedAt = seedTime,
                     },
                     new Coupon
                     {
                         Code = "NEWBIE25",
                         Description = "25% off your very first order",
-                        Type = CouponType.FixedAmount,
-                        Value = 0,
-                        MinimumOrderAmount = 50,
+                        Type = CouponType.Percentage,
+                        Value = 0.25m,
+                        DiscountAmount = 25.00m,
+                        MinimumOrderAmount = 50.00m,
                         IsActive = true,
-                        IsForNewUsersOnly = false,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow,
-                        DiscountAmount = null
+                        IsForNewUsersOnly = true,
+                        CreatedAt = seedTime,
+                        UpdatedAt = seedTime,
                     },
                     new Coupon
                     {
                         Code = "WELCOMEBACK",
                         Description = "Get $20 off your initial order over $75",
                         Type = CouponType.FixedAmount,
-                        Value = 0,
-                        MinimumOrderAmount = 50,
+                        Value = 20.00m,
+                        DiscountAmount = 20.00m,
+                        MinimumOrderAmount = 75.00m,
                         IsActive = true,
-                        IsForNewUsersOnly = false,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow,
-                        DiscountAmount = 20.00m
+                        IsForNewUsersOnly = true,
+                        CreatedAt = seedTime,
+                        UpdatedAt = seedTime,
                     },
                 };
 
