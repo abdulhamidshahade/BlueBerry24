@@ -1,4 +1,4 @@
-﻿using BlueBerry24.Application.Authorization.Attributes;
+using BlueBerry24.Application.Authorization.Attributes;
 using BlueBerry24.Application.Dtos.WishlistDtos;
 using BlueBerry24.Application.Services.Interfaces.WishlistServiceInterfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -17,20 +17,23 @@ namespace BlueBerry24.API.Controllers
             _wishlistService = wishlistService;
         }
 
-        private int GetUserId()
+        private bool TryResolveUserId(out int userId)
         {
-            return Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            userId = 0;
+            var idClaim = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User?.FindFirst("sub")?.Value;
+            return !string.IsNullOrWhiteSpace(idClaim)
+                && int.TryParse(idClaim, out userId)
+                && userId > 0;
         }
 
-        // GET: api/wishlists
         [HttpGet]
         [UserAndAbove]
         public async Task<IActionResult> GetUserWishlists()
         {
             try
             {
-                var userId = GetUserId();
-                if (userId == null)
+                if (!TryResolveUserId(out var userId))
                     return Unauthorized();
 
                 var wishlists = await _wishlistService.GetUserWishlistsAsync(userId);
@@ -48,8 +51,7 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                var userId = GetUserId();
-                if (userId == null)
+                if (!TryResolveUserId(out var userId))
                     return Unauthorized();
 
                 var wishlist = await _wishlistService.GetByIdAsync(id);
@@ -74,8 +76,7 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                var userId = GetUserId();
-                if (userId == null)
+                if (!TryResolveUserId(out var userId))
                     return Unauthorized();
 
                 var wishlist = await _wishlistService.GetUserDefaultWishlistAsync(userId);
@@ -94,8 +95,7 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                var userId = GetUserId();
-                if (userId == null)
+                if (!TryResolveUserId(out var userId))
                     return Unauthorized();
 
                 var summary = await _wishlistService.GetUserSummaryAsync(userId);
@@ -114,8 +114,7 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                var userId = GetUserId();
-                if (userId == null)
+                if (!TryResolveUserId(out var userId))
                     return Unauthorized();
 
                 if (!ModelState.IsValid)
@@ -138,8 +137,7 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                var userId = GetUserId();
-                if (userId == null)
+                if (!TryResolveUserId(out var userId))
                     return Unauthorized();
 
                 if (!ModelState.IsValid)
@@ -167,8 +165,7 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                var userId = GetUserId();
-                if (userId == null)
+                if (!TryResolveUserId(out var userId))
                     return Unauthorized();
 
                 var existingWishlist = await _wishlistService.GetByIdAsync(id);
@@ -196,8 +193,7 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                var userId = GetUserId();
-                if (userId == null)
+                if (!TryResolveUserId(out var userId))
                     return Unauthorized();
 
                 if (!ModelState.IsValid)
@@ -222,8 +218,7 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                var userId = GetUserId();
-                if (userId == null)
+                if (!TryResolveUserId(out var userId))
                     return Unauthorized();
 
                 var wishlist = await _wishlistService.GetByIdAsync(wishlistId);
@@ -248,8 +243,7 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                var userId = GetUserId();
-                if (userId == null)
+                if (!TryResolveUserId(out var userId))
                     return Unauthorized();
 
                 var wishlist = await _wishlistService.GetByIdAsync(wishlistId);
@@ -274,8 +268,7 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                var userId = GetUserId();
-                if (userId == null)
+                if (!TryResolveUserId(out var userId))
                     return Unauthorized();
 
                 var isInWishlist = await _wishlistService.IsProductInWishlistAsync(userId, productId);
@@ -293,8 +286,7 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                var userId = GetUserId();
-                if (userId == null)
+                if (!TryResolveUserId(out var userId))
                     return Unauthorized();
 
                 var wishlist = await _wishlistService.GetByIdAsync(wishlistId);
@@ -319,8 +311,7 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                var userId = GetUserId();
-                if (userId == null)
+                if (!TryResolveUserId(out var userId))
                     return Unauthorized();
 
                 var wishlist = await _wishlistService.GetByIdAsync(wishlistId);
@@ -342,8 +333,7 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                var userId = GetUserId();
-                if (userId == null)
+                if (!TryResolveUserId(out var userId))
                     return Unauthorized();
 
                 var wishlist = await _wishlistService.GetByIdAsync(wishlistId);
@@ -365,8 +355,7 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                var userId = GetUserId();
-                if (userId == null)
+                if (!TryResolveUserId(out var userId))
                     return Unauthorized();
 
                 var wishlist = await _wishlistService.GetByIdAsync(wishlistId);
@@ -391,8 +380,7 @@ namespace BlueBerry24.API.Controllers
         {
             try
             {
-                var userId = GetUserId();
-                if (userId == null)
+                if (!TryResolveUserId(out var userId))
                     return Unauthorized();
 
                 var wishlist = await _wishlistService.GetByIdAsync(wishlistId);
