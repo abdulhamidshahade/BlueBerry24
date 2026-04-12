@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { CouponService } from '../services/coupon/service';
 import { ICouponService } from '../services/coupon/interface';
 import { CreateCouponDto, UpdateCouponDto, CouponType, CouponDto } from '../../types/coupon';
+import { parseDiscountFormValues } from '../coupon-amounts';
 import { getCurrentUser } from './auth-actions';
 import { User } from '../../types/user';
 import { IUserService } from '../services/user/interface';
@@ -139,13 +140,17 @@ export async function hasUserUsedCoupon(userId: number, couponCode: string): Pro
 
 export async function createCoupon(formData: FormData) {
   try {
+    const type = parseInt(formData.get('type') as string) as CouponType;
+    const inputAmount = parseFloat(formData.get('discountAmount') as string);
+    const { value, discountAmount } = parseDiscountFormValues(type, inputAmount);
+
     const couponData: CreateCouponDto = {
       code: formData.get('code') as string,
       description: formData.get('description') as string,
-      type: parseInt(formData.get('type') as string) as CouponType,
-      value: parseFloat(formData.get('value') as string),
-      minimumAmount: parseFloat(formData.get('minimumAmount') as string) || 0,
-      discountAmount: parseFloat(formData.get('value') as string), // Same as value for now
+      type,
+      value,
+      minimumOrderAmount: parseFloat(formData.get('minimumOrderAmount') as string) || 0,
+      discountAmount,
       isActive: formData.get('isActive') === 'on',
       isForNewUsersOnly: formData.get('isForNewUsersOnly') === 'on',
     };
@@ -156,10 +161,6 @@ export async function createCoupon(formData: FormData) {
 
     if (!couponData.description || couponData.description.trim() === '') {
       throw new Error('Coupon description is required');
-    }
-
-    if (couponData.value <= 0) {
-      throw new Error('Coupon value must be greater than 0');
     }
 
     const codeExists = await checkCouponCodeExists(couponData.code);
@@ -193,14 +194,18 @@ export async function updateCoupon(formData: FormData) {
       throw new Error('Coupon not found');
     }
 
+    const type = parseInt(formData.get('type') as string) as CouponType;
+    const inputAmount = parseFloat(formData.get('discountAmount') as string);
+    const { value, discountAmount } = parseDiscountFormValues(type, inputAmount);
+
     const couponData: UpdateCouponDto = {
       id,
       code: formData.get('code') as string,
       description: formData.get('description') as string,
-      type: parseInt(formData.get('type') as string) as CouponType,
-      value: parseFloat(formData.get('value') as string),
-      minimumOrderAmount: parseFloat(formData.get('minimumAmount') as string) || 0,
-      discountAmount: parseFloat(formData.get('value') as string),
+      type,
+      value,
+      minimumOrderAmount: parseFloat(formData.get('minimumOrderAmount') as string) || 0,
+      discountAmount,
       isActive: formData.get('isActive') === 'on',
       isForNewUsersOnly: formData.get('isForNewUsersOnly') === 'on',
     };
@@ -211,10 +216,6 @@ export async function updateCoupon(formData: FormData) {
 
     if (!couponData.description || couponData.description.trim() === '') {
       throw new Error('Coupon description is required');
-    }
-
-    if (couponData.value <= 0) {
-      throw new Error('Coupon value must be greater than 0');
     }
 
     await couponService.update(id, couponData);
