@@ -19,7 +19,7 @@ export default async function WishlistPage({ searchParams }: WishlistPageProps) 
   const user = await getCurrentUser();
   const resolvedSearchParams = await searchParams;
   if (!user) {
-    redirect('/auth/login?redirectTo=/profile/wishlist');
+    redirect('/auth/login?redirectTo=/wishlist');
   }
 
   let wishlists;
