@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { getProducts } from '../../../lib/actions/product-actions';
 import { getInventoryHistory } from '../../../lib/actions/inventory-actions';
 import InventoryManager from '../../../components/admin/InventoryManager';
@@ -35,7 +35,7 @@ export default async function AdminInventoryPage() {
       <div className="container-fluid">
         <div className="row mb-4">
           <div className="col-12">
-            <div className="d-flex justify-content-between align-items-center">
+            <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
               <div>
                 <h1 className="h3 mb-1">Inventory Management</h1>
                 <p className="text-muted mb-0">Monitor and manage your product inventory</p>
@@ -133,7 +133,7 @@ export default async function AdminInventoryPage() {
         <div className="row mb-4">
           <div className="col-12">
             <div className="card">
-              <div className="card-header d-flex justify-content-between align-items-center">
+              <div className="card-header d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                 <h5 className="mb-0">Product Inventory</h5>
                 <div className="d-flex gap-2">
                   <div className="input-group" style={{ width: '300px' }}>
