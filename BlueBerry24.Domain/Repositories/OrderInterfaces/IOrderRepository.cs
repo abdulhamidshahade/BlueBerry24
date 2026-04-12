@@ -17,5 +17,6 @@ namespace BlueBerry24.Domain.Repositories.OrderInterfaces
         Task<Order?> GetOrderByCartIdAsync(int cartId);
         Task<bool> UpdateOrderAsync(Order order);
         Task<bool> DeleteOrderItemsAsync(int orderId);
+        Task<bool> UserHasPaidOrderAsync(int userId);
     }
 }
