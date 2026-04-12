@@ -7,7 +7,9 @@ using BlueBerry24.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
 using BlueBerry24.Domain.Constants;
 using BlueBerry24.Domain.Entities.ProductEntities;
 using BlueBerry24.Domain.Entities.ShoppingCartEntities;
+using BlueBerry24.Application.Dtos.CouponDtos;
 using BlueBerry24.Domain.Repositories;
+using BlueBerry24.Domain.Repositories.OrderInterfaces;
 using BlueBerry24.Domain.Repositories.ShoppingCartInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -25,6 +27,7 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
         private readonly IInventoryService _inventoryService;
         private readonly ICouponService _couponService;
         private readonly IUserCouponService _userCouponService;
+        private readonly IOrderRepository _orderRepository;
 
         public CartService(
                            IMapper mapper,
@@ -35,7 +38,8 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                            IInventoryService inventoryService,
                            IProductService productService,
                            ICouponService couponService,
-                           IUserCouponService userCouponService
+                           IUserCouponService userCouponService,
+                           IOrderRepository orderRepository
                            )
         {
             _mapper = mapper;
@@ -46,6 +50,66 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
             _productService = productService;
             _couponService = couponService;
             _userCouponService = userCouponService;
+            _orderRepository = orderRepository;
+        }
+
+        /// <summary>
+        /// <see cref="CouponDto.Value"/> is authoritative: for <see cref="CouponType.Percentage"/> use a fraction in (0,1] (e.g. 0.20 = 20%),
+        /// or a legacy whole-number percent (&gt; 1, e.g. 20). For <see cref="CouponType.FixedAmount"/>, <c>Value</c> is currency off.
+        /// <see cref="CouponDto.DiscountAmount"/> is a display companion; used as fallback when <c>Value</c> is missing.
+        /// </summary>
+        private static decimal GetPercentageRate(CouponDto coupon)
+        {
+            if (coupon.Value > 0)
+            {
+                return coupon.Value <= 1m ? coupon.Value : coupon.Value / 100m;
+            }
+
+            if (coupon.DiscountAmount > 0)
+            {
+                return coupon.DiscountAmount / 100m;
+            }
+
+            return 0;
+        }
+
+        private static decimal GetFixedDiscountAmount(CouponDto coupon)
+        {
+            if (coupon.Value > 0)
+            {
+                return coupon.Value;
+            }
+
+            return coupon.DiscountAmount > 0 ? coupon.DiscountAmount : 0;
+        }
+
+        private static decimal ComputePercentageDiscount(CouponDto coupon, decimal cartSubTotal)
+        {
+            var rate = GetPercentageRate(coupon);
+            return rate > 0
+                ? Math.Round(cartSubTotal * rate, 2, MidpointRounding.AwayFromZero)
+                : 0;
+        }
+
+        private static decimal ComputeFixedDiscount(CouponDto coupon, decimal cartSubTotal)
+        {
+            var amt = GetFixedDiscountAmount(coupon);
+            return amt > 0 ? Math.Min(amt, cartSubTotal) : 0;
+        }
+
+        private static decimal ComputeDiscountAmount(CouponDto coupon, decimal cartSubTotal)
+        {
+            if (cartSubTotal <= 0)
+            {
+                return 0;
+            }
+
+            return coupon.Type switch
+            {
+                CouponType.Percentage => ComputePercentageDiscount(coupon, cartSubTotal),
+                CouponType.FixedAmount => ComputeFixedDiscount(coupon, cartSubTotal),
+                _ => 0
+            };
         }
 
 
@@ -78,70 +142,97 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
             if (dbCart == null)
             {
                 await CreateCartAsync(null, sessionId);
+                dbCart = await _cartRepository.GetCartBySessionIdAsync(sessionId, status);
             }
 
-            var mappedCart = _mapper.Map<CartDto>(dbCart);
-
-            return mappedCart;
+            return _mapper.Map<CartDto>(dbCart);
         }
 
         public async Task MergeCartAsync(int userId, string sessionId)
         {
-
-            var cartById = await _cartRepository.GetCartByUserIdAsync(userId, CartStatus.Active);
-
-            //if(cartById != null)
-            //{
-            //    return null;
-            //}
-
-
-            var cart = await _cartRepository.GetCartBySessionIdAsync(sessionId);
-
-
-            if (cart.CartItems.Count != 0)
+            if (string.IsNullOrWhiteSpace(sessionId))
             {
-                //await CreateCartAsync(null, sessionId);
-                //cart = await _cartRepository.GetCartBySessionIdAsync(sessionId);
-
-
-                cart.SessionId = null;
-                cart.UserId = userId;
-
-                var cartItems = cart.CartItems.Where(i => i.ShoppingCartId == cart.Id).ToList();
-
-                foreach (var item in cartItems)
-                {
-                    var isExistsingItem = await _cartRepository.IsItemExistingByRealCart(cart.Id, item.ProductId, userId);
-                    if (isExistsingItem != null)
-                    {
-                        await _cartRepository.UpdateItemQuantityAsync(userId, null, item.ProductId, item.Quantity + isExistsingItem.Quantity);
-                        await _cartRepository.RemoveItemAsync(cart.Id, userId, item.ProductId);
-                    }
-                    else
-                    {
-                        item.SessionId = null;
-                        if (cartById != null)
-                        {
-                            item.ShoppingCartId = cartById.Id;
-                        }
-                        item.UserId = userId;
-                    }
-                }
-
-                if (cartById != null)
-                {
-                    await _cartRepository.DeleteCartById(cart.Id);
-                }
-
-                //var updatedItems = await _cartRepository.UpdateItemsAsync(cartItems);
-
-                //TODO here the shopping cart's items will update successfully because the cart has navigation property for items List<CartItem>
-                //var updatedCart = await _cartRepository.UpdateCartAsync(cart);
-
-
+                return;
             }
 
+            var sessionCart = await _cartRepository.GetCartBySessionIdAsync(sessionId, CartStatus.Active);
+            if (sessionCart == null || sessionCart.CartItems == null || sessionCart.CartItems.Count == 0)
+            {
+                return;
+            }
+
+            var guestItems = sessionCart.CartItems.Where(i => i.ShoppingCartId == sessionCart.Id).ToList();
+            if (guestItems.Count == 0)
+            {
+                return;
+            }
+
+            var userCart = await _cartRepository.GetCartByUserIdAsync(userId, CartStatus.Active);
+
+            if (userCart == null)
+            {
+                sessionCart.UserId = userId;
+                sessionCart.SessionId = null;
+                foreach (var item in sessionCart.CartItems)
+                {
+                    item.UserId = userId;
+                    item.SessionId = null;
+                }
+
+                await _cartRepository.UpdateCartAsync(sessionCart);
+                _logger.LogInformation("Merged guest cart {CartId} into user {UserId} (took over guest cart)", sessionCart.Id, userId);
+                return;
+            }
+
+            foreach (var guestItem in guestItems)
+            {
+                var userCartFresh = await _cartRepository.GetCartByUserIdAsync(userId, CartStatus.Active);
+                if (userCartFresh == null)
+                {
+                    _logger.LogWarning("User {UserId} lost active cart during merge; stopping", userId);
+                    break;
+                }
+
+                var productId = guestItem.ProductId;
+                var guestQty = guestItem.Quantity;
+                var unitPrice = guestItem.UnitPrice;
+                var userLine = userCartFresh.CartItems?.FirstOrDefault(i => i.ProductId == productId);
+
+                var released = await _inventoryService.ReleaseReservedStockAsync(productId, guestQty, sessionCart.Id, "CartItem");
+                if (!released)
+                {
+                    _logger.LogWarning("Could not release guest reservation for product {ProductId} on cart {CartId}", productId, sessionCart.Id);
+                    continue;
+                }
+
+                var reserved = await _inventoryService.ReserveStockAsync(productId, guestQty, userCartFresh.Id, "CartItem");
+                if (!reserved)
+                {
+                    _logger.LogWarning("Could not reserve product {ProductId} on user cart {CartId}; restoring guest reservation", productId, userCartFresh.Id);
+                    await _inventoryService.ReserveStockAsync(productId, guestQty, sessionCart.Id, "CartItem");
+                    continue;
+                }
+
+                if (userLine != null)
+                {
+                    var combined = userLine.Quantity + guestQty;
+                    await _cartRepository.UpdateItemQuantityAsync(userId, null, productId, combined);
+                }
+                else
+                {
+                    await _cartRepository.CreateItemAsync(userCartFresh.Id, userId, null, productId, guestQty, unitPrice);
+                }
+
+                await _cartRepository.RemoveItemAsync(null, sessionId, productId);
+            }
+
+            var leftover = await _cartRepository.GetCartByIdAsync(sessionCart.Id, CartStatus.Active);
+            if (leftover?.CartItems == null || leftover.CartItems.Count == 0)
+            {
+                await _cartRepository.DeleteCartById(sessionCart.Id);
+            }
+
+            _logger.LogInformation("Merged guest session {SessionId} into user {UserId} cart {UserCartId}", sessionId, userId, userCart.Id);
         }
 
         public async Task<CartDto> GetCartByIdAsync(int cartId, CartStatus status)
@@ -652,8 +743,18 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                 var cart = await _cartRepository.GetCartByIdAsync(cartId, CartStatus.Active);
                 if (cart == null)
                 {
+                    cart = await _cartRepository.GetCartByIdAsync(cartId, CartStatus.PendingPayment);
+                }
+
+                if (cart == null)
+                {
                     _logger.LogWarning("Cart not found: {CartId}", cartId);
                     return false;
+                }
+
+                if (cart.Status == status)
+                {
+                    return true;
                 }
 
                 cart.Status = status;
@@ -771,6 +872,11 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                     return null;
                 }
 
+                if (!userId.HasValue || userId.Value <= 0)
+                {
+                    return null;
+                }
+
                 var coupon = await _couponService.GetByCodeAsync(couponCode);
 
                 if (coupon == null || !coupon.IsActive || await _userCouponService.IsCouponUsedByUser(userId.Value, couponCode))
@@ -783,46 +889,23 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                     return null;
                 }
 
-                decimal cartSubTotal = cart.SubTotal;
+                if (coupon.IsForNewUsersOnly && await _orderRepository.UserHasPaidOrderAsync(userId.Value))
+                {
+                    return null;
+                }
 
+                decimal cartSubTotal = cart.SubTotal;
 
                 if (coupon.MinimumOrderAmount > 0 && cartSubTotal < coupon.MinimumOrderAmount)
                 {
                     return null;
                 }
 
-                decimal discountAmount = 0;
-
-                if (coupon.MinimumOrderAmount == 0)
+                var discountAmount = ComputeDiscountAmount(coupon, cartSubTotal);
+                if (discountAmount <= 0)
                 {
-                    switch (coupon.Type)
-                    {
-                        case CouponType.Percentage:
-                            discountAmount = cartSubTotal * (coupon.Value / 100);
-                            break;
-                        case CouponType.FixedAmount:
-                            discountAmount = Math.Min(coupon.DiscountAmount, cartSubTotal);
-                            break;
-                    }
+                    return null;
                 }
-                else
-                {
-                    if (coupon.MinimumOrderAmount <= cartSubTotal)
-                        switch (coupon.Type)
-                        {
-                            case CouponType.Percentage:
-                                discountAmount = cartSubTotal * (coupon.Value / 100);
-                                break;
-                            case CouponType.FixedAmount:
-                                discountAmount = coupon.DiscountAmount;
-                                break;
-                        }
-                    else
-                    {
-                        return null;
-                    }
-                }
-
 
                 var cartCoupon = new CartCoupon
                 {
