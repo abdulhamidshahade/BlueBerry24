@@ -84,6 +84,8 @@ namespace BlueBerry24.Infrastructure.DI
                 ServiceLifetime.Scoped
                 ));
 
+            serviceDescriptors.AddScoped<DataSeeder>();
+
             return serviceDescriptors;
         }
     }
