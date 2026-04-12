@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { CategoryService } from '../../../lib/services/category/service';
 import { ICategoryService } from "../../../lib/services/category/interface";
 import { CategoryDto } from "../../../types/category";
@@ -30,7 +30,7 @@ export default async function AdminCategoriesPage({ searchParams }: Props) {
     <div className="container-fluid">
       <div className="row mb-4">
         <div className="col-12">
-          <div className="d-flex justify-content-between align-items-center">
+          <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
             <div>
               <h1 className="h2 mb-1">
                 <i className="bi bi-gear me-2 text-primary"></i>
@@ -96,7 +96,7 @@ export default async function AdminCategoriesPage({ searchParams }: Props) {
         <div className="col-12">
           <div className="card shadow-sm border-0">
             <div className="card-header bg-white py-3">
-              <div className="d-flex justify-content-between align-items-center">
+              <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                 <h5 className="card-title mb-0">
                   <i className="bi bi-list-ul me-2"></i>
                   Categories ({categories.length})
