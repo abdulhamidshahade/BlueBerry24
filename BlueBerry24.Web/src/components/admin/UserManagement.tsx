@@ -1,4 +1,4 @@
-import { UserWithRoles, Role } from '../../types/roleManagement';
+﻿import { UserWithRoles, Role } from '../../types/roleManagement';
 import {
   promoteUserToAdmin,
   demoteAdminUser,
@@ -239,7 +239,7 @@ export default function UserManagement({
       </div>
 
       <div className="card shadow mb-4">
-        <div className="card-header py-3 d-flex justify-content-between align-items-center">
+        <div className="card-header py-3 d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
           <h6 className="m-0 font-weight-bold text-primary">Current Admin Users</h6>
           <span className="badge bg-primary">{filteredAdminUsers.length} Users</span>
         </div>
@@ -370,7 +370,7 @@ export default function UserManagement({
       </div>
 
       <div className="card shadow">
-        <div className="card-header py-3 d-flex justify-content-between align-items-center">
+        <div className="card-header py-3 d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
           <h6 className="m-0 font-weight-bold text-success">Users Available for Promotion</h6>
           <span className="badge bg-success">{filteredRegularUsers.length} Users</span>
         </div>
