@@ -36,22 +36,22 @@ function HeroSection() {
           <div className="col-lg-6 text-center">
             <div className="hero-image mt-4 mt-lg-0">
               <i className="bi bi-bag-heart display-1 text-warning opacity-75"></i>
-              <div className="mt-3">
-                <div className="d-flex justify-content-center gap-3">
-                  <div className="badge bg-warning text-dark fs-6">
-                    <i className="bi bi-truck me-1"></i>
-                    Free Shipping
-                  </div>
-                  <div className="badge bg-warning text-dark fs-6">
-                    <i className="bi bi-shield-check me-1"></i>
-                    Secure Payment
-                  </div>
-                  <div className="badge bg-warning text-dark fs-6">
-                    <i className="bi bi-arrow-clockwise me-1"></i>
-                    Easy Returns
+                <div className="mt-3">
+                  <div className="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+                    <div className="badge bg-warning text-dark fs-6 px-3 py-2">
+                      <i className="bi bi-truck me-1"></i>
+                      Free Shipping
+                    </div>
+                    <div className="badge bg-warning text-dark fs-6 px-3 py-2">
+                      <i className="bi bi-shield-check me-1"></i>
+                      Secure Payment
+                    </div>
+                    <div className="badge bg-warning text-dark fs-6 px-3 py-2">
+                      <i className="bi bi-arrow-clockwise me-1"></i>
+                      Easy Returns
+                    </div>
                   </div>
                 </div>
-              </div>
             </div>
           </div>
         </div>
