@@ -1,4 +1,4 @@
-import { Role, UserWithRoles } from '../../types/roleManagement';
+﻿import { Role, UserWithRoles } from '../../types/roleManagement';
 import { assignRoleToUserAction, removeRoleFromUserAction } from '../../lib/actions/roleManagement';
 
 interface UsersTableProps {
@@ -418,7 +418,7 @@ export default function UsersTable({
 
         {totalPages > 1 && (
           <div className="card-footer">
-            <div className="d-flex justify-content-between align-items-center">
+            <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
               <div className="text-muted small">
                 Page {currentPage} of {totalPages} ({totalUsers} total users)
               </div>
