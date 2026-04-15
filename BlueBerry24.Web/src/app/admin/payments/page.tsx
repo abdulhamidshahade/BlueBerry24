@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { getAllPayments } from '../../../lib/actions/payment-actions';
 import { PaymentStatus, PaymentMethod, Payment } from '../../../types/payment';
 
@@ -181,7 +181,7 @@ export default async function AdminPaymentsPage({ searchParams }: AdminPaymentsP
       </div>
 
       <div className="card">
-        <div className="card-header d-flex justify-content-between align-items-center">
+        <div className="card-header d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
           <h5 className="mb-0">Payment Transactions</h5>
           <span className="badge bg-primary">{payments.length} total</span>
         </div>
