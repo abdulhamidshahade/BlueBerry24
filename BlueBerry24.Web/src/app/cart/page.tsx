@@ -90,18 +90,18 @@ export default async function CartPage({
 
         <div className="row">
           <div className="col-12">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <h1 className="mb-0 d-flex align-items-center gap-3">
-                <i className="bi bi-cart3 me-2"></i>
+            <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-column flex-sm-row gap-3 mb-4">
+              <h1 className="mb-0 d-flex align-items-center flex-wrap gap-2">
+                <i className="bi bi-cart3"></i>
                 Shopping Cart
                 {hasItems && (
-                  <span className="badge bg-primary ms-2">
+                  <span className="badge bg-primary">
                     {cart.cartItems.reduce((sum, item) => sum + item.quantity, 0)} items
                   </span>
                 )}
                 <CartStatusIndicator status={cart.status} />
               </h1>
-              <Link href="/products" className="btn btn-outline-primary">
+              <Link href="/products" className="btn btn-outline-primary flex-shrink-0">
                 <i className="bi bi-arrow-left me-2"></i>
                 Continue Shopping
               </Link>
