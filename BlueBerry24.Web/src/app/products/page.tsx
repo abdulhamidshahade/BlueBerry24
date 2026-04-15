@@ -100,16 +100,16 @@ function ProductsHeader({ category, searchTerm, totalCount }: {
   const countText = totalCount > 0 ? ` (${totalCount} items)` : '';
   
   return (
-    <div className="bg-primary text-white py-5 mb-5">
+    <div className="bg-primary text-white py-4 py-md-5 mb-4 mb-md-5">
       <div className="container">
         <div className="row align-items-center">
           <div className="col-lg-8">
-            <h1 className="display-4 fw-bold mb-3">
-              <i className="bi bi-shop me-3"></i>{categoryText}{searchText}
+            <h1 className="h2 h1-md fw-bold mb-3">
+              <i className="bi bi-shop me-2"></i>{categoryText}{searchText}
             </h1>
-            <p className="lead mb-0">
-              Discover our amazing collection of high-quality products{countText}. 
-              Find exactly what you're looking for with great prices and excellent service.
+            <p className="mb-0">
+              Discover our amazing collection of high-quality products{countText}.
+              Find exactly what you&apos;re looking for with great prices and excellent service.
             </p>
           </div>
           <div className="col-lg-4 text-end d-none d-lg-block">
