@@ -218,6 +218,12 @@ if (useHsts && app.Environment.IsProduction())
 app.UseRateLimiter();
 
 var runMigrationsOnStartup = builder.Configuration.GetValue("Database:RunMigrationsOnStartup", false);
+Log.Information(
+    "Startup configuration → RunMigrationsOnStartup={RunMigrations}, RunSeedOnStartup={RunSeed}, Environment={Env}",
+    runMigrationsOnStartup,
+    builder.Configuration.GetValue("Database:RunSeedOnStartup", false),
+    app.Environment.EnvironmentName);
+
 if (runMigrationsOnStartup)
 {
     using var scope = app.Services.CreateScope();
