@@ -41,6 +41,16 @@ namespace BlueBerry24.Infrastructure.Data
                 return;
             }
 
+            bool canConnect;
+            try { canConnect = await _context.Database.CanConnectAsync(); }
+            catch { canConnect = false; }
+
+            if (!canConnect)
+            {
+                Console.WriteLine("Database is not reachable; skipping seed. Ensure migrations have run.");
+                return;
+            }
+
             try
             {
                 Console.WriteLine("Starting database seeding...");
