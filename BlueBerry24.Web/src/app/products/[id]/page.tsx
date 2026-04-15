@@ -57,12 +57,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   src={product.imageUrl} 
                   className="card-img-top"
                   alt={product.name}
-                  style={{ height: '500px', objectFit: 'contain' }}
+                  style={{ maxHeight: '500px', height: 'min(60vw, 500px)', objectFit: 'contain' }}
                 />
               ) : (
                 <div 
                   className="card-img-top bg-light d-flex align-items-center justify-content-center"
-                  style={{ height: '500px' }}
+                  style={{ maxHeight: '500px', height: 'min(60vw, 500px)' }}
                 >
                   <i className="bi bi-image display-1 text-muted"></i>
                 </div>
@@ -88,7 +88,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
             </div>
 
             <div className="mb-4">
-              <span className="display-4 text-primary fw-bold">
+              <span className="fs-1 text-primary fw-bold">
                 ${product.price.toFixed(2)}
               </span>
             </div>
