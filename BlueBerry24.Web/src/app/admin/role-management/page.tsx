@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+﻿import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '../../../lib/actions/auth-actions';
 import RoleManagementHeader from '../../../components/roleManagement/RoleManagementHeader';
@@ -262,49 +262,49 @@ export default async function RoleManagementPage({ searchParams }: RoleManagemen
                     </h3>
                     <div className="row g-3">
                       <div className="col-6">
-                        <div className="d-flex justify-content-between align-items-center">
+                        <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                           <span className="text-muted small">Total Roles:</span>
                           <span className="fw-medium text-primary">{roles.length}</span>
                         </div>
                       </div>
                       <div className="col-6">
-                        <div className="d-flex justify-content-between align-items-center">
+                        <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                           <span className="text-muted small">System Roles:</span>
                           <span className="fw-medium text-secondary">{additionalStats.systemRoles}</span>
                         </div>
                       </div>
                       <div className="col-6">
-                        <div className="d-flex justify-content-between align-items-center">
+                        <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                           <span className="text-muted small">Custom Roles:</span>
                           <span className="fw-medium text-info">{additionalStats.customRoles}</span>
                         </div>
                       </div>
                       <div className="col-6">
-                        <div className="d-flex justify-content-between align-items-center">
+                        <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                           <span className="text-muted small">Total Users:</span>
                           <span className="fw-medium text-primary">{users.length}</span>
                         </div>
                       </div>
                       <div className="col-6">
-                        <div className="d-flex justify-content-between align-items-center">
+                        <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                           <span className="text-muted small">Super Admins:</span>
                           <span className="fw-medium text-danger">{roleDistribution.superAdmins}</span>
                         </div>
                       </div>
                       <div className="col-6">
-                        <div className="d-flex justify-content-between align-items-center">
+                        <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                           <span className="text-muted small">Admins:</span>
                           <span className="fw-medium text-warning">{roleDistribution.admins}</span>
                         </div>
                       </div>
                       <div className="col-6">
-                        <div className="d-flex justify-content-between align-items-center">
+                        <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                           <span className="text-muted small">Regular Users:</span>
                           <span className="fw-medium text-success">{roleDistribution.regularUsers}</span>
                         </div>
                       </div>
                       <div className="col-6">
-                        <div className="d-flex justify-content-between align-items-center">
+                        <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                           <span className="text-muted small">Unassigned:</span>
                           <span className="fw-medium text-secondary">{roleDistribution.unassigned}</span>
                         </div>
