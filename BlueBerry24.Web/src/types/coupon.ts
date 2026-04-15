@@ -5,15 +5,15 @@ export interface CouponDto {
   minimumOrderAmount: number;
   description: string;
   isActive: boolean;
-  type: CouponType;
-  value: number;
+    type: CouponType;
+    value: number;
   isForNewUsersOnly: boolean;
 }
 
 export interface CreateCouponDto {
   code: string;
   discountAmount: number;
-  minimumAmount: number;
+  minimumOrderAmount: number;
   description: string;
   isActive: boolean;
   type: CouponType;
