@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { OrderService } from '../../../lib/services/order/service';
 import { redirect } from 'next/navigation';
 import { formatCurrency } from '../../../lib/utils/formatCurrency';
@@ -54,27 +54,25 @@ export default async function OrderReviewPage({ searchParams }: OrderReviewPageP
           </ol>
         </nav>
 
-        <div className="mb-4">
-          <div className="d-flex justify-content-center">
-            <div className="d-flex align-items-center text-center">
-              <div className="d-flex align-items-center text-primary me-4">
-                <i className="bi bi-check-circle-fill me-2"></i>
-                <span className="fw-medium">Checkout</span>
-              </div>
-              <div className="border-top border-primary flex-fill mx-3" style={{width: '50px'}}></div>
-              <div className="d-flex align-items-center text-primary me-4">
-                <i className="bi bi-check-circle-fill me-2"></i>
-                <span className="fw-medium">Order Review</span>
-              </div>
-              <div className="border-top border-secondary flex-fill mx-3" style={{width: '50px'}}></div>
-              <div className="d-flex align-items-center text-muted me-4">
-                <span className="fw-medium">Payment</span>
-              </div>
-              <div className="border-top border-secondary flex-fill mx-3" style={{width: '50px'}}></div>
-              <div className="d-flex align-items-center text-muted">
-                <span className="me-2">4</span>
-                <span>Confirmation</span>
-              </div>
+        {/* Checkout progress stepper — scrollable on small screens */}
+        <div className="mb-4 overflow-x-auto">
+          <div className="d-flex align-items-center justify-content-center text-center" style={{minWidth: '360px'}}>
+            <div className="d-flex align-items-center text-primary">
+              <i className="bi bi-check-circle-fill me-1 me-sm-2"></i>
+              <span className="fw-medium small">Checkout</span>
+            </div>
+            <div className="border-top border-primary mx-2 mx-sm-3 flex-fill" style={{minWidth: '24px'}}></div>
+            <div className="d-flex align-items-center text-primary">
+              <i className="bi bi-check-circle-fill me-1 me-sm-2"></i>
+              <span className="fw-medium small">Order Review</span>
+            </div>
+            <div className="border-top border-secondary mx-2 mx-sm-3 flex-fill" style={{minWidth: '24px'}}></div>
+            <div className="d-flex align-items-center text-muted">
+              <span className="small fw-medium">Payment</span>
+            </div>
+            <div className="border-top border-secondary mx-2 mx-sm-3 flex-fill" style={{minWidth: '24px'}}></div>
+            <div className="d-flex align-items-center text-muted">
+              <span className="small">Confirmation</span>
             </div>
           </div>
         </div>
@@ -106,7 +104,7 @@ export default async function OrderReviewPage({ searchParams }: OrderReviewPageP
                           <h6 className="mb-0">{item.productName}</h6>
                           <span className="fw-medium">{formatCurrency(item.totalPrice)}</span>
                         </div>
-                        <div className="d-flex justify-content-between align-items-center">
+                        <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                           <small className="text-muted">Qty {item.quantity}</small>
                           <small className="text-muted">{formatCurrency(item.unitPrice)} each</small>
                         </div>
