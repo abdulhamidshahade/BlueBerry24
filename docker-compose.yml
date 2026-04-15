@@ -64,6 +64,12 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7105/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
     networks:
       - blueberry24-network
 
@@ -92,7 +98,8 @@ services:
     ports:
       - "30305:30305"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - blueberry24-network
 
