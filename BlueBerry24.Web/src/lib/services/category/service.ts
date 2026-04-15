@@ -3,7 +3,6 @@ import { ICategoryService } from "./interface";
 import { ResponseDto } from "../../../types/responseDto";
 import { apiRequest } from "../../utils/api";
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const API_BASE = process.env.API_BASE_CATEGORY;
 
 export class CategoryService implements ICategoryService {
