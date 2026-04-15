@@ -7,11 +7,12 @@ export function middleware(request: NextRequest) {
   const session = request.cookies.get("cart_session");
   if (!session) {
     const newSessionId = crypto.randomUUID();
+    const isProduction = process.env.NODE_ENV === "production";
     response.cookies.set("cart_session", newSessionId, {
       path: "/",
       httpOnly: true,
       sameSite: "lax",
-      secure: true,
+      secure: isProduction,
       maxAge: 30 * 24 * 60 * 60,
     });
   }
@@ -19,7 +20,7 @@ export function middleware(request: NextRequest) {
   const authToken = request.cookies.get("auth_token");
   const { pathname } = request.nextUrl;
 
-  const protectedRoutes = ["/profile", "/orders", "/admin"];
+  const protectedRoutes = ["/profile", "/orders", "/wishlist", "/admin"];
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route)
   );
