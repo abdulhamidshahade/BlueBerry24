@@ -42,9 +42,9 @@ namespace BlueBerry24.Infrastructure.DI
                         sqloptions.MigrationsAssembly("BlueBerry24.Infrastructure");
 
                         sqloptions.EnableRetryOnFailure(
-                            maxRetryCount: 5,
+                            maxRetryCount: 10,
                             maxRetryDelay: TimeSpan.FromSeconds(30),
-                            errorNumbersToAdd: null);
+                            errorNumbersToAdd: new[] { 4060 }); // 4060 = database not yet online (startup timing)
                         sqloptions.CommandTimeout(120);
                     });
 
