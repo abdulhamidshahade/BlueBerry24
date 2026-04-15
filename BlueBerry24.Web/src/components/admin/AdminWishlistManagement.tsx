@@ -1,4 +1,4 @@
-import { 
+﻿import { 
   adminDeleteWishlist, 
   adminClearWishlist, 
   adminToggleWishlistVisibility, 
@@ -183,7 +183,7 @@ export default function AdminWishlistManagement({
       </div>
 
       <div className="card">
-        <div className="card-header d-flex justify-content-between align-items-center">
+        <div className="card-header d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
           <h5 className="card-title mb-0">
             <i className="bi bi-table me-2"></i>
             All Wishlists ({wishlists.length})
