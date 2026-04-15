@@ -41,15 +41,29 @@ interface CouponValueDisplayProps {
   coupon: CouponDto;
 }
 
-export function CouponValueDisplay({ coupon }: CouponValueDisplayProps) {
+function formatCouponDiscountLabel(coupon: CouponDto): string {
   switch (coupon.type) {
-    case CouponType.Percentage:
-      return `${coupon.value}%`;
-    case CouponType.FixedAmount:
-      return `$${coupon.value.toFixed(2)}`;
+    case CouponType.Percentage: {
+      const pct =
+        coupon.value > 0 && coupon.value <= 1
+          ? coupon.value * 100
+          : coupon.value > 1
+            ? coupon.value
+            : coupon.discountAmount;
+      const rounded = Math.abs(pct - Math.round(pct)) < 1e-6 ? Math.round(pct) : pct;
+      return `${rounded}%`;
+    }
+    case CouponType.FixedAmount: {
+      const amt = coupon.value > 0 ? coupon.value : coupon.discountAmount;
+      return `$${amt.toFixed(2)}`;
+    }
     default:
-      return `$${coupon.value.toFixed(2)}`;
+      return '';
   }
+}
+
+export function CouponValueDisplay({ coupon }: CouponValueDisplayProps) {
+  return formatCouponDiscountLabel(coupon);
 }
 
 interface CouponStatusDisplayProps {
