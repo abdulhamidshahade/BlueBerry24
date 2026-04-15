@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { getProducts } from '../../lib/actions/product-actions';
 import { IOrderService } from '../../lib/services/order/interface';
 import { OrderService } from '../../lib/services/order/service';
@@ -29,7 +29,7 @@ export default async function AdminDashboard() {
       <div className="container-fluid">
         <div className="row mb-4">
           <div className="col-12">
-            <div className="d-flex justify-content-between align-items-center">
+            <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
               <div>
                 <h1 className="h3 mb-1">Dashboard Overview</h1>
                 <p className="text-muted mb-0">Welcome back! Here's what's happening in your store.</p>
@@ -46,7 +46,7 @@ export default async function AdminDashboard() {
           <div className="col-md-3">
             <div className="card bg-primary text-white">
               <div className="card-body">
-                <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                   <div>
                     <h4 className="mb-1">{totalSales}</h4>
                     <small className="opacity-75">Total Sales</small>
@@ -66,7 +66,7 @@ export default async function AdminDashboard() {
           <div className="col-md-3">
             <div className="card bg-success text-white">
               <div className="card-body">
-                <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                   <div>
                     <h4 className="mb-1">{orders.length}</h4>
                     <small className="opacity-75">Total Orders</small>
@@ -86,7 +86,7 @@ export default async function AdminDashboard() {
           <div className="col-md-3">
             <div className="card bg-info text-white">
               <div className="card-body">
-                <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                   <div>
                     <h4 className="mb-1">{totalProducts}</h4>
                     <small className="opacity-75">Total Products</small>
@@ -105,7 +105,7 @@ export default async function AdminDashboard() {
           <div className="col-md-3">
             <div className="card bg-warning text-white">
               <div className="card-body">
-                <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                   <div>
                     <h4 className="mb-1">{(await userService.getAll()).length}</h4>
                     <small className="opacity-75">Total Customers</small>
@@ -199,7 +199,7 @@ export default async function AdminDashboard() {
         <div className="row">
           <div className="col-md-6">
             <div className="card">
-              <div className="card-header d-flex justify-content-between align-items-center">
+              <div className="card-header d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                 <h5 className="mb-0">Recent Orders</h5>
                 <Link href="/admin/orders" className="btn btn-sm btn-outline-primary">
                   View All
