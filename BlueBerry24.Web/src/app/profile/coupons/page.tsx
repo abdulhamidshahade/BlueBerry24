@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+﻿import { Suspense } from 'react';
 import Link from 'next/link';
 import { getCurrentUser } from '../../../lib/actions/auth-actions';
 import { getUserCoupons, hasUserUsedCoupon } from '../../../lib/actions/coupon-actions';
@@ -37,7 +37,7 @@ async function CouponCard({ coupon, userId }: { coupon: CouponDto; userId: numbe
   return (
     <div key={coupon.id} className="col-md-6 col-lg-4 mb-4">
       <div className={`card h-100 ${!coupon.isActive ? 'border-secondary opacity-75' : hasUsed ? 'border-warning' : 'border-primary shadow-sm'}`}>
-        <div className="card-header bg-light d-flex justify-content-between align-items-center">
+        <div className="card-header bg-light d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
           <div className="d-flex align-items-center">
             <i className="bi bi-ticket-detailed me-2 text-primary"></i>
             <strong className="text-primary">{coupon.code}</strong>
