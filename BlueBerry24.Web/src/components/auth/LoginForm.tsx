@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { loginFormSubmitAction } from '../../lib/actions/auth-actions';
@@ -106,7 +106,7 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
             />
           </div>
 
-          <div className="mb-3 d-flex justify-content-between align-items-center">
+          <div className="mb-3 d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
             <div className="form-check">
               <input
                 type="checkbox"
