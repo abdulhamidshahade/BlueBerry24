@@ -24,6 +24,25 @@ export default async function Navigation() {
           BlueBerry24
         </Link>
 
+        {/* Cart + user always visible on mobile (left of hamburger) */}
+        <div className="d-flex d-lg-none gap-2 align-items-center ms-auto me-2">
+          <Suspense fallback={<MiniCartFallback />}>
+            <MiniCart />
+          </Suspense>
+          {user ? (
+            <UserMenu user={user} />
+          ) : (
+            <>
+              <Link href="/auth/login" className="btn btn-outline-light btn-sm">
+                <i className="bi bi-box-arrow-in-right"></i>
+              </Link>
+              <Link href="/auth/register" className="btn btn-light btn-sm">
+                <i className="bi bi-person-plus"></i>
+              </Link>
+            </>
+          )}
+        </div>
+
         <button
           className="navbar-toggler"
           type="button"
@@ -36,6 +55,7 @@ export default async function Navigation() {
           <span className="navbar-toggler-icon"></span>
         </button>
 
+        {/* Collapsible section: nav links + desktop cart/user */}
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav me-auto">
             <li className="nav-item">
@@ -58,27 +78,22 @@ export default async function Navigation() {
             </li>
           </ul>
 
-          <div className="d-flex gap-2 align-items-center">
+          {/* Cart + user visible only on desktop inside collapse */}
+          <div className="d-none d-lg-flex gap-2 align-items-center">
             <Suspense fallback={<MiniCartFallback />}>
               <MiniCart />
             </Suspense>
-            
-            <Link href="/cart" className="btn btn-outline-light">
-              <i className="bi bi-cart3 me-1"></i>
-              <span className="d-none d-lg-inline">View Cart</span>
-            </Link>
-
             {user ? (
               <UserMenu user={user} />
             ) : (
               <div className="d-flex gap-2">
                 <Link href="/auth/login" className="btn btn-outline-light">
                   <i className="bi bi-box-arrow-in-right me-1"></i>
-                  <span className="d-none d-md-inline">Sign In</span>
+                  Sign In
                 </Link>
                 <Link href="/auth/register" className="btn btn-light">
                   <i className="bi bi-person-plus me-1"></i>
-                  <span className="d-none d-md-inline">Sign Up</span>
+                  Sign Up
                 </Link>
               </div>
             )}
