@@ -41,13 +41,20 @@ namespace BlueBerry24.Infrastructure.Data
                 return;
             }
 
-            bool canConnect;
-            try { canConnect = await _context.Database.CanConnectAsync(); }
-            catch { canConnect = false; }
-
-            if (!canConnect)
+            try
             {
-                Console.WriteLine("Database is not reachable; skipping seed. Ensure migrations have run.");
+                var pending = (await _context.Database.GetPendingMigrationsAsync()).ToList();
+                if (pending.Count > 0)
+                {
+                    Console.WriteLine($"Skipping seed: {pending.Count} migration(s) still pending " +
+                        $"({string.Join(", ", pending)}). " +
+                        "Run 'dotnet ef database update' or set Database:RunMigrationsOnStartup=true.");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Skipping seed: unable to verify migration state – {ex.Message}");
                 return;
             }
 
