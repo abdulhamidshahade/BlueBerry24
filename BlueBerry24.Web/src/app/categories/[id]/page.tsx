@@ -78,27 +78,25 @@ async function CategoryProducts({ category }: { category: CategoryDto }) {
 
 function CategoryHeader({ category }: { category: CategoryDto }) {
     return (
-        <div className="bg-primary text-white py-5 mb-5">
+        <div className="bg-primary text-white py-4 py-md-5 mb-4 mb-md-5">
             <div className="container">
                 <div className="row align-items-center">
                     <div className="col-lg-8">
-                        <div className="d-flex align-items-center mb-3">
-                            <div className="me-4">
-                                <img
-                                    src={category.imageUrl}
-                                    alt={category.name}
-                                    className="rounded-circle border border-white border-3"
-                                    style={{ width: '80px', height: '80px', objectFit: 'cover' }}
-                                />
-                            </div>
+                        <div className="d-flex align-items-center flex-column flex-sm-row mb-3 text-center text-sm-start gap-3">
+                            <img
+                                src={category.imageUrl}
+                                alt={category.name}
+                                className="rounded-circle border border-white border-3 flex-shrink-0"
+                                style={{ width: '72px', height: '72px', objectFit: 'cover' }}
+                            />
                             <div>
-                                <h1 className="display-4 fw-bold mb-2">{category.name}</h1>
+                                <h1 className="h2 h1-md fw-bold mb-2">{category.name}</h1>
                                 <div className="badge bg-light text-primary fs-6 px-3 py-2">
                                     {category.products.filter(p => p.isActive).length} Products Available
                                 </div>
                             </div>
                         </div>
-                        <p className="lead mb-0">{category.description}</p>
+                        <p className="lead mb-0 text-center text-sm-start">{category.description}</p>
                     </div>
                     <div className="col-lg-4 text-end d-none d-lg-block">
                         <i className="bi bi-grid-3x3-gap-fill display-1 opacity-50"></i>
