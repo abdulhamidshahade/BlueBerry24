@@ -25,10 +25,10 @@ services:
           memory: 2G
     healthcheck:
       test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -Q 'SELECT 1' -C"]
-      interval: 30s
-      timeout: 30s
-      retries: 5
-      start_period: 60s
+      interval: 15s
+      timeout: 15s
+      retries: 10
+      start_period: 90s
 
   # Backend API
   backend:
@@ -37,12 +37,18 @@ services:
       dockerfile: BlueBerry24.API/Dockerfile
     container_name: blueberry24-backend
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:7105
-      - ConnectionStrings__MSSQLServer=Server=sqlserver,1433;Database=BlueBerry24;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Connection Timeout=30;Command Timeout=120;Pooling=true;Min Pool Size=5;Max Pool Size=100;MultipleActiveResultSets=true;Packet Size=4096;
+      - AllowedHosts=*
+      - Cors__Origins=http://localhost:30305;http://frontend:30305
+      - Database__RunMigrationsOnStartup=true
+      - Database__RunSeedOnStartup=true
+      - SEED_SUPERADMIN_PASSWORD=${SEED_SUPERADMIN_PASSWORD:-SuperAdmin@123!}
+      - ConnectionStrings__MSSQLServer=Server=sqlserver,1433;Database=BlueBerry24;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Connection Timeout=60;Command Timeout=120;MultipleActiveResultSets=true;
       - ApiSettings__JwtOptions__SecretKey=${ApiSettings__JwtOptions__SecretKey}
       - ApiSettings__JwtOptions__Issuer=https://blueberry24.com
       - ApiSettings__JwtOptions__Audience=blueberry24-api
+      - ApiSettings__JwtOptions__RequireHttps=false
       - App__BaseUrl=http://localhost:30305
       - App__AppName=BlueBerry24
       - App__Version=1.0.0
@@ -51,6 +57,8 @@ services:
       - GmailSettings__Host=smtp.gmail.com
       - GmailSettings__Port=587
       - GmailSettings__DisplayName=BlueBerry24 Support
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://backend.seq:5341/ingest/otlp/v1/traces
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
     ports:
       - "7105:7105"
     depends_on:
@@ -72,11 +80,11 @@ services:
       - NEXT_PUBLIC_APP_URL=http://localhost:30305
       - API_BASE_PRODUCT=http://backend:7105/api/Products
       - API_BASE_CATEGORY=http://backend:7105/api/Categories
-      - API_BASE_SHOPPING_CART=http://backend:7105/api/ShoppingCarts
+      - API_BASE_SHOPPING_CART=http://backend:7105/api/shopping-carts
       - API_BASE_AUTH=http://backend:7105/api/Auth
       - API_BASE_PAYMENT=http://backend:7105/api/Payments
       - API_BASE_COUPON=http://backend:7105/api/Coupons
-      - API_BASE_ROLE_MANAGEMENT=http://backend:7105/api/Auth
+      - API_BASE_ROLE_MANAGEMENT=http://backend:7105/api/role-managements
       - API_BASE_WISHLIST=http://backend:7105/api/Wishlists
       - API_BASE_ORDER=http://backend:7105/api/Orders
       - API_BASE_INVENTORY=http://backend:7105/api/Inventories
@@ -88,9 +96,53 @@ services:
     networks:
       - blueberry24-network
 
+  backend.seq:
+    image: datalust/seq:2025.2 # Pinned version
+    container_name: seq
+    ports:
+      - "5341:5341" # Ingestion port
+      - "8081:80"   # UI port
+    networks:
+      - blueberry24-network
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_ADMINPASSWORD=${SEQ_ADMIN_PASSWORD}  # Default password for first login
+      - SEQ_API_INGESTIONPORT=5341        # Internal ingestion port
+    volumes:
+      - seq_data:/data # Named volume for better reliability
+
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - blueberry24-network
+    volumes:
+      - prometheus_data:/prometheus
+
+  grafana:
+    image: grafana/grafana:12.0.0
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+    ports:
+      - "3001:3000"
+    networks:
+      - blueberry24-network
+    volumes:
+      - grafana_data:/var/lib/grafana
+
 volumes:
   sqlserver_data:
     driver: local
+  seq_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
 
 networks:
   blueberry24-network:
