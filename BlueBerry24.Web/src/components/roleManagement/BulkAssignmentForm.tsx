@@ -1,4 +1,4 @@
-import { Role, UserWithRoles } from '../../types/roleManagement';
+﻿import { Role, UserWithRoles } from '../../types/roleManagement';
 import { bulkAssignRolesAction } from '../../lib/actions/roleManagement';
 
 interface BulkAssignmentFormProps {
@@ -105,7 +105,7 @@ export default function BulkAssignmentForm({
                                 id={`user-${user.id}`}
                               />
                               <label className="form-check-label small" htmlFor={`user-${user.id}`}>
-                                <div className="d-flex justify-content-between align-items-center">
+                                <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                                   <div>
                                     <span className="fw-medium">
                                       {user.firstName && user.lastName 
