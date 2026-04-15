@@ -260,6 +260,20 @@ if (runMigrationsOnStartup)
             Log.Fatal("Cannot connect to database after migration.");
             Environment.Exit(1);
         }
+
+        var stillPending = (await context.Database.GetPendingMigrationsAsync()).ToList();
+        if (stillPending.Count > 0)
+        {
+            Log.Fatal(
+                "MigrateAsync() completed but {Count} migration(s) are still pending: {Migrations}. " +
+                "The database volume may be in an inconsistent state. " +
+                "Run 'docker-compose down -v' to reset volumes and try again.",
+                stillPending.Count, string.Join(", ", stillPending));
+            Environment.Exit(1);
+        }
+
+        Log.Information("All {Count} migrations applied successfully.",
+            (await context.Database.GetAppliedMigrationsAsync()).Count());
     }
     catch (Exception ex)
     {
