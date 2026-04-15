@@ -139,38 +139,39 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
         </nav>
 
         <div className="alert alert-info mb-4">
-          <div className="d-flex align-items-center">
-            <i className="bi bi-info-circle-fill me-2"></i>
-            <div className="flex-grow-1">
-              <strong>Need to make changes?</strong> You can still modify your cart items before completing payment.
+          <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2">
+            <div className="d-flex align-items-center flex-grow-1">
+              <i className="bi bi-info-circle-fill me-2 flex-shrink-0"></i>
+              <div>
+                <strong>Need to make changes?</strong> You can still modify your cart items before completing payment.
+              </div>
             </div>
-            <Link href="/cart" className="btn btn-sm btn-outline-primary ms-2">
+            <Link href="/cart" className="btn btn-sm btn-outline-primary flex-shrink-0">
               <i className="bi bi-cart me-1"></i> Edit Cart
             </Link>
           </div>
         </div>
 
-        <div className="mb-4">
-          <div className="d-flex justify-content-center">
-            <div className="d-flex align-items-center text-center">
-              <div className="d-flex align-items-center text-primary me-4">
-                <i className="bi bi-check-circle-fill me-2"></i>
-                <span className="fw-medium">Cart</span>
-              </div>
-              <div className="border-top border-primary flex-fill mx-3" style={{width: '50px'}}></div>
-              <div className="d-flex align-items-center text-primary me-4">
-                <i className="bi bi-credit-card-fill me-2"></i>
-                <span className="fw-medium">Checkout</span>
-              </div>
-              <div className="border-top border-primary flex-fill mx-3" style={{width: '50px'}}></div>
-              <div className="d-flex align-items-center text-primary me-4">
-                <i className="bi bi-credit-card-fill me-2"></i>
-                <span className="fw-medium">Order Review</span>
-              </div>
-              <div className="border-top border-secondary flex-fill mx-3" style={{width: '50px'}}></div>
-              <div className="d-flex align-items-center text-muted">
-                <span>Payment</span>
-              </div>
+        {/* Payment progress stepper — scrollable on small screens */}
+        <div className="mb-4 overflow-x-auto">
+          <div className="d-flex align-items-center justify-content-center text-center" style={{minWidth: '320px'}}>
+            <div className="d-flex align-items-center text-primary">
+              <i className="bi bi-check-circle-fill me-1 me-sm-2"></i>
+              <span className="fw-medium small">Cart</span>
+            </div>
+            <div className="border-top border-primary mx-2 mx-sm-3 flex-fill" style={{minWidth: '24px'}}></div>
+            <div className="d-flex align-items-center text-primary">
+              <i className="bi bi-check-circle-fill me-1 me-sm-2"></i>
+              <span className="fw-medium small">Checkout</span>
+            </div>
+            <div className="border-top border-primary mx-2 mx-sm-3 flex-fill" style={{minWidth: '24px'}}></div>
+            <div className="d-flex align-items-center text-primary">
+              <i className="bi bi-check-circle-fill me-1 me-sm-2"></i>
+              <span className="fw-medium small">Order Review</span>
+            </div>
+            <div className="border-top border-secondary mx-2 mx-sm-3 flex-fill" style={{minWidth: '24px'}}></div>
+            <div className="d-flex align-items-center text-muted">
+              <span className="small fw-semibold">Payment</span>
             </div>
           </div>
         </div>
