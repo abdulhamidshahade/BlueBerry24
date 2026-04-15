@@ -226,7 +226,33 @@ if (runMigrationsOnStartup)
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         Log.Information("Applying database migrations...");
-        await context.Database.MigrateAsync();
+
+        const int maxMigrationAttempts = 10;
+        Exception? lastMigrationEx = null;
+        for (var attempt = 1; attempt <= maxMigrationAttempts; attempt++)
+        {
+            try
+            {
+                await context.Database.MigrateAsync();
+                lastMigrationEx = null;
+                break;
+            }
+            catch (Exception migEx)
+            {
+                lastMigrationEx = migEx;
+                if (attempt < maxMigrationAttempts)
+                {
+                    Log.Warning(migEx,
+                        "Migration attempt {Attempt}/{Max} failed; retrying in 5 s…",
+                        attempt, maxMigrationAttempts);
+                    await Task.Delay(TimeSpan.FromSeconds(5));
+                }
+            }
+        }
+
+        if (lastMigrationEx != null)
+            throw lastMigrationEx;
+
         Log.Information("Database migrations completed.");
 
         if (!await context.Database.CanConnectAsync())
