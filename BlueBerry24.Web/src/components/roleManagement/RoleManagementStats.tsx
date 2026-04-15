@@ -1,4 +1,4 @@
-import { RoleStats } from '../../types/roleManagement';
+﻿import { RoleStats } from '../../types/roleManagement';
 
 interface RoleManagementStatsProps {
   stats: RoleStats;
@@ -126,7 +126,7 @@ export default function RoleManagementStats({ stats }: RoleManagementStatsProps)
 
             <div className="col-12 col-md-6">
               <div className="d-flex flex-column gap-3">
-                <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                   <span className="small text-muted">Role Coverage Rate:</span>
                   <span className={`small fw-medium ${
                     usersWithRolesPercentage >= 80 ? 'text-success' : 
@@ -135,13 +135,13 @@ export default function RoleManagementStats({ stats }: RoleManagementStatsProps)
                     {usersWithRolesPercentage}%
                   </span>
                 </div>
-                <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                   <span className="small text-muted">Avg Roles per User:</span>
                   <span className="small fw-medium text-dark">
                     {avgRolesPerUser}
                   </span>
                 </div>
-                <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                   <span className="small text-muted">Users Needing Roles:</span>
                   <span className={`small fw-medium ${
                     stats.usersWithoutRoles > 0 ? 'text-warning' : 'text-success'
