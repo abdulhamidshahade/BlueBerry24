@@ -1,4 +1,4 @@
-import { 
+﻿import { 
   createWishlist, 
   updateWishlist, 
   deleteWishlist, 
@@ -149,7 +149,7 @@ export default function WishlistManagement({
           {wishlists.map((wishlist) => (
             <div key={wishlist.id} className="col-lg-6 col-xl-4 mb-4">
               <div className={`card h-100 ${wishlist.isDefault ? 'border-primary' : ''}`}>
-                <div className="card-header d-flex justify-content-between align-items-center">
+                <div className="card-header d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                   <div className="d-flex align-items-center">
                     <h5 className="card-title mb-0">
                       {wishlist.name}
@@ -254,7 +254,7 @@ export default function WishlistManagement({
                   )}
                 </div>
 
-                <div className="card-footer text-muted d-flex justify-content-between align-items-center">
+                <div className="card-footer text-muted d-flex justify-content-between align-items-start align-items-sm-center flex-wrap gap-2">
                   <small>
                     Updated {formatDate(wishlist.updatedDate)}
                   </small>
