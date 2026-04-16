@@ -43,7 +43,7 @@ services:
       - Cors__Origins=http://localhost:30305;http://frontend:30305
       - Database__RunMigrationsOnStartup=true
       - Database__RunSeedOnStartup=true
-      - SEED_SUPERADMIN_PASSWORD=${SEED_SUPERADMIN_PASSWORD:-SuperAdmin@123!}
+      - SEED_SUPERADMIN_PASSWORD=${SEED_SUPERADMIN_PASSWORD:-lkjflajljlka@32lkjA32}
       - ConnectionStrings__MSSQLServer=Server=sqlserver,1433;Database=BlueBerry24;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Connection Timeout=60;Command Timeout=120;MultipleActiveResultSets=true;
       - ApiSettings__JwtOptions__SecretKey=${ApiSettings__JwtOptions__SecretKey}
       - ApiSettings__JwtOptions__Issuer=https://blueberry24.com
@@ -57,8 +57,6 @@ services:
       - GmailSettings__Host=smtp.gmail.com
       - GmailSettings__Port=587
       - GmailSettings__DisplayName=BlueBerry24 Support
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://backend.seq:5341/ingest/otlp/v1/traces
-      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
     ports:
       - "7105:7105"
     depends_on:
@@ -103,51 +101,8 @@ services:
     networks:
       - blueberry24-network
 
-  backend.seq:
-    image: datalust/seq:2025.2 # Pinned version
-    container_name: seq
-    ports:
-      - "5341:5341" # Ingestion port
-      - "8081:80"   # UI port
-    networks:
-      - blueberry24-network
-    environment:
-      - ACCEPT_EULA=Y
-      - SEQ_FIRSTRUN_ADMINPASSWORD=${SEQ_ADMIN_PASSWORD}  # Default password for first login
-      - SEQ_API_INGESTIONPORT=5341        # Internal ingestion port
-    volumes:
-      - seq_data:/data # Named volume for better reliability
-
-  prometheus:
-    image: prom/prometheus:v2.52.0
-    container_name: prometheus
-    ports:
-      - "9090:9090"
-    networks:
-      - blueberry24-network
-    volumes:
-      - prometheus_data:/prometheus
-
-  grafana:
-    image: grafana/grafana:12.0.0
-    container_name: grafana
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
-    ports:
-      - "3001:3000"
-    networks:
-      - blueberry24-network
-    volumes:
-      - grafana_data:/var/lib/grafana
-
 volumes:
   sqlserver_data:
-    driver: local
-  seq_data:
-    driver: local
-  prometheus_data:
-    driver: local
-  grafana_data:
     driver: local
 
 
