@@ -7,12 +7,11 @@ export function middleware(request: NextRequest) {
   const session = request.cookies.get("cart_session");
   if (!session) {
     const newSessionId = crypto.randomUUID();
-    const isProduction = process.env.NODE_ENV === "production";
     response.cookies.set("cart_session", newSessionId, {
       path: "/",
       httpOnly: true,
       sameSite: "lax",
-      secure: isProduction,
+      secure: process.env.COOKIE_SECURE === "true",
       maxAge: 30 * 24 * 60 * 60,
     });
   }

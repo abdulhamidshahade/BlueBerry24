@@ -23,20 +23,22 @@ export async function loginAction(formData: FormData) {
     if (response.isSuccess && response.data) {
       const cookieStore = await cookies();
       
+      const secureCookies = process.env.COOKIE_SECURE === 'true';
+
       cookieStore.set('auth_token', response.data.token, {
         path: '/',
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: secureCookies,
         sameSite: 'lax',
-        maxAge: 24 * 60 * 60, // 24 hours
+        maxAge: 24 * 60 * 60,
       });
 
       cookieStore.set('user_info', JSON.stringify(response.data.user), {
         path: '/',
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: secureCookies,
         sameSite: 'lax',
-        maxAge: 24 * 60 * 60, // 24 hours
+        maxAge: 24 * 60 * 60,
       });
 
       

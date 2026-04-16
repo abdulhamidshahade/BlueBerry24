@@ -93,6 +93,7 @@ services:
       - API_BASE_ORDER=http://backend:7105/api/Orders
       - API_BASE_INVENTORY=http://backend:7105/api/Inventories
       - USE_CLOUDFLARE=false
+      - COOKIE_SECURE=false
     ports:
       - "30305:30305"
     depends_on:
