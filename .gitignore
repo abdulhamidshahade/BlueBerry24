@@ -375,8 +375,7 @@ BlueBerry24.API/Properties/launchSettings.json
 #Ignore BlueBerry24.API.http in BlueBerry24.API Layer
 BlueBerry24.API/BlueBerry24.API.http
 
-#Ignore Migrattions in BlueBerry24.Infrastructure Layer
-BlueBerry24.Infrastructure/Migrations
+# EF Core migrations must be committed so the Docker image includes them
 
 #Ignore appsettings.json in BlueBerry24.Bot Layer
 BlueBerry24.Bot/appsettings.json
