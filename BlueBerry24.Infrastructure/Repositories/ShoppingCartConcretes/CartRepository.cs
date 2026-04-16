@@ -4,7 +4,6 @@ using BlueBerry24.Domain.Repositories;
 using BlueBerry24.Domain.Repositories.ShoppingCartInterfaces;
 using BlueBerry24.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using OpenTelemetry.Trace;
 
 namespace BlueBerry24.Infrastructure.Repositories.ShoppingCartConcretes
 {
