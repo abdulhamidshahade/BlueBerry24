@@ -343,8 +343,6 @@ app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks
     }
 }).DisableRateLimiting();
 
-app.UseOpenTelemetryPrometheusScrapingEndpoint();
-
 app.UseSerilogRequestLogging();
 
 app.MapControllers();
