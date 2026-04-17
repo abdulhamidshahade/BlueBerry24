@@ -131,11 +131,14 @@ export async function clearCart() {
   try {
     const cart = await getOrCreateCart();
     await cartService.clearCart(cart.id);
-
     revalidatePath("/cart");
+    redirect("/cart");
   } catch (error) {
+    if (error instanceof Error && error.message === "NEXT_REDIRECT") {
+      throw error;
+    }
     console.error("Error clearing cart:", error);
-    throw new Error("Failed to clear cart");
+    redirect("/cart?error=Failed+to+clear+cart");
   }
 }
 
