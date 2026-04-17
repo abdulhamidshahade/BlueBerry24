@@ -1,17 +1,67 @@
+'use client';
+
+import { useState, useTransition } from 'react';
 import { registerAction } from '../../lib/actions/auth-actions';
-import { redirect } from 'next/navigation';
+
+const rules = [
+  {
+    key: 'length',
+    label: 'At least 6 characters',
+    test: (v: string) => v.length >= 6,
+  },
+  {
+    key: 'uppercase',
+    label: 'One uppercase letter (A–Z)',
+    test: (v: string) => /[A-Z]/.test(v),
+  },
+  {
+    key: 'digit',
+    label: 'One number (0–9)',
+    test: (v: string) => /[0-9]/.test(v),
+  },
+  {
+    key: 'special',
+    label: 'One special character (!@#$…)',
+    test: (v: string) => /[^A-Za-z0-9]/.test(v),
+  },
+];
 
 export default function RegisterForm() {
-  async function handleRegister(formData: FormData) {
-    'use server';
-    
-    const result = await registerAction(formData);
-    
-    if (result) {
-      redirect('/auth/login?message=Registration successful! Please check your email to confirm your account before signing in.');
-    } else {
-      redirect(`/auth/register?error=${encodeURIComponent(result || 'Registration failed')}`);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isPending, startTransition] = useTransition();
+
+  const allRulesPassed = rules.every((r) => r.test(password));
+  const passwordsMatch = password === confirmPassword && confirmPassword !== '';
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (!allRulesPassed) {
+      setError('Password does not meet all requirements.');
+      return;
     }
+    if (!passwordsMatch) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setError('');
+    const formData = new FormData(e.currentTarget);
+
+    startTransition(async () => {
+      const result = await registerAction(formData);
+      if (result) {
+        window.location.href =
+          '/auth/login?message=' +
+          encodeURIComponent(
+            'Registration successful! Please check your email to confirm your account before signing in.'
+          );
+      } else {
+        setError('Registration failed. Please try again.');
+      }
+    });
   }
 
   return (
@@ -25,7 +75,14 @@ export default function RegisterForm() {
           <p className="text-muted">Join BlueBerry24 and start shopping today!</p>
         </div>
 
-        <form action={handleRegister}>
+        {error && (
+          <div className="alert alert-danger py-2" role="alert">
+            <i className="bi bi-exclamation-triangle me-2"></i>
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
           <div className="row">
             <div className="col-md-6 mb-3">
               <label htmlFor="firstName" className="form-label">
@@ -87,6 +144,7 @@ export default function RegisterForm() {
             />
           </div>
 
+          {/* Password with live validation */}
           <div className="mb-3">
             <label htmlFor="password" className="form-label">
               <i className="bi bi-lock me-1"></i>
@@ -94,18 +152,45 @@ export default function RegisterForm() {
             </label>
             <input
               type="password"
-              className="form-control"
+              className={`form-control ${
+                password === ''
+                  ? ''
+                  : allRulesPassed
+                  ? 'is-valid'
+                  : 'is-invalid'
+              }`}
               id="password"
               name="password"
               placeholder="Create a password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={6}
             />
-            <div className="form-text">
-              Password must be at least 6 characters long.
-            </div>
+
+            {/* Checklist */}
+            <ul className="list-unstyled mt-2 mb-0 ps-1" style={{ fontSize: '0.85rem' }}>
+              {rules.map((rule) => {
+                const passed = rule.test(password);
+                const touched = password !== '';
+                return (
+                  <li key={rule.key} className="d-flex align-items-center gap-2 mb-1">
+                    {!touched ? (
+                      <i className="bi bi-circle text-muted" />
+                    ) : passed ? (
+                      <i className="bi bi-check-circle-fill text-success" />
+                    ) : (
+                      <i className="bi bi-x-circle-fill text-danger" />
+                    )}
+                    <span className={!touched ? 'text-muted' : passed ? 'text-success' : 'text-danger'}>
+                      {rule.label}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
 
+          {/* Confirm password */}
           <div className="mb-3">
             <label htmlFor="confirmPassword" className="form-label">
               <i className="bi bi-lock-fill me-1"></i>
@@ -113,13 +198,26 @@ export default function RegisterForm() {
             </label>
             <input
               type="password"
-              className="form-control"
+              className={`form-control ${
+                confirmPassword === ''
+                  ? ''
+                  : passwordsMatch
+                  ? 'is-valid'
+                  : 'is-invalid'
+              }`}
               id="confirmPassword"
               name="confirmPassword"
               placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              minLength={6}
             />
+            {confirmPassword !== '' && !passwordsMatch && (
+              <div className="invalid-feedback">Passwords do not match.</div>
+            )}
+            {confirmPassword !== '' && passwordsMatch && (
+              <div className="valid-feedback">Passwords match!</div>
+            )}
           </div>
 
           <div className="mb-3 form-check">
@@ -141,9 +239,22 @@ export default function RegisterForm() {
             </label>
           </div>
 
-          <button type="submit" className="btn btn-primary w-100 mb-3">
-            <i className="bi bi-person-plus me-2"></i>
-            Create Account
+          <button
+            type="submit"
+            className="btn btn-primary w-100 mb-3"
+            disabled={isPending || !allRulesPassed || !passwordsMatch}
+          >
+            {isPending ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                Creating account…
+              </>
+            ) : (
+              <>
+                <i className="bi bi-person-plus me-2"></i>
+                Create Account
+              </>
+            )}
           </button>
 
           <div className="text-center">
@@ -158,4 +269,4 @@ export default function RegisterForm() {
       </div>
     </div>
   );
-} 
+}
