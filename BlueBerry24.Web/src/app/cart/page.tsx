@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 export default async function CartPage({
   searchParams,
 }: {
-  searchParams: Promise<{ confirm_clear?: string; error?: string, code: string }>;
+  searchParams: Promise<{ confirm_clear?: string; error?: string; couponError?: string }>;
 }) {
 
   try {
@@ -42,10 +42,11 @@ export default async function CartPage({
       productMap.set(product.id, product);
     });
 
-    var search = await searchParams;
+    const search = await searchParams;
     const hasItems = cart.cartItems && cart.cartItems.length > 0;
-    const showClearConfirm =  search.confirm_clear === 'true';
+    const showClearConfirm = search.confirm_clear === 'true';
     const errorMessage = search.error;
+    const couponError = search.couponError ? decodeURIComponent(search.couponError) : undefined;
     const isActiveCart = cart.status === CartStatus.Active;
     const isPendingPayment = cart.status === CartStatus.PendingPayment;
     const isEditable = isActiveCart || isPendingPayment; // Can edit both Active and PendingPayment carts
@@ -147,7 +148,10 @@ export default async function CartPage({
               </div>
 
               {isEditable && (
-                <CouponSection appliedCoupons={cart.cartCoupons || []} code={search.code} />
+                <CouponSection
+                  appliedCoupons={cart.cartCoupons || []}
+                  couponError={couponError}
+                />
               )}
             </div>
 
