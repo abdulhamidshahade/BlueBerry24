@@ -195,16 +195,21 @@ export async function resetPasswordAction(formData: FormData) {
     const response = await AuthService.resetPassword(resetData);
 
     if (response.isSuccess) {
-      return { success: true };
+      return { success: true, error: undefined, errors: undefined };
     } else {
+      const errs = response.errors && response.errors.length > 0 ? response.errors : undefined;
       return {
-        error: response.statusMessage || 'Failed to reset password',
+        error: errs ? errs[0] : (response.statusMessage || 'Failed to reset password'),
+        errors: errs,
+        success: false,
       };
     }
   } catch (error) {
     console.error('Reset password error:', error);
     return {
-      error: 'An unexpected error occurred',
+      error: 'An unexpected error occurred. Please try again.',
+      errors: undefined,
+      success: false,
     };
   }
 }
