@@ -139,37 +139,52 @@ export async function clearCart() {
   }
 }
 
-export async function applyCoupon(formData: FormData) {
+export type CouponActionState = {
+  error?: string;
+  success?: string;
+} | null;
+
+export async function applyCoupon(
+  _prevState: CouponActionState,
+  formData: FormData
+): Promise<CouponActionState> {
   try {
-    const couponCode = formData.get("couponCode") as string;
+    const couponCode = (formData.get("couponCode") as string)?.trim();
 
     if (!couponCode) {
-      throw new Error("Coupon code is required");
+      return { error: "Please enter a coupon code." };
     }
 
     const cart = await getOrCreateCart();
-    await cartService.applyCoupon(cart.id, { couponCode });
 
+    if (!cart) {
+      return { error: "Could not find your cart. Please refresh and try again." };
+    }
+
+    await cartService.applyCoupon(cart.id, { couponCode });
     revalidatePath("/cart");
+    return { success: `Coupon "${couponCode}" applied successfully!` };
   } catch (error) {
     console.error("Error applying coupon:", error);
-    throw new Error(
-      error instanceof Error ? error.message : "Failed to apply coupon"
-    );
+    const message = error instanceof Error ? error.message : "Failed to apply coupon";
+    return { error: message };
   }
 }
 
 export async function removeCoupon(formData: FormData) {
   try {
     const couponId = parseInt(formData.get("couponId") as string);
-
     const cart = await getOrCreateCart();
-    await cartService.removeCoupon(cart.id, couponId);
 
+    if (!cart) {
+      redirect("/cart?couponError=Could+not+find+your+cart");
+    }
+
+    await cartService.removeCoupon(cart.id, couponId);
     revalidatePath("/cart");
   } catch (error) {
     console.error("Error removing coupon:", error);
-    throw new Error("Failed to remove coupon");
+    redirect("/cart?couponError=Failed+to+remove+coupon");
   }
 }
 
