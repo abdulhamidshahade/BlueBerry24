@@ -267,18 +267,17 @@ export class CartService implements ICartService {
 
   async clearCart(cartId: number): Promise<boolean> {
     const cookieStore = await cookies();
-    const token = cookieStore.get("cart_session")?.value;
+    const sessionToken = cookieStore.get("cart_session")?.value;
 
     const options: any = {
       method: "DELETE",
+      requireAuth: true,
     };
 
-    if (token) {
+    if (sessionToken) {
       options.headers = {
-        "X-Session-Id": token ?? "",
+        "X-Session-Id": sessionToken,
       };
-    } else {
-      options.requireAuth = true;
     }
 
     try {
@@ -291,7 +290,7 @@ export class CartService implements ICartService {
         throw new Error(`Failed to clear cart: ${response.statusMessage}`);
       }
 
-      return response.statusCode === 204;
+      return true;
     } catch (error) {
       console.error("Failed to clear cart:", error);
       throw new Error("Failed to clear cart");
