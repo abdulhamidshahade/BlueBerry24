@@ -597,36 +597,28 @@ namespace BlueBerry24.Application.Services.Concretes.ShoppingCartServiceConcrete
                     return false;
                 }
 
-                Cart cart = null;
-
-                if (userId.HasValue)
+                
+                Cart cart = await _cartRepository.GetCartByIdAsync(cartId, CartStatus.Active);
+                if (cart == null)
                 {
-                    cart = await _cartRepository.GetCartByUserIdAsync(userId, CartStatus.Converted);
-                    if (cart == null)
-                    {
-                        cart = await _cartRepository.GetCartByUserIdAsync(userId, CartStatus.Active);
-                    }
+                    cart = await _cartRepository.GetCartByIdAsync(cartId, CartStatus.PendingPayment);
                 }
-                else if (!string.IsNullOrEmpty(sessionId))
+                if (cart == null)
                 {
                     cart = await _cartRepository.GetCartByIdAsync(cartId, CartStatus.Converted);
-                    if (cart == null)
-                    {
-                        cart = await _cartRepository.GetCartByIdAsync(cartId, CartStatus.Active);
-                    }
-                }
-                else
-                {
-                    cart = await _cartRepository.GetCartByIdAsync(cartId, CartStatus.Converted);
-                    if (cart == null)
-                    {
-                        cart = await _cartRepository.GetCartByIdAsync(cartId, CartStatus.Active);
-                    }
                 }
 
                 if (cart == null)
                 {
                     _logger.LogWarning("Cart not found for clearing: CartId={CartId}", cartId);
+                    return false;
+                }
+
+                
+                if (userId.HasValue && cart.UserId.HasValue && cart.UserId != userId)
+                {
+                    _logger.LogWarning("User {UserId} attempted to clear cart {CartId} owned by user {OwnerId}",
+                        userId, cartId, cart.UserId);
                     return false;
                 }
 
