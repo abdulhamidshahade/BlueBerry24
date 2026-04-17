@@ -54,7 +54,7 @@ services:
       - App__Version=1.0.0
       - GmailSettings__Email=${GmailSettings__Email}
       - GmailSettings__Password=${GmailSettings__Password}
-      - GmailSettings__Host=smtp.gmail.com
+      - GmailSettings__Host=${GmailSettings__Host}
       - GmailSettings__Port=587
       - GmailSettings__DisplayName=BlueBerry24 Support
     ports:
