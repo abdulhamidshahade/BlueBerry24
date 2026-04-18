@@ -46,8 +46,8 @@ services:
       - SEED_SUPERADMIN_PASSWORD=${SEED_SUPERADMIN_PASSWORD:-lkjflajljlka@32lkjA32}
       - ConnectionStrings__MSSQLServer=Server=sqlserver,1433;Database=Berryfy;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Connection Timeout=60;Command Timeout=120;MultipleActiveResultSets=true;
       - ApiSettings__JwtOptions__SecretKey=${ApiSettings__JwtOptions__SecretKey}
-      - ApiSettings__JwtOptions__Issuer=https://blueberry24.com
-      - ApiSettings__JwtOptions__Audience=blueberry24-api
+      - ApiSettings__JwtOptions__Issuer=https://berryfy.com
+      - ApiSettings__JwtOptions__Audience=berryfy-api
       - ApiSettings__JwtOptions__RequireHttps=false
       - App__BaseUrl=http://localhost:30305
       - App__AppName=Berryfy
@@ -69,7 +69,7 @@ services:
       retries: 10
       start_period: 120s
     networks:
-      - blueberry24-network
+      - berryfy-network
 
   # Frontend Web App
   frontend:
