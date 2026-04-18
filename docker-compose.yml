@@ -108,5 +108,5 @@ volumes:
 
 
 networks:
-  blueberry24-network:
+  berryfy-network:
     driver: bridge
