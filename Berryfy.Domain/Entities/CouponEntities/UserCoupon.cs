@@ -1,0 +1,27 @@
+
+using Berryfy.Domain.Entities.AuthEntities;
+using Berryfy.Domain.Entities.Base;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Berryfy.Domain.Entities.CouponEntities
+{
+    public class UserCoupon : IAuditableEntity
+    {
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public ApplicationUser User { get; set; }
+
+        public int CouponId { get; set; }
+        public Coupon Coupon { get; set; }
+        public bool IsUsed { get; set; }
+        public DateTime? UsedAt { get; set; }
+        public int? OrderId { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+    }
+}
