@@ -4,7 +4,7 @@ services:
   # SQL Server Database
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: blueberry24-sqlserver
+    container_name: berryfy-sqlserver
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=${SA_PASSWORD}
@@ -16,7 +16,7 @@ services:
     volumes:
       - sqlserver_data:/var/opt/mssql
     networks:
-      - blueberry24-network
+      - berryfy-network
     deploy:
       resources:
         limits:
@@ -24,7 +24,7 @@ services:
         reservations:
           memory: 2G
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -C -Q \"IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'BlueBerry24') CREATE DATABASE [BlueBerry24]; SELECT 1\""]
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -C -Q \"IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'Berryfy') CREATE DATABASE [Berryfy]; SELECT 1\""]
       interval: 15s
       timeout: 15s
       retries: 10
@@ -34,8 +34,8 @@ services:
   backend:
     build:
       context: .
-      dockerfile: BlueBerry24.API/Dockerfile
-    container_name: blueberry24-backend
+      dockerfile: Berryfy.API/Dockerfile
+    container_name: berryfy-backend
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:7105
@@ -44,19 +44,19 @@ services:
       - Database__RunMigrationsOnStartup=true
       - Database__RunSeedOnStartup=true
       - SEED_SUPERADMIN_PASSWORD=${SEED_SUPERADMIN_PASSWORD:-lkjflajljlka@32lkjA32}
-      - ConnectionStrings__MSSQLServer=Server=sqlserver,1433;Database=BlueBerry24;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Connection Timeout=60;Command Timeout=120;MultipleActiveResultSets=true;
+      - ConnectionStrings__MSSQLServer=Server=sqlserver,1433;Database=Berryfy;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Connection Timeout=60;Command Timeout=120;MultipleActiveResultSets=true;
       - ApiSettings__JwtOptions__SecretKey=${ApiSettings__JwtOptions__SecretKey}
       - ApiSettings__JwtOptions__Issuer=https://blueberry24.com
       - ApiSettings__JwtOptions__Audience=blueberry24-api
       - ApiSettings__JwtOptions__RequireHttps=false
       - App__BaseUrl=http://localhost:30305
-      - App__AppName=BlueBerry24
+      - App__AppName=Berryfy
       - App__Version=1.0.0
       - GmailSettings__Email=${GmailSettings__Email}
       - GmailSettings__Password=${GmailSettings__Password}
       - GmailSettings__Host=${GmailSettings__Host}
       - GmailSettings__Port=587
-      - GmailSettings__DisplayName=BlueBerry24 Support
+      - GmailSettings__DisplayName=Berryfy Support
     ports:
       - "7105:7105"
     depends_on:
@@ -74,9 +74,9 @@ services:
   # Frontend Web App
   frontend:
     build:
-      context: ./BlueBerry24.Web
+      context: ./Berryfy.Web
       dockerfile: Dockerfile
-    container_name: blueberry24-frontend
+    container_name: berryfy-frontend
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=http://backend:7105
@@ -100,7 +100,7 @@ services:
       backend:
         condition: service_healthy
     networks:
-      - blueberry24-network
+      - berryfy-network
 
 volumes:
   sqlserver_data:
