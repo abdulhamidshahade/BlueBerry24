@@ -460,6 +460,6 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 ## 📞 Support
 
 For support and questions:
-- 📧 Email: shahade.abdulhamid@gmail.com
+- 📧 Email: support@berryfy.org
 
 ---
