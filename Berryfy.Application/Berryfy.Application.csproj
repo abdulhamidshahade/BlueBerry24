@@ -1,10 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Utils\**" />
+    <EmbeddedResource Remove="Utils\**" />
+    <None Remove="Utils\**" />
+  </ItemGroup>
 
   
 
@@ -23,7 +29,6 @@
 
   <ItemGroup>
     <Folder Include="Dtos\CategoryDtos\CategoryValidations\" />
-    <Folder Include="Utils\Auth\" />
   </ItemGroup>
 
 </Project>
