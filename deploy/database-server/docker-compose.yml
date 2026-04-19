@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: berryfy-sqlserver
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SA_PASSWORD}
+      - MSSQL_PID=Express
+      - MSSQL_MEMORY_LIMIT_MB=4096
+      - MSSQL_COLLATION=SQL_Latin1_General_CP1_CI_AS
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -C -Q \"IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'Berryfy') CREATE DATABASE [Berryfy]; SELECT 1\""]
+      interval: 15s
+      timeout: 15s
+      retries: 10
+      start_period: 90s
+
+volumes:
+  sqlserver_data:
+    driver: local
