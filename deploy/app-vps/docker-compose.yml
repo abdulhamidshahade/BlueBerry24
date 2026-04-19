@@ -1,0 +1,79 @@
+version: '3.9'
+
+services:
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Berryfy.API/Dockerfile
+    container_name: berryfy-backend
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:7105
+      - AllowedHosts=*
+      - Cors__Origins=http://localhost:30305;http://frontend:30305
+      - Database__RunMigrationsOnStartup=true
+      - Database__RunSeedOnStartup=true
+      - SEED_SUPERADMIN_PASSWORD=${SEED_SUPERADMIN_PASSWORD:-lkjflajljlka@32lkjA32}
+      
+      - ConnectionStrings__MSSQLServer=Server=${TAILSCALE_DB_IP},1433;Database=Berryfy;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Connection Timeout=60;Command Timeout=120;MultipleActiveResultSets=true;
+      
+      - ApiSettings__JwtOptions__SecretKey=${ApiSettings__JwtOptions__SecretKey}
+      - ApiSettings__JwtOptions__Issuer=https://berryfy.com
+      - ApiSettings__JwtOptions__Audience=berryfy-api
+      - ApiSettings__JwtOptions__RequireHttps=false
+      - App__BaseUrl=http://localhost:30305
+      - App__AppName=Berryfy
+      - App__Version=1.0.0
+      - GmailSettings__Email=${GmailSettings__Email}
+      - GmailSettings__Password=${GmailSettings__Password}
+      - GmailSettings__Host=${GmailSettings__Host}
+      - GmailSettings__Port=587
+      - GmailSettings__DisplayName=Berryfy Support
+    ports:
+      - "7105:7105"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7105/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+    networks:
+      - berryfy-network
+
+  # Frontend Web App
+  frontend:
+    build:
+      context: ./Berryfy.Web
+      dockerfile: Dockerfile
+    container_name: berryfy-frontend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://backend:7105
+      - NEXT_PUBLIC_API_BASE_URL=http://backend:7105/api
+      - NEXT_PUBLIC_APP_URL=http://localhost:30305
+      - API_BASE_PRODUCT=http://backend:7105/api/Products
+      - API_BASE_CATEGORY=http://backend:7105/api/Categories
+      - API_BASE_SHOPPING_CART=http://backend:7105/api/shopping-carts
+      - API_BASE_AUTH=http://backend:7105/api/Auth
+      - API_BASE_PAYMENT=http://backend:7105/api/Payments
+      - API_BASE_COUPON=http://backend:7105/api/Coupons
+      - API_BASE_ROLE_MANAGEMENT=http://backend:7105/api/role-managements
+      - API_BASE_WISHLIST=http://backend:7105/api/Wishlists
+      - API_BASE_ORDER=http://backend:7105/api/Orders
+      - API_BASE_INVENTORY=http://backend:7105/api/Inventories
+      - USE_CLOUDFLARE=false
+      - COOKIE_SECURE=false
+    ports:
+      - "30305:30305"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - berryfy-network
+
+networks:
+  berryfy-network:
+    driver: bridge
