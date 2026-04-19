@@ -92,7 +92,7 @@ namespace Berryfy.Application.Services.Concretes.AuthServiceConcretes
                     try
                     {
                         var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        var baseUrl = _configuration["App:BaseUrl"] ?? "https://localhost:3000";
+                        var baseUrl = _configuration["App:BaseUrl"] ?? "https://demo.berryfy.org";
                         var confirmationUrl = $"{baseUrl}/auth/confirm-email";
 
                         await _mailService.SendEmailConfirmationAsync(user.Email, confirmationToken, confirmationUrl, user.UserName);
@@ -191,7 +191,7 @@ namespace Berryfy.Application.Services.Concretes.AuthServiceConcretes
 
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-                var baseUrl = _configuration["App:BaseUrl"] ?? "https://localhost:3000";
+                var baseUrl = _configuration["App:BaseUrl"] ?? "https://demo.berryfy.org";
                 var resetUrl = $"{baseUrl}/auth/reset-password";
 
                 try
@@ -307,7 +307,7 @@ namespace Berryfy.Application.Services.Concretes.AuthServiceConcretes
                 }
 
                 var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var baseUrl = _configuration["App:BaseUrl"] ?? "https://localhost:3000";
+                var baseUrl = _configuration["App:BaseUrl"] ?? "https://demo.berryfy.org";
                 var confirmationUrl = $"{baseUrl}/auth/confirm-email";
 
                 try
