@@ -1,4 +1,4 @@
-# 🫐 BlueBerry24
+# 🫐 Berryfy
 
 A modern, full-stack **e-commerce platform** built with **.NET 9** and **Next.js 15**. BlueBerry24 combines a robust, clean architecture backend with a beautiful, responsive React frontend to deliver a comprehensive online shopping experience.
 
@@ -16,10 +16,10 @@ BlueBerry24 follows **Clean Architecture** principles with clear separation of c
 ### Backend (.NET 9)
 | Project | Responsibility |
 |---------|----------------|
-| **BlueBerry24.Domain**        | Enterprise rules, entities, value objects & validations. Core business logic with no external dependencies except cross-cutting libraries (FluentValidation, Identity, Redis). |
-| **BlueBerry24.Application**   | Application logic, use cases, DTOs, services, and AutoMapper profiles. Depends only on Domain layer. |
-| **BlueBerry24.Infrastructure**| External concerns: Entity Framework Core, SQL Server persistence, Identity stores, Redis cache, repository implementations. Depends on Domain layer. |
-| **BlueBerry24.API**           | RESTful API endpoints using ASP.NET Core Minimal APIs. Exposes OpenAPI/Swagger documentation. |
+| **Berryfy.Domain**        | Enterprise rules, entities, value objects & validations. Core business logic with no external dependencies except cross-cutting libraries (FluentValidation, Identity, Redis). |
+| **Berryfy.Application**   | Application logic, use cases, DTOs, services, and AutoMapper profiles. Depends only on Domain layer. |
+| **Berryfy.Infrastructure**| External concerns: Entity Framework Core, SQL Server persistence, Identity stores, Redis cache, repository implementations. Depends on Domain layer. |
+| **Berryfy.API**           | RESTful API endpoints using ASP.NET Core Minimal APIs. Exposes OpenAPI/Swagger documentation. |
 
 ### Frontend (Next.js 15)
 | Directory | Responsibility |
@@ -99,19 +99,19 @@ BlueBerry24 follows **Clean Architecture** principles with clear separation of c
 ## 📁 Project Structure
 
 ```text
-BlueBerry24/
-├── BlueBerry24.API/                    # ASP.NET Core Web API
+Berryfy/
+├── Berryfy.API/                    # ASP.NET Core Web API
 │   ├── Controllers/                    # API Controllers
 │   ├── Program.cs                      # Application entry point
 │   └── appsettings.json               # Configuration
-├── BlueBerry24.Application/            # Application Layer
+├── Berryfy.Application/            # Application Layer
 │   ├── Services/                       # Business logic services
 │   │   ├── Concretes/                 # Service implementations
 │   │   └── Interfaces/                # Service contracts
 │   ├── Dtos/                          # Data Transfer Objects
 │   ├── Mapping/                       # AutoMapper profiles
 │   └── Authorization/                 # Authorization policies
-├── BlueBerry24.Domain/                 # Domain Layer
+├── Berryfy.Domain/                 # Domain Layer
 │   ├── Entities/                      # Domain entities
 │   │   ├── AuthEntities/              # User & Role entities
 │   │   ├── ProductEntities/           # Product & Category entities
@@ -123,11 +123,11 @@ BlueBerry24/
 │   │   └── InventoryEntities/         # Stock management entities
 │   ├── Repositories/                  # Repository interfaces
 │   └── Constants/                     # Domain constants
-├── BlueBerry24.Infrastructure/         # Infrastructure Layer
+├── Berryfy.Infrastructure/         # Infrastructure Layer
 │   ├── Data/                          # EF Core DbContext
 │   ├── Repositories/                  # Repository implementations
 │   └── Migrations/                    # Database migrations
-└── BlueBerry24.Web/                   # Next.js Frontend
+└── Berryfy.Web/                   # Next.js Frontend
     ├── src/
     │   ├── app/                       # App Router pages
     │   │   ├── admin/                 # Admin dashboard pages
@@ -175,8 +175,8 @@ BlueBerry24/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/abdulhamidshahade/BlueBerry24.git
-cd BlueBerry24
+git clone https://github.com/abdulhamidshahade/berryfy.git berryfy
+cd berryfy
 ```
 
 ### 2. Backend Setup (.NET API)
@@ -189,19 +189,19 @@ dotnet restore
 **Configure database connection:**
 ```bash
 # Using user secrets (recommended for development)
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=.;Database=BlueBerry24;Trusted_Connection=True;MultipleActiveResultSets=true" --project BlueBerry24.API
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=.;Database=Berryfy;Trusted_Connection=True;MultipleActiveResultSets=true" --project Berryfy.API
 
 # Or edit appsettings.Development.json directly
 ```
 
 **Run database migrations:**
 ```bash
-dotnet ef database update --startup-project BlueBerry24.API --project BlueBerry24.Infrastructure
+dotnet ef database update --startup-project Berryfy.API --project Berryfy.Infrastructure
 ```
 
 **Start the API:**
 ```bash
-dotnet run --project BlueBerry24.API
+dotnet run --project Berryfy.API
 ```
 API will be available at `https://localhost:7105` with Swagger at `/swagger`
 
@@ -209,7 +209,7 @@ API will be available at `https://localhost:7105` with Swagger at `/swagger`
 
 **Navigate to frontend directory:**
 ```bash
-cd BlueBerry24.Web
+cd Berryfy.Web
 ```
 
 **Install dependencies:**
@@ -336,8 +336,8 @@ Key settings in `appsettings.json`:
   },
   "Jwt": {
     "Key": "your-secret-key",
-    "Issuer": "BlueBerry24",
-    "Audience": "BlueBerry24-Users",
+    "Issuer": "Berryfy",
+    "Audience": "berryfy-Users",
     "ExpirationHours": 24
   }
 }
@@ -348,7 +348,7 @@ Environment variables in `.env.local`:
 
 ```bash
 NEXT_PUBLIC_API_URL=https://localhost:3000
-NEXT_PUBLIC_SITE_NAME=BlueBerry24
+NEXT_PUBLIC_SITE_NAME=Berryfy
 ```
 
 ---
@@ -368,7 +368,7 @@ Unit and integration tests are planned for both backend and frontend components.
 ### Backend Deployment
 1. Publish the API:
    ```bash
-   dotnet publish BlueBerry24.API -c Release -o ./publish
+   dotnet publish Berryfy.API -c Release -o ./publish
    ```
 2. Deploy to your preferred hosting platform (Azure App Service, AWS, etc.)
 3. Configure production connection strings and secrets
@@ -376,7 +376,7 @@ Unit and integration tests are planned for both backend and frontend components.
 ### Frontend Deployment
 1. Build the Next.js application:
    ```bash
-   cd BlueBerry24.Web
+   cd Berryfy.Web
    npm run build
    ```
 2. Deploy to Vercel, Netlify, or your preferred hosting platform
@@ -385,7 +385,7 @@ Unit and integration tests are planned for both backend and frontend components.
 ### Database Deployment
 ```bash
 # Generate migration scripts for production
-dotnet ef migrations script --project BlueBerry24.Infrastructure --startup-project BlueBerry24.API
+dotnet ef migrations script --project Berryfy.Infrastructure --startup-project Berryfy.API
 ```
 
 ---
@@ -419,7 +419,7 @@ We welcome contributions! Please follow these steps:
 
 ## 🛡️ Security
 
-BlueBerry24 implements comprehensive security measures:
+Berryfy implements comprehensive security measures:
 
 - **Authentication**: JWT tokens with secure headers
 - **Authorization**: Role-based access control
@@ -460,6 +460,6 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 ## 📞 Support
 
 For support and questions:
-- 📧 Email: shahade.abdulhamid@gmail.com
+- 📧 Email: support@berryfy.org
 
 ---
