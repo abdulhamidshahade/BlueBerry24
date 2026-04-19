@@ -49,7 +49,7 @@ services:
       - ApiSettings__JwtOptions__Issuer=https://berryfy.com
       - ApiSettings__JwtOptions__Audience=berryfy-api
       - ApiSettings__JwtOptions__RequireHttps=false
-      - App__BaseUrl=http://localhost:30305
+      - App__BaseUrl=https://demo.berryfy.org
       - App__AppName=Berryfy
       - App__Version=1.0.0
       - GmailSettings__Email=${GmailSettings__Email}
