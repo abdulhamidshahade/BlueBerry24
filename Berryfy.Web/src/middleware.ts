@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { cookieIsSecureForRequest } from "@/lib/cookie-is-secure-request";
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
+  const secure = cookieIsSecureForRequest(request);
 
   const session = request.cookies.get("cart_session");
   if (!session) {
@@ -11,7 +13,7 @@ export function middleware(request: NextRequest) {
       path: "/",
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.COOKIE_SECURE === "true",
+      secure,
       maxAge: 30 * 24 * 60 * 60,
     });
   }
@@ -27,6 +29,9 @@ export function middleware(request: NextRequest) {
   if (authToken) {
     response.cookies.set("cart_session", "", {
       path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      secure,
       maxAge: 0,
     });
   }
