@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { AuthService } from '../services/auth/service';
 import { LoginRequest, RegisterRequest } from '../../types/auth';
 import { User } from '../../types/user';
+import { cookieIsSecure } from '../cookie-is-secure-server';
 
 export async function loginAction(formData: FormData) {
   const email = formData.get('email') as string;
@@ -22,13 +23,12 @@ export async function loginAction(formData: FormData) {
 
     if (response.isSuccess && response.data) {
       const cookieStore = await cookies();
-      
-      const secureCookies = process.env.COOKIE_SECURE === 'true';
+      const secure = await cookieIsSecure();
 
       cookieStore.set('auth_token', response.data.token, {
         path: '/',
         httpOnly: true,
-        secure: secureCookies,
+        secure,
         sameSite: 'lax',
         maxAge: 24 * 60 * 60,
       });
@@ -36,7 +36,7 @@ export async function loginAction(formData: FormData) {
       cookieStore.set('user_info', JSON.stringify(response.data.user), {
         path: '/',
         httpOnly: true,
-        secure: secureCookies,
+        secure,
         sameSite: 'lax',
         maxAge: 24 * 60 * 60,
       });
