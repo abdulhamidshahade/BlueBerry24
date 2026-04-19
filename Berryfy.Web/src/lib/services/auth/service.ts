@@ -3,6 +3,7 @@ import { ResponseDto } from '../../../types/responseDto';
 import { cookies } from 'next/headers';
 import { User } from '../../../types/user';
 import { apiRequest } from '../../utils/api';
+import { cookieIsSecure } from '../../cookie-is-secure-server';
 
 const API_BASE_URL = process.env.API_BASE_AUTH;
 
@@ -88,11 +89,12 @@ const cookieStore = await cookies();
       },
     });
 const newSessionId = crypto.randomUUID();
-    const tokens = cookieStore.set("cart_session", newSessionId, {
+    const secure = await cookieIsSecure();
+    cookieStore.set("cart_session", newSessionId, {
       path: "/",
       httpOnly: true,
       sameSite: "lax",
-      secure: true, //this ensures the cookie is only sent over HTTPS.
+      secure,
       maxAge: 30 * 24 * 60 * 60,
     });
 
