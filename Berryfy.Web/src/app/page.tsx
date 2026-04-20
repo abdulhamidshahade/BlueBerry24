@@ -15,7 +15,7 @@ function HeroSection() {
           <div className="col-lg-6">
             <div className="hero-content">
               <h1 className="display-4 fw-bold mb-4">
-                Welcome to <span className="text-warning">BlueBerry24</span>
+                Welcome to <span className="text-warning">Berryfy</span>
               </h1>
               <p className="lead mb-4">
                 Discover amazing products with unbeatable prices. Your one-stop destination 
