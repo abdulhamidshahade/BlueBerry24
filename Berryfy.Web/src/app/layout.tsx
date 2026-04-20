@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BlueBerry24 - Your Shopping Destination",
+  title: "Berryfy - Your Shopping Destination",
   description: "Shop the best products with our amazing shopping cart experience",
 };
 
@@ -45,12 +45,12 @@ export default function RootLayout({
           <div className="container">
             <div className="row">
               <div className="col-md-6">
-                <h5>BlueBerry24</h5>
+                <h5>Berryfy</h5>
                 <p className="text-muted">Your trusted shopping destination with server-side cart management.</p>
               </div>
               <div className="col-md-6 text-md-end">
                 <p className="text-muted mb-0">
-                  &copy; 2025 BlueBerry24. All rights reserved.
+                  &copy; 2026 Berryfy. All rights reserved.
                 </p>
               </div>
             </div>
