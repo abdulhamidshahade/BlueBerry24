@@ -42,6 +42,6 @@ export default async function EmailConfirmationPage({ searchParams }: EmailConfi
 }
 
 export const metadata = {
-  title: 'Confirm Email - BlueBerry24',
-  description: 'Confirm your BlueBerry24 account email address',
+  title: 'Confirm Email - Berryfy',
+  description: 'Confirm your Berryfy account email address',
 }; 
