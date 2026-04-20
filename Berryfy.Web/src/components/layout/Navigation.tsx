@@ -21,7 +21,7 @@ export default async function Navigation() {
       <div className="container">
         <Link className="navbar-brand fw-bold" href="/">
           <i className="bi bi-shop me-2"></i>
-          BlueBerry24
+          Berryfy
         </Link>
 
         {/* Cart + user always visible on mobile (left of hamburger) */}
