@@ -7,6 +7,6 @@ export default function AnalyticsPage() {
 }
 
 export const metadata = {
-  title: 'Analytics | BlueBerry24',
+  title: 'Analytics | Berryfy',
   description: 'This page is currently under development. Please check back soon for updates.',
 };
