@@ -72,7 +72,7 @@ export default function SettingsManagement({
             System Settings
           </h1>
           <p className="text-muted mb-0">
-            Configure and manage your BlueBerry24 e-commerce platform settings
+            Configure and manage your Berryfy e-commerce platform settings
           </p>
         </div>
         <div className="btn-group" role="group">
@@ -624,7 +624,7 @@ export default function SettingsManagement({
             <div className="card-body">
               <div className="mb-3">
                 <small className="text-muted">Version</small>
-                <div className="fw-bold">BlueBerry24 v1.0.0</div>
+                <div className="fw-bold">Berryfy v1.0.0</div>
               </div>
               <div className="mb-3">
                 <small className="text-muted">Last Updated</small>
@@ -812,7 +812,7 @@ function ImportSettingsOverlay() {
 
 function SystemLogsOverlay() {
   const sampleLogs = [
-    { timestamp: '2024-01-15 10:30:25', level: 'INFO', message: 'User admin@blueberry24.com logged in successfully', category: 'Authentication' },
+    { timestamp: '2024-01-15 10:30:25', level: 'INFO', message: 'User admin@Berryfy.com logged in successfully', category: 'Authentication' },
     { timestamp: '2024-01-15 10:28:15', level: 'INFO', message: 'Settings updated: General Settings', category: 'Settings' },
     { timestamp: '2024-01-15 10:25:42', level: 'INFO', message: 'Database backup completed successfully', category: 'Backup' },
     { timestamp: '2024-01-15 10:20:18', level: 'WARNING', message: 'Failed login attempt for user: test@example.com', category: 'Security' },
