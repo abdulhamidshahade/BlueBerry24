@@ -93,7 +93,7 @@ function FeaturesSection() {
       <div className="container">
         <div className="row">
           <div className="col-12 text-center mb-5">
-            <h2 className="display-5 fw-bold text-dark">Why Choose BlueBerry24?</h2>
+            <h2 className="display-5 fw-bold text-dark">Why Choose Berryfy?</h2>
             <p className="lead text-muted">Experience the best online shopping with our premium features</p>
           </div>
         </div>
@@ -305,7 +305,7 @@ function TestimonialsSection() {
     {
       name: "Mike Chen",
       role: "Regular Customer",
-      content: "Great product quality and competitive prices. BlueBerry24 has become my go-to online store.",
+      content: "Great product quality and competitive prices. Berryfy has become my go-to online store.",
       rating: 5
     },
     {
@@ -461,6 +461,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 }
 
 export const metadata = {
-  title: 'BlueBerry24 - Your Shopping Destination',
+  title: 'Berryfy - Your Shopping Destination',
   description: 'Discover amazing products with unbeatable prices. Your one-stop destination for quality shopping with fast delivery and excellent customer service.',
 };
