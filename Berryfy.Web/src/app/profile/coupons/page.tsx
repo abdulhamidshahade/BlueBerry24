@@ -245,6 +245,6 @@ export default async function UserCouponsPage() {
 }
 
 export const metadata = {
-  title: 'My Coupons - BlueBerry24',
+  title: 'My Coupons - Berryfy',
   description: 'View and manage your available discount coupons',
 }; 
