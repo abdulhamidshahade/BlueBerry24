@@ -8,6 +8,6 @@ export default function TrafficPage() {
 }
 
 export const metadata = {
-  title: 'Traffic | BlueBerry24',
+  title: 'Traffic | Berryfy',
   description: 'This page is currently under development. Please check back soon for updates.',
 };

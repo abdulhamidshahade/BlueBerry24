@@ -374,6 +374,6 @@ export default async function RoleManagementPage({ searchParams }: RoleManagemen
 }
 
 export const metadata = {
-  title: 'Role Management - BlueBerry24 Admin',
-  description: 'Manage user roles and permissions in the BlueBerry24 system',
+  title: 'Role Management - Berryfy Admin',
+  description: 'Manage user roles and permissions in the Berryfy system',
 };

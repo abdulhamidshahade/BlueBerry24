@@ -48,6 +48,6 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 }
 
 export const metadata = {
-  title: 'Settings | Admin Dashboard | BlueBerry24',
-  description: 'Manage system settings and configuration for BlueBerry24 e-commerce platform.',
+  title: 'Settings | Admin Dashboard | Berryfy',
+  description: 'Manage system settings and configuration for Berryfy e-commerce platform.',
 };

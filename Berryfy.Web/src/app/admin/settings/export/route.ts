@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
         exportedAt: new Date().toISOString(),
         exportedBy: user.email,
         version: '1.0.0',
-        application: 'BlueBerry24'
+        application: 'Berryfy'
       },
       settings: settings
     };
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 
     const response = new NextResponse(jsonContent);
     response.headers.set('Content-Type', 'application/json');
-    response.headers.set('Content-Disposition', `attachment; filename="blueberry24-settings-${new Date().toISOString().split('T')[0]}.json"`);
+    response.headers.set('Content-Disposition', `attachment; filename="Berryfy-settings-${new Date().toISOString().split('T')[0]}.json"`);
     
     return response;
 

@@ -8,6 +8,6 @@ export default function ReportsPage(){
 
 
 export const metadata = {
-  title: 'Reports | BlueBerry24',
+  title: 'Reports | Berryfy',
   description: 'This page is currently under development. Please check back soon for updates.',
 };

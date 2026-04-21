@@ -60,6 +60,6 @@ export default async function AdminWishlistPage({ searchParams }: AdminWishlistP
 }
 
 export const metadata = {
-  title: 'Wishlist Management | Admin Dashboard | BlueBerry24',
-  description: 'Manage and monitor all user wishlists on BlueBerry24.',
+  title: 'Wishlist Management | Admin Dashboard | Berryfy',
+  description: 'Manage and monitor all user wishlists on Berryfy.',
 }; 

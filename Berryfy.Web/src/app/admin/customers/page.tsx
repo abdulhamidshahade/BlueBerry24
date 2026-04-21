@@ -65,6 +65,6 @@ export default async function CustomersPage({ searchParams }: CustomersPageProps
 }
 
 export const metadata = {
-  title: 'Customers | Admin Dashboard | BlueBerry24',
+  title: 'Customers | Admin Dashboard | Berryfy',
   description: 'Manage customer accounts and view customer information.',
 }; 

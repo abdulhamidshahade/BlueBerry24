@@ -86,6 +86,6 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
 }
 
 export const metadata = {
-  title: 'Admin Users | Admin Dashboard | BlueBerry24',
+  title: 'Admin Users | Admin Dashboard | Berryfy',
   description: 'Manage super admin and admin users with elevated privileges.',
 }; 
