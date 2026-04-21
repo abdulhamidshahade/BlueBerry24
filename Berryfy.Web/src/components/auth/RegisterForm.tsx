@@ -50,14 +50,13 @@ export default function RegisterForm() {
     setError('');
     const formData = new FormData(e.currentTarget);
 
+    const email = (formData.get('email') as string) || '';
+
     startTransition(async () => {
       const result = await registerAction(formData);
       if (result) {
         window.location.href =
-          '/auth/login?message=' +
-          encodeURIComponent(
-            'Registration successful! Please check your email to confirm your account before signing in.'
-          );
+          '/auth/confirm-email?email=' + encodeURIComponent(email);
       } else {
         setError('Registration failed. Please try again.');
       }

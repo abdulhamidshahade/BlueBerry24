@@ -216,18 +216,18 @@ export async function resetPasswordAction(formData: FormData) {
 
 export async function confirmEmailAction(formData: FormData) {
   const email = formData.get('email') as string;
-  const token = formData.get('token') as string;
+  const code = formData.get('code') as string;
 
-  if (!email || !token) {
+  if (!email || !code) {
     return {
-      error: 'Email and token are required',
+      error: 'Email and verification code are required',
     };
   }
 
   try {
     const confirmationData = {
       email,
-      token,
+      code,
     };
 
     const response = await AuthService.confirmEmail(confirmationData);

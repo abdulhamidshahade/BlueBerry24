@@ -1,11 +1,10 @@
-import EmailConfirmationForm from '../../../components/auth/EmailConfirmationForm';
+import OtpConfirmationForm from '../../../components/auth/OtpConfirmationForm';
 import { getCurrentUser } from '../../../lib/actions/auth-actions';
 import { redirect } from 'next/navigation';
 
 interface EmailConfirmationPageProps {
   searchParams: Promise<{
     email?: string;
-    token?: string;
     error?: string;
   }>;
 }
@@ -17,10 +16,10 @@ export default async function EmailConfirmationPage({ searchParams }: EmailConfi
   }
 
   const params = await searchParams;
-  const { email, token, error } = params;
+  const { email, error } = params;
 
-  if (!email || !token) {
-    redirect('/auth/resend-confirmation?error=Invalid or missing confirmation link. Please request a new confirmation email.');
+  if (!email) {
+    redirect('/auth/resend-confirmation?error=Missing email address. Please request a new confirmation code.');
   }
 
   return (
@@ -33,8 +32,7 @@ export default async function EmailConfirmationPage({ searchParams }: EmailConfi
               {decodeURIComponent(error)}
             </div>
           )}
-
-          <EmailConfirmationForm email={email} token={token} />
+          <OtpConfirmationForm email={email} />
         </div>
       </div>
     </div>
@@ -42,6 +40,6 @@ export default async function EmailConfirmationPage({ searchParams }: EmailConfi
 }
 
 export const metadata = {
-  title: 'Confirm Email - Berryfy',
-  description: 'Confirm your Berryfy account email address',
-}; 
+  title: 'Verify Email - Berryfy',
+  description: 'Enter your 6-digit verification code to activate your Berryfy account',
+};

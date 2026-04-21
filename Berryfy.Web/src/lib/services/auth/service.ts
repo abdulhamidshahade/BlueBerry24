@@ -141,7 +141,7 @@ const newSessionId = crypto.randomUUID();
 
   static async confirmEmail(data: {
     email: string;
-    token: string;
+    code: string;
   }): Promise<ResponseDto<any>> {
     const response = await fetch(`${API_BASE_URL}/confirm-email`, {
       method: 'POST',
