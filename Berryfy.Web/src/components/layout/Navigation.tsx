@@ -32,14 +32,9 @@ export default async function Navigation() {
           {user ? (
             <UserMenu user={user} />
           ) : (
-            <>
-              <Link href="/auth/login" className="btn btn-outline-light btn-sm">
-                <i className="bi bi-box-arrow-in-right"></i>
-              </Link>
-              <Link href="/auth/register" className="btn btn-light btn-sm">
-                <i className="bi bi-person-plus"></i>
-              </Link>
-            </>
+            <Link href="/auth/login" className="btn btn-outline-light btn-sm">
+              <i className="bi bi-box-arrow-in-right"></i>
+            </Link>
           )}
         </div>
 
@@ -86,16 +81,10 @@ export default async function Navigation() {
             {user ? (
               <UserMenu user={user} />
             ) : (
-              <div className="d-flex gap-2">
-                <Link href="/auth/login" className="btn btn-outline-light">
-                  <i className="bi bi-box-arrow-in-right me-1"></i>
-                  Sign In
-                </Link>
-                <Link href="/auth/register" className="btn btn-light">
-                  <i className="bi bi-person-plus me-1"></i>
-                  Sign Up
-                </Link>
-              </div>
+              <Link href="/auth/login" className="btn btn-outline-light">
+                <i className="bi bi-box-arrow-in-right me-1"></i>
+                Sign In
+              </Link>
             )}
           </div>
         </div>
