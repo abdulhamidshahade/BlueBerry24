@@ -3,6 +3,7 @@ import MiniCart from '../cart/MiniCart';
 import UserMenu from '../auth/UserMenu';
 import { getCurrentUser } from '../../lib/actions/auth-actions';
 import { Suspense } from 'react';
+import NavScrollBehavior from '@/components/layout/NavScrollBehavior';
 
 function MiniCartFallback() {
   return (
@@ -17,8 +18,10 @@ export default async function Navigation() {
   const user = await getCurrentUser();
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
-      <div className="container">
+    <>
+      <NavScrollBehavior />
+      <nav id="main-navbar" className="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow-sm">
+        <div className="container">
         <Link className="navbar-brand fw-bold" href="/">
           <i className="bi bi-shop me-2"></i>
           Berryfy
@@ -99,7 +102,8 @@ export default async function Navigation() {
             )}
           </div>
         </div>
-      </div>
-    </nav>
+        </div>
+      </nav>
+    </>
   );
 } 
