@@ -12,5 +12,7 @@ namespace Berryfy.Application.Services.Interfaces.AuthServiceInterfaces
         Task<bool> ResetPasswordAsync(ResetPasswordRequestDto requestDto);
         Task<bool> ConfirmEmailAsync(EmailConfirmationDto confirmationDto);
         Task<bool> ResendConfirmationEmailAsync(string email);
+        Task<bool> UpdateProfileAsync(int userId, UpdateProfileDto dto);
+        Task<bool> ChangePasswordAsync(int userId, ChangePasswordDto dto);
     }
 }

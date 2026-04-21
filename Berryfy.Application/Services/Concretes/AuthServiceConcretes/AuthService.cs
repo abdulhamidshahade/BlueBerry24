@@ -365,5 +365,51 @@ namespace Berryfy.Application.Services.Concretes.AuthServiceConcretes
                 return false;
             }
         }
+
+        public async Task<bool> UpdateProfileAsync(int userId, UpdateProfileDto dto)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId.ToString());
+                if (user == null) return false;
+
+                user.FirstName = dto.FirstName;
+                user.LastName = dto.LastName;
+
+                if (user.UserName != dto.UserName)
+                {
+                    var userNameTaken = await IsUsernameTaken(dto.UserName);
+                    if (userNameTaken) return false;
+                    user.UserName = dto.UserName;
+                }
+
+                var result = await _userManager.UpdateAsync(user);
+                return result.Succeeded;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating profile for user {UserId}", userId);
+                return false;
+            }
+        }
+
+        public async Task<bool> ChangePasswordAsync(int userId, ChangePasswordDto dto)
+        {
+            try
+            {
+                if (dto.NewPassword != dto.ConfirmNewPassword) return false;
+
+                var user = await _userManager.FindByIdAsync(userId.ToString());
+                if (user == null) return false;
+
+                var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
+                return result.Succeeded;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error changing password for user {UserId}", userId);
+                return false;
+            }
+        }
     }
 }
