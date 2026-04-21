@@ -17,7 +17,7 @@ export default async function Navigation() {
   const user = await getCurrentUser();
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow-sm site-navbar">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
       <div className="container">
         <Link className="navbar-brand fw-bold" href="/">
           <i className="bi bi-shop me-2"></i>
