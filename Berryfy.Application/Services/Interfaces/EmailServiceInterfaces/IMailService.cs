@@ -6,6 +6,6 @@ namespace Berryfy.Application.Services.Interfaces.EmailServiceInterfaces
     {
         Task SendEmailAsync(SendEmailRequest request);
         Task SendPasswordResetEmailAsync(string email, string resetToken, string resetUrl);
-        Task SendEmailConfirmationAsync(string email, string confirmationToken, string confirmationUrl, string userName);
+        Task SendEmailConfirmationAsync(string email, string confirmationCode, string userName);
     }
 }

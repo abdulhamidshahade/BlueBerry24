@@ -37,6 +37,17 @@ namespace Berryfy.Application.Services.Concretes.AuthServiceConcretes
             _configuration = configuration;
             _userService = userService;
         }
+        private static string GenerateOtpCode()
+        {
+            var digits = new char[6];
+            var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+            var buffer = new byte[6];
+            rng.GetBytes(buffer);
+            for (int i = 0; i < 6; i++)
+                digits[i] = (char)('0' + buffer[i] % 10);
+            return new string(digits);
+        }
+
         private async Task<bool> IsUsernameTaken(string userName)
         {
             return await _userService.IsUsernameTaken(userName);
@@ -91,12 +102,13 @@ namespace Berryfy.Application.Services.Concretes.AuthServiceConcretes
 
                     try
                     {
-                        var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        var baseUrl = _configuration["App:BaseUrl"] ?? "https://demo.berryfy.org";
-                        var confirmationUrl = $"{baseUrl}/auth/confirm-email";
+                        var code = GenerateOtpCode();
+                        user.EmailConfirmationCode = code;
+                        user.EmailConfirmationCodeExpiry = DateTime.UtcNow.AddMinutes(15);
+                        await _userManager.UpdateAsync(user);
 
-                        await _mailService.SendEmailConfirmationAsync(user.Email, confirmationToken, confirmationUrl, user.UserName);
-                        _logger.LogInformation($"Email confirmation sent successfully to user", user.Email);
+                        await _mailService.SendEmailConfirmationAsync(user.Email, code, user.UserName);
+                        _logger.LogInformation("Email confirmation code sent successfully to {Email}", user.Email);
                     }
                     catch (Exception emailEx)
                     {
@@ -267,10 +279,33 @@ namespace Berryfy.Application.Services.Concretes.AuthServiceConcretes
                     return true;
                 }
 
-                var result = await _userManager.ConfirmEmailAsync(user, confirmationDto.Token);
+                if (user.EmailConfirmationCode == null || user.EmailConfirmationCodeExpiry == null)
+                {
+                    _logger.LogWarning("No confirmation code found for user {Email}", normalizedEmail);
+                    return false;
+                }
+
+                if (DateTime.UtcNow > user.EmailConfirmationCodeExpiry)
+                {
+                    _logger.LogWarning("Confirmation code expired for user {Email}", normalizedEmail);
+                    return false;
+                }
+
+                if (user.EmailConfirmationCode != confirmationDto.Code)
+                {
+                    _logger.LogWarning("Invalid confirmation code for user {Email}", normalizedEmail);
+                    return false;
+                }
+
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var result = await _userManager.ConfirmEmailAsync(user, token);
 
                 if (result.Succeeded)
                 {
+                    user.EmailConfirmationCode = null;
+                    user.EmailConfirmationCodeExpiry = null;
+                    await _userManager.UpdateAsync(user);
+
                     _logger.LogInformation("Email confirmed successfully for user {Email}", user.Email);
                     return true;
                 }
@@ -306,14 +341,15 @@ namespace Berryfy.Application.Services.Concretes.AuthServiceConcretes
                     return true;
                 }
 
-                var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var baseUrl = _configuration["App:BaseUrl"] ?? "https://demo.berryfy.org";
-                var confirmationUrl = $"{baseUrl}/auth/confirm-email";
+                var code = GenerateOtpCode();
+                user.EmailConfirmationCode = code;
+                user.EmailConfirmationCodeExpiry = DateTime.UtcNow.AddMinutes(15);
+                await _userManager.UpdateAsync(user);
 
                 try
                 {
-                    await _mailService.SendEmailConfirmationAsync(user.Email, confirmationToken, confirmationUrl, user.UserName);
-                    _logger.LogInformation("Confirmation email resent successfully to user {Email}", user.Email);
+                    await _mailService.SendEmailConfirmationAsync(user.Email, code, user.UserName);
+                    _logger.LogInformation("Confirmation code resent successfully to user {Email}", user.Email);
                 }
                 catch (Exception emailEx)
                 {
