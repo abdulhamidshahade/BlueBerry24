@@ -315,7 +315,7 @@ export default async function UserPaymentsPage({ searchParams }: UserPaymentsPag
               <p className="card-text text-muted">
                 Have questions about a payment? Our support team is here to help.
               </p>
-              <a href="mailto:support@blueberry24.com" className="btn btn-outline-primary">
+              <a href="mailto:support@berryfy.org" className="btn btn-outline-primary">
                 <i className="bi bi-envelope me-2"></i>
                 Contact Support
               </a>

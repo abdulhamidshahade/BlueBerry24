@@ -325,7 +325,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
                   Have questions about this order? We're here to help.
                 </p>
                 <div className="d-grid gap-2">
-                    <a href="mailto:bilgi.blueberry24@gmail.com" className="btn btn-outline-primary btn-sm">
+                    <a href="mailto:support@berryfy.org" className="btn btn-outline-primary btn-sm">
                     <i className="bi bi-envelope me-2"></i>
                     Contact Support
                   </a>

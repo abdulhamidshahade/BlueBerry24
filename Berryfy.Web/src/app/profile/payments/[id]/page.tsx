@@ -351,7 +351,7 @@ export default async function ReceiptPage({ params }: ReceiptPageProps) {
                   Have questions about this payment? Our support team is here to help.
                 </p>
                 <div className="d-grid gap-2">
-                  <a href="mailto:bilgi.blueberry24@gmail.com" className="btn btn-outline-primary btn-sm">
+                  <a href="mailto:support@berryfy.org" className="btn btn-outline-primary btn-sm">
                     <i className="bi bi-envelope me-2"></i>
                     Contact Support
                   </a>

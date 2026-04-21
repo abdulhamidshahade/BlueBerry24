@@ -144,8 +144,8 @@ export default async function PaymentSuccessPage({ searchParams }: PaymentSucces
                   </p>
                   <p className="mb-0 small">
                     Contact our support team at{' '}
-                    <a href="mailto:support@blueberry24.com" className="text-decoration-none">
-                      support@blueberry24.com
+                    <a href="mailto:support@berryfy.com" className="text-decoration-none">
+                      support@berryfy.com
                     </a>
                     {' '}or visit our{' '}
                     <Link href="/help" className="text-decoration-none">
