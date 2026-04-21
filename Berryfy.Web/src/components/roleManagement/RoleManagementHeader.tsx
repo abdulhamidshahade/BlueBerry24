@@ -36,7 +36,7 @@ export default function RoleManagementHeader({ currentUser }: RoleManagementHead
                 Role Management
               </h1>
               <p className="text-muted small mb-0">
-                Manage user roles and permissions across the BlueBerry24 system
+                Manage user roles and permissions across the Berryfy system
               </p>
             </div>
           </div>

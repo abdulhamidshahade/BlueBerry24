@@ -72,7 +72,7 @@ export default function RegisterForm() {
             <i className="bi bi-person-plus me-2"></i>
             Create Account
           </h2>
-          <p className="text-muted">Join BlueBerry24 and start shopping today!</p>
+          <p className="text-muted">Join Berryfy and start shopping today!</p>
         </div>
 
         {error && (

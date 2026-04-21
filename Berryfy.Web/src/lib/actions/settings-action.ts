@@ -25,9 +25,9 @@ async function checkAdminAccess() {
 }
 
 let systemSettings = {
-  siteName: 'BlueBerry24',
+  siteName: 'Berryfy',
   siteDescription: 'Your premium e-commerce platform',
-  contactEmail: 'admin@blueberry24.com',
+  contactEmail: 'support@berryfy.org',
   maintenanceMode: false,
   allowRegistrations: true,
   defaultCurrency: 'USD',
@@ -245,9 +245,9 @@ export async function resetToDefaults(formData: FormData) {
   
   try {
     systemSettings = {
-      siteName: 'BlueBerry24',
+      siteName: 'Berryfy',
       siteDescription: 'Your premium e-commerce platform',
-      contactEmail: 'admin@blueberry24.com',
+      contactEmail: 'support@berryfy.org',
       maintenanceMode: false,
       allowRegistrations: true,
       defaultCurrency: 'USD',
