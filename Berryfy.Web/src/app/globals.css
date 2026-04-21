@@ -1,7 +1,6 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --nav-height: 0px;
 }
 
 html,
@@ -18,7 +17,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
-  padding-top: var(--nav-height);
 }
 
 * {
@@ -98,13 +96,4 @@ a {
 .dropdown-menu {
   max-height: none !important;
   overflow: visible !important;
-}
-
-#main-navbar {
-  z-index: 1030;
-  transition: transform 0.25s ease-in-out;
-}
-
-#main-navbar.nav-hidden {
-  transform: translateY(-100%);
 }
