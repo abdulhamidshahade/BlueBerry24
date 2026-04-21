@@ -167,4 +167,34 @@ const newSessionId = crypto.randomUUID();
     const jsonRes: ResponseDto<any> = await response.json();
     return jsonRes;
   }
+
+  static async updateProfile(
+    token: string,
+    data: { firstName: string; lastName: string; userName: string }
+  ): Promise<ResponseDto<any>> {
+    const response = await fetch(`${API_BASE_URL}/me`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.json();
+  }
+
+  static async changePassword(
+    token: string,
+    data: { currentPassword: string; newPassword: string; confirmNewPassword: string }
+  ): Promise<ResponseDto<any>> {
+    const response = await fetch(`${API_BASE_URL}/me/change-password`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.json();
+  }
 }

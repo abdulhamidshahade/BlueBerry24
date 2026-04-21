@@ -324,4 +324,73 @@ export async function getCurrentUser(): Promise<User | null> {
 export async function getAuthToken(): Promise<string | null> {
   const cookieStore = await cookies();
   return cookieStore.get('auth_token')?.value || null;
-} 
+}
+
+export async function updateProfileAction(formData: FormData) {
+  const firstName = formData.get('firstName') as string;
+  const lastName = formData.get('lastName') as string;
+  const userName = formData.get('userName') as string;
+
+  if (!firstName || !lastName || !userName) {
+    return { error: 'All fields are required' };
+  }
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get('auth_token')?.value;
+  if (!token) return { error: 'Not authenticated' };
+
+  try {
+    const response = await AuthService.updateProfile(token, { firstName, lastName, userName });
+    if (response.isSuccess) {
+      const userInfo = cookieStore.get('user_info')?.value;
+      if (userInfo) {
+        const user = JSON.parse(userInfo) as User;
+        user.firstName = firstName;
+        user.lastName = lastName;
+        user.userName = userName;
+        const secure = await cookieIsSecure();
+        cookieStore.set('user_info', JSON.stringify(user), {
+          path: '/',
+          httpOnly: true,
+          secure,
+          sameSite: 'lax',
+          maxAge: 24 * 60 * 60,
+        });
+      }
+      return { success: true };
+    }
+    return { error: response.statusMessage || 'Failed to update profile' };
+  } catch {
+    return { error: 'An unexpected error occurred' };
+  }
+}
+
+export async function changePasswordAction(formData: FormData) {
+  const currentPassword = formData.get('currentPassword') as string;
+  const newPassword = formData.get('newPassword') as string;
+  const confirmNewPassword = formData.get('confirmNewPassword') as string;
+
+  if (!currentPassword || !newPassword || !confirmNewPassword) {
+    return { error: 'All fields are required' };
+  }
+
+  if (newPassword !== confirmNewPassword) {
+    return { error: 'New password and confirmation do not match' };
+  }
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get('auth_token')?.value;
+  if (!token) return { error: 'Not authenticated' };
+
+  try {
+    const response = await AuthService.changePassword(token, {
+      currentPassword,
+      newPassword,
+      confirmNewPassword,
+    });
+    if (response.isSuccess) return { success: true };
+    return { error: response.statusMessage || 'Failed to change password' };
+  } catch {
+    return { error: 'An unexpected error occurred' };
+  }
+}
