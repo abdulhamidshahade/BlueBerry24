@@ -1,6 +1,6 @@
-# 🫐 BlueBerry24 Web Frontend
+# 🫐 Berryfy Web Frontend
 
-A modern, responsive **e-commerce frontend** built with **Next.js 15** and **TypeScript**. This is the client-side application for the BlueBerry24 e-commerce platform, featuring a comprehensive shopping experience with an advanced admin dashboard.
+A modern, responsive **e-commerce frontend** built with **Next.js 15** and **TypeScript**. This is the client-side application for the Berryfy e-commerce platform, featuring a comprehensive shopping experience with an advanced admin dashboard.
 
 [![Next.js 15](https://img.shields.io/badge/Next.js-15.1.8-000000?style=flat&logo=next.js)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19.0.0-61DAFB?style=flat&logo=react)](https://reactjs.org/)
@@ -11,7 +11,7 @@ A modern, responsive **e-commerce frontend** built with **Next.js 15** and **Typ
 
 ## 🎯 Overview
 
-BlueBerry24 Web is a feature-rich e-commerce frontend that provides:
+Berryfy Web is a feature-rich e-commerce frontend that provides:
 
 - **Customer Experience**: Modern shopping interface with product browsing, cart management, and checkout
 - **Admin Dashboard**: Comprehensive management system for products, orders, customers, and analytics
@@ -79,7 +79,7 @@ BlueBerry24 Web is a feature-rich e-commerce frontend that provides:
 ## 📁 Project Structure
 
 ```
-BlueBerry24.Web/
+Berryfy.Web/
 ├── src/
 │   ├── app/                           # Next.js App Router
 │   │   ├── admin/                     # Admin Dashboard
@@ -172,15 +172,15 @@ BlueBerry24.Web/
 
 ### Prerequisites
 - **Node.js 18+** and npm/yarn/pnpm
-- **BlueBerry24.API** running (for backend integration)
+- **Berryfy.API** running (for backend integration)
 - Modern web browser
 
 ### 1. Installation
 
 ```bash
 # Clone the repository (if not already done)
-git clone https://github.com/abdulhamidshahade/BlueBerry24.git
-cd BlueBerry24/BlueBerry24.Web
+git clone https://github.com/abdulhamidshahade/Berryfy.git
+cd Berryfy/Berryfy.Web
 
 # Install dependencies
 npm install
@@ -252,7 +252,7 @@ const nextConfig: NextConfig = {
 
 ## 🔌 API Integration
 
-The frontend communicates with the BlueBerry24.API backend through:
+The frontend communicates with the Berryfy.API backend through:
 
 ### Service Layer
 - **Centralized API clients** in `src/lib/services/`
@@ -381,16 +381,16 @@ NEXT_PUBLIC_APP_URL=https://your-frontend-domain.com
 
 ## 📄 License
 
-This project is part of the BlueBerry24 e-commerce platform. See the main project repository for license information.
+This project is part of the Berryfy e-commerce platform. See the main project repository for license information.
 
 ---
 
 ## 🔗 Related Projects
 
-- **[BlueBerry24.API](../BlueBerry24.API/)** - Backend REST API
-- **[BlueBerry24.Application](../BlueBerry24.Application/)** - Business logic layer
-- **[BlueBerry24.Domain](../BlueBerry24.Domain/)** - Domain entities and rules
-- **[BlueBerry24.Infrastructure](../BlueBerry24.Infrastructure/)** - Data access layer
+- **[Berryfy.API](../Berryfy.API/)** - Backend REST API
+- **[Berryfy.Application](../Berryfy.Application/)** - Business logic layer
+- **[Berryfy.Domain](../Berryfy.Domain/)** - Domain entities and rules
+- **[Berryfy.Infrastructure](../Berryfy.Infrastructure/)** - Data access layer
 
 ---
 
