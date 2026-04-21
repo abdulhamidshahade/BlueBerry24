@@ -80,7 +80,9 @@ export default function ProductCard({
               </span>
               <span className={`badge bg-${stockStatus}`}>
                 <i className={`bi ${stockIcon} me-1`}></i>
-                {product.stockQuantity} in stock
+                {stockStatus === "success"
+                  ? "In Stock"
+                  : `Only ${product.stockQuantity} left`}
               </span>
             </div>
 
