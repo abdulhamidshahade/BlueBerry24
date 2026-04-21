@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -14,8 +14,7 @@ namespace Berryfy.Infrastructure.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "EmailConfirmationCode",
                 table: "AspNetUsers",
-                type: "nvarchar(6)",
-                maxLength: 6,
+                type: "nvarchar(max)",
                 nullable: true);
 
             migrationBuilder.AddColumn<DateTime>(

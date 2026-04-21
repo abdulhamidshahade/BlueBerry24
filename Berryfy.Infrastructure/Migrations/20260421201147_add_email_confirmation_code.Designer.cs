@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Berryfy.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260421194602_refactor_db_10")]
-    partial class refactor_db_10
+    [Migration("20260421201147_add_email_confirmation_code")]
+    partial class add_email_confirmation_code
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
