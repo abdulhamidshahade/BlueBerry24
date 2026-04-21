@@ -83,14 +83,11 @@ export default async function ProfilePage() {
               <hr />
 
               <div className="d-flex gap-2">
-                <a href="" className="btn btn-primary">
+                <a href="/profile/edit" className="btn btn-primary">
                   <i className="bi bi-pencil me-1"></i>
                   Edit Profile
                 </a>
-                <a
-                  href=""
-                  className="btn btn-outline-secondary"
-                >
+                <a href="/profile/change-password" className="btn btn-outline-secondary">
                   <i className="bi bi-key me-1"></i>
                   Change Password
                 </a>
