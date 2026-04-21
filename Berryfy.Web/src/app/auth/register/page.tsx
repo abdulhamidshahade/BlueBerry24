@@ -36,6 +36,6 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
 }
 
 export const metadata = {
-  title: 'Create Account - BlueBerry24',
-  description: 'Create your BlueBerry24 account and start shopping',
+  title: 'Create Account - Berryfy',
+  description: 'Create your Berryfy account and start shopping',
 }; 

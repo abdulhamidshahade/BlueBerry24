@@ -155,6 +155,6 @@ export default async function ProfilePage() {
 }
 
 export const metadata = {
-  title: "My Profile - BlueBerry24",
-  description: "Manage your BlueBerry24 account profile",
+  title: "My Profile - Berryfy",
+  description: "Manage your Berryfy account profile",
 };

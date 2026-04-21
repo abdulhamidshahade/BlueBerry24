@@ -44,6 +44,6 @@ export default async function ForgotPasswordPage({ searchParams }: ForgotPasswor
 }
 
 export const metadata = {
-  title: 'Forgot Password - BlueBerry24',
-  description: 'Reset your BlueBerry24 account password',
+  title: 'Forgot Password - Berryfy',
+  description: 'Reset your Berryfy account password',
 }; 

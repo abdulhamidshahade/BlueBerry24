@@ -51,6 +51,6 @@ export default function NotFound() {
 }
 
 export const metadata = {
-  title: '404 - Page Not Found | BlueBerry24',
+  title: '404 - Page Not Found | Berryfy',
   description: 'The page you are looking for could not be found.',
 };

@@ -45,6 +45,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 }
 
 export const metadata = {
-  title: 'Sign In - BlueBerry24',
-  description: 'Sign in to your BlueBerry24 account',
+  title: 'Sign In - Berryfy',
+  description: 'Sign in to your Berryfy account',
 }; 

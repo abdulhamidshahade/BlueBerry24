@@ -42,6 +42,6 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
 }
 
 export const metadata = {
-  title: 'Reset Password - BlueBerry24',
-  description: 'Reset your BlueBerry24 account password',
+  title: 'Reset Password - Berryfy',
+  description: 'Reset your Berryfy account password',
 }; 

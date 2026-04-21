@@ -50,6 +50,6 @@ export default async function WishlistPage({ searchParams }: WishlistPageProps) 
 }
 
 export const metadata = {
-  title: 'My Wishlists | BlueBerry24',
-  description: 'Manage your wishlists and saved products on BlueBerry24.',
+  title: 'My Wishlists | Berryfy',
+  description: 'Manage your wishlists and saved products on Berryfy.',
 }; 

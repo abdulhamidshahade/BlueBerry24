@@ -45,6 +45,6 @@ export default async function ResendConfirmationPage({ searchParams }: ResendCon
 }
 
 export const metadata = {
-  title: 'Resend Confirmation Email - BlueBerry24',
-  description: 'Resend your BlueBerry24 account confirmation email',
+  title: 'Resend Confirmation Email - Berryfy',
+  description: 'Resend your Berryfy account confirmation email',
 }; 

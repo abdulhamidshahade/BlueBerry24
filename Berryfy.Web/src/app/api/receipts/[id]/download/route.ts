@@ -217,7 +217,7 @@ export async function GET(
 </head>
 <body>
     <div class="header">
-        <div class="company-name">BlueBerry24</div>
+        <div class="company-name">Berryfy</div>
         <div class="receipt-title">Payment Receipt</div>
     </div>
 
@@ -358,7 +358,7 @@ export async function GET(
 
     <div class="footer">
         <p>Thank you for your business!</p>
-        <p>If you have any questions about this receipt, please contact us at support@blueberry24.com</p>
+        <p>If you have any questions about this receipt, please contact us at support@Berryfy.com</p>
         <p>Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
     </div>
 </body>
