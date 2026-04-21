@@ -12,6 +12,8 @@ export default function ProductCard({
   product,
   showAdminActions = false,
 }: ProductCardProps) {
+  const displayName = product.name.replace(/\s*\([^)]*\)\s*/g, " ").trim();
+
   const stockStatus =
     product.stockQuantity <= product.lowStockThreshold
       ? "danger"
@@ -51,7 +53,7 @@ export default function ProductCard({
 
         <div className="card-body d-flex flex-column">
           <div className="d-flex justify-content-between align-items-start mb-2">
-            <h5 className="card-title mb-0">{product.name}</h5>
+            <h5 className="card-title mb-0">{displayName}</h5>
             {!product.isActive && (
               <span className="badge bg-secondary">Inactive</span>
             )}
