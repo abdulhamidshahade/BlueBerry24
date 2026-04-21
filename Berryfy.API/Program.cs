@@ -308,7 +308,10 @@ catch (Exception ex)
     }
 }
 
-if (app.Environment.IsDevelopment())
+var enableApiDocs = app.Environment.IsDevelopment() ||
+    builder.Configuration.GetValue("OpenApi:EnableInProduction", false);
+
+if (enableApiDocs)
 {
     app.MapOpenApi();
     app.MapScalarApiReference(options =>
