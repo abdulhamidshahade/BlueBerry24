@@ -1,6 +1,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --site-nav-offset: 5.5rem;
 }
 
 html,
@@ -17,6 +18,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
+  padding-top: var(--site-nav-offset);
 }
 
 * {
@@ -96,4 +98,14 @@ a {
 .dropdown-menu {
   max-height: none !important;
   overflow: visible !important;
+}
+
+.site-navbar {
+  z-index: 1030;
+}
+
+@media (min-width: 992px) {
+  :root {
+    --site-nav-offset: 4.75rem;
+  }
 }
