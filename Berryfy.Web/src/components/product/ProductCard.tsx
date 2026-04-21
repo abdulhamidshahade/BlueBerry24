@@ -30,7 +30,7 @@ export default function ProductCard({
 
   return (
     <div className="col">
-      <div className="card h-100 shadow-sm">
+      <div className="card h-100 shadow-sm position-relative">
         {product.imageUrl && (
           <div
             className="card-img-container"
@@ -52,6 +52,14 @@ export default function ProductCard({
         )}
 
         <div className="card-body d-flex flex-column">
+          {!showAdminActions && (
+            <Link
+              href={`/products/${product.id}`}
+              className="stretched-link"
+              aria-label={`View ${displayName}`}
+            />
+          )}
+
           <div className="d-flex justify-content-between align-items-start mb-2">
             <h5 className="card-title mb-0">{displayName}</h5>
             {!product.isActive && (
@@ -86,7 +94,7 @@ export default function ProductCard({
             )}
           </div>
 
-          <div className="d-flex gap-2">
+          <div className="d-flex gap-2 position-relative" style={{ zIndex: 1 }}>
             {showAdminActions ? (
               <>
                 <a
