@@ -1,4 +1,5 @@
 import { CategoryDto } from "../../types/category";
+import Link from "next/link";
 
 interface Props {
   categories: CategoryDto[];
@@ -19,7 +20,7 @@ export default async function CategoryList({ categories }: Props) {
     <div className="row g-4">
       {categories.map((category) => (
         <div key={category.id} className="col-12 col-sm-6 col-lg-4">
-          <div className="card h-100 shadow-sm border-0 category-card">
+          <div className="card h-100 shadow-sm border-0 category-card position-relative">
             <div className="position-relative overflow-hidden">
               <img
                 src={category.imageUrl}
@@ -30,17 +31,23 @@ export default async function CategoryList({ categories }: Props) {
               <div className="position-absolute top-0 start-0 w-100 h-100 category-overlay"></div>
             </div>
             <div className="card-body d-flex flex-column">
+              <Link
+                href={`/categories/${category.id}`}
+                className="stretched-link"
+                aria-label={`Explore ${category.name}`}
+              />
+
               <h5 className="card-title fw-bold text-primary mb-2">
                 {category.name}
               </h5>
               <p className="card-text text-muted flex-grow-1">
                 {category.description}
               </p>
-              <div className="mt-auto">
-                <a href={`/categories/${category.id}`} className="btn btn-primary btn-sm">
+              <div className="mt-auto position-relative" style={{ zIndex: 1 }}>
+                <Link href={`/categories/${category.id}`} className="btn btn-primary btn-sm">
                   Explore Category
                   <i className="bi bi-arrow-right ms-2"></i>
-                </a>
+                </Link>
               </div>
             </div>
           </div>
