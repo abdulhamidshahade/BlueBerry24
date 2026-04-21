@@ -588,6 +588,41 @@ namespace Berryfy.API.Controllers
             });
         }
 
+        [HttpPut]
+        [Route("me")]
+        [AllRoles]
+        public async Task<IActionResult> UpdateMyProfile([FromBody] UpdateProfileDto dto)
+        {
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+                return Unauthorized(new ResponseDto<bool> { IsSuccess = false, StatusCode = 401, StatusMessage = "Unauthorized" });
+
+            var result = await _authService.UpdateProfileAsync(userId, dto);
+            if (result)
+                return Ok(new ResponseDto<bool> { IsSuccess = true, StatusCode = 200, StatusMessage = "Profile updated successfully." });
+
+            return BadRequest(new ResponseDto<bool> { IsSuccess = false, StatusCode = 400, StatusMessage = "Failed to update profile. Username may already be taken." });
+        }
+
+        [HttpPost]
+        [Route("me/change-password")]
+        [AllRoles]
+        public async Task<IActionResult> ChangeMyPassword([FromBody] ChangePasswordDto dto)
+        {
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+                return Unauthorized(new ResponseDto<bool> { IsSuccess = false, StatusCode = 401, StatusMessage = "Unauthorized" });
+
+            if (dto.NewPassword != dto.ConfirmNewPassword)
+                return BadRequest(new ResponseDto<bool> { IsSuccess = false, StatusCode = 400, StatusMessage = "New password and confirmation do not match." });
+
+            var result = await _authService.ChangePasswordAsync(userId, dto);
+            if (result)
+                return Ok(new ResponseDto<bool> { IsSuccess = true, StatusCode = 200, StatusMessage = "Password changed successfully." });
+
+            return BadRequest(new ResponseDto<bool> { IsSuccess = false, StatusCode = 400, StatusMessage = "Failed to change password. Current password may be incorrect." });
+        }
+
         [HttpPost]
         [AdminAndAbove]
         [Route("users/{userId}/lock")]
