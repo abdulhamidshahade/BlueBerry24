@@ -102,9 +102,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
               <div className="row">
                 <div className="col-sm-6">
                   <h6>Availability</h6>
-                  <span className={`badge bg-${stockStatus} fs-6`}>
-                    <i className="bi bi-box-seam me-1"></i>
-                    {isInStock ? `${availableStock} in stock` : 'Out of stock'}
+                  <span className={`badge bg-${isInStock ? 'success' : 'danger'} fs-6`}>
+                    <i className={`bi ${isInStock ? 'bi-box-seam' : 'bi-x-circle'} me-1`}></i>
+                    {isInStock ? 'In Stock' : 'Out of Stock'}
                   </span>
                 </div>
                 <div className="col-sm-6">
@@ -115,13 +115,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 </div>
               </div>
             </div>
-
-            {stockStatus === 'warning' && isInStock && (
-              <div className="alert alert-warning">
-                <i className="bi bi-exclamation-triangle me-2"></i>
-                <strong>Limited Stock:</strong> Only {availableStock} items remaining!
-              </div>
-            )}
 
             <div className="d-grid gap-2">
               <AddToCartForm

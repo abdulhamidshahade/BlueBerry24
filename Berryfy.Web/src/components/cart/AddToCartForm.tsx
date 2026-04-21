@@ -19,8 +19,6 @@ export default function AddToCartForm({
   buttonSize = 'lg',
   className = "btn btn-primary w-100"
 }: AddToCartFormProps) {
-  const maxQuantity = Math.min(availableStock, 10);
-
   return (
     <form action={addToCart} className="w-100">
       <input type="hidden" name="productId" value={productId} />
@@ -29,18 +27,15 @@ export default function AddToCartForm({
         <div className="row g-2 mb-3">
           <div className="col-4">
             <label htmlFor={`quantity-${productId}`} className="form-label">Quantity:</label>
-            <select 
-              name="quantity" 
+            <input
+              type="number"
+              name="quantity"
               id={`quantity-${productId}`}
-              className="form-select"
-              defaultValue="1"
-            >
-              {Array.from({ length: maxQuantity }, (_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  {i + 1}
-                </option>
-              ))}
-            </select>
+              className="form-control"
+              defaultValue={1}
+              min={1}
+              max={20}
+            />
           </div>
           <div className="col-8 d-flex align-items-end">
             <button 
