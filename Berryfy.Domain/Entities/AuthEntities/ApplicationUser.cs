@@ -16,6 +16,9 @@ namespace Berryfy.Domain.Entities.AuthEntities
 
         public string? PhoneNumber { get; set; }
 
+        public string? EmailConfirmationCode { get; set; }
+        public DateTime? EmailConfirmationCodeExpiry { get; set; }
+
         public List<UserCoupon> UserCoupons { get; set; }
 
         public List<Cart> Cart { get; set; }

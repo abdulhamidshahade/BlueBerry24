@@ -11,9 +11,11 @@ namespace Berryfy.Application.Dtos.AuthDtos.AuthValidations
                 .NotEmpty().WithMessage("Email is required.")
                 .EmailAddress().WithMessage("Email must be a valid email address.");
 
-            RuleFor(em => em.Token)
-                .NotNull().WithMessage("Token is required.")
-                .NotEmpty().WithMessage("Token is required.");
+            RuleFor(em => em.Code)
+                .NotNull().WithMessage("Confirmation code is required.")
+                .NotEmpty().WithMessage("Confirmation code is required.")
+                .Length(6).WithMessage("Confirmation code must be exactly 6 digits.")
+                .Matches(@"^\d{6}$").WithMessage("Confirmation code must contain only digits.");
         }
     }
 }
