@@ -239,7 +239,7 @@ new Product
     Name = "Fresh Broccoli Florets",
     Description = "Pre-cut fresh broccoli florets, ready to cook.",
     Price = 3.49m,
-    StockQuantity = 2,
+    StockQuantity = 1,
     ImageUrl = "/uploads/product/1749037264045_product_b53023e1-135b-443d-9019-adcd36f823f5.png",
     SKU = "VF-002",
     IsActive = true,
