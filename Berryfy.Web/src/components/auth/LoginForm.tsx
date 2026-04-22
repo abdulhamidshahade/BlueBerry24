@@ -133,7 +133,10 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
           <div className="text-center">
             <p className="mb-0">
               Don&apos;t have an account?{' '}
-              <a href="/auth/register" className="text-decoration-none">
+              <a
+                href={`/auth/register${redirectTo && redirectTo !== '/' ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ''}`}
+                className="text-decoration-none"
+              >
                 Sign up here
               </a>
             </p>

@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 interface RegisterPageProps {
   searchParams: Promise<{
     error?: string;
+    redirectTo?: string;
   }>;
 }
 
@@ -15,7 +16,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
   }
 
   const params = await searchParams;
-  const { error } = params;
+  const { error, redirectTo } = params;
 
   return (
     <div className="container py-5">
@@ -28,7 +29,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
             </div>
           )}
 
-          <RegisterForm />
+          <RegisterForm redirectTo={redirectTo} />
         </div>
       </div>
     </div>

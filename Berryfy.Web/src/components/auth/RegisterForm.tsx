@@ -26,7 +26,11 @@ const rules = [
   },
 ];
 
-export default function RegisterForm() {
+interface RegisterFormProps {
+  redirectTo?: string;
+}
+
+export default function RegisterForm({ redirectTo }: RegisterFormProps) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -55,8 +59,11 @@ export default function RegisterForm() {
     startTransition(async () => {
       const result = await registerAction(formData);
       if (result) {
-        window.location.href =
-          '/auth/confirm-email?email=' + encodeURIComponent(email);
+        let url = '/auth/confirm-email?email=' + encodeURIComponent(email);
+        if (redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')) {
+          url += '&redirectTo=' + encodeURIComponent(redirectTo);
+        }
+        window.location.href = url;
       } else {
         setError('Registration failed. Please try again.');
       }
@@ -259,7 +266,10 @@ export default function RegisterForm() {
           <div className="text-center">
             <p className="mb-0">
               Already have an account?{' '}
-              <a href="/auth/login" className="text-decoration-none">
+              <a
+                href={`/auth/login${redirectTo && redirectTo !== '/' ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ''}`}
+                className="text-decoration-none"
+              >
                 Sign in here
               </a>
             </p>

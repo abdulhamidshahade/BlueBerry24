@@ -5,11 +5,12 @@ import { confirmEmailAction, resendConfirmationAction } from '../../lib/actions/
 
 interface OtpConfirmationFormProps {
   email: string;
+  redirectTo?: string;
 }
 
 const CODE_LENGTH = 6;
 
-export default function OtpConfirmationForm({ email }: OtpConfirmationFormProps) {
+export default function OtpConfirmationForm({ email, redirectTo }: OtpConfirmationFormProps) {
   const [digits, setDigits] = useState<string[]>(Array(CODE_LENGTH).fill(''));
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -78,8 +79,12 @@ export default function OtpConfirmationForm({ email }: OtpConfirmationFormProps)
       if (result.success) {
         setSuccess(true);
         setTimeout(() => {
-          window.location.href = '/auth/login?message=' +
+          let loginUrl = '/auth/login?message=' +
             encodeURIComponent('Email verified! You can now sign in.');
+          if (redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')) {
+            loginUrl += '&redirectTo=' + encodeURIComponent(redirectTo);
+          }
+          window.location.href = loginUrl;
         }, 1500);
       } else {
         setError(result.error || 'Invalid or expired code. Please try again.');
