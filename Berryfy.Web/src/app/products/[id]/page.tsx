@@ -22,9 +22,20 @@ export default async function ProductDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const stockStatus = product.stockQuantity <= product.lowStockThreshold ? 'danger' : 
-                     product.stockQuantity <= product.lowStockThreshold * 2 ? 'warning' : 'success';
-  
+  const stockStatus =
+    product.stockQuantity <= product.lowStockThreshold
+      ? 'danger'
+      : product.stockQuantity <= product.lowStockThreshold * 2
+      ? 'warning'
+      : 'success';
+
+  const stockIcon =
+    stockStatus === 'danger'
+      ? 'bi-exclamation-triangle-fill'
+      : stockStatus === 'warning'
+      ? 'bi-exclamation-circle-fill'
+      : 'bi-check-circle-fill';
+
   const availableStock = product.stockQuantity - product.reservedStock;
   const isInStock = availableStock > 0;
 
@@ -102,15 +113,18 @@ export default async function ProductDetailPage({ params }: PageProps) {
               <div className="row">
                 <div className="col-sm-6">
                   <h6>Availability</h6>
-                  <span className={`badge bg-${isInStock ? 'success' : 'danger'} fs-6`}>
-                    <i className={`bi ${isInStock ? 'bi-box-seam' : 'bi-x-circle'} me-1`}></i>
-                    {isInStock ? 'In Stock' : 'Out of Stock'}
+                  <span className={`badge bg-${stockStatus} fs-6`}>
+                    <i className={`bi ${stockIcon} me-1`}></i>
+                    {stockStatus === 'success'
+                      ? 'In Stock'
+                      : `Only ${product.stockQuantity} left`}
                   </span>
                 </div>
                 <div className="col-sm-6">
-                  <h6>Status</h6>
-                  <span className="badge bg-success fs-6">
-                    <i className="bi bi-check-circle me-1"></i>Available
+                  <h6>Stock</h6>
+                  <span className="badge bg-secondary fs-6">
+                    <i className="bi bi-box-seam me-1"></i>
+                    {availableStock} available
                   </span>
                 </div>
               </div>

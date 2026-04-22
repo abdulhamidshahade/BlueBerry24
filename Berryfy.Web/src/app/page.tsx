@@ -219,56 +219,67 @@ async function FeaturedProductsSection() {
         </div>
         <div className="row g-4">
           {products.length > 0 ? (
-            products.map((product) => (
-              <div key={product.id} className="col-md-6 col-lg-3">
-                <div className="card border-0 shadow-sm hover-lift h-100">
-                  <div className="position-relative">
-                    <div className="card-img-top bg-white d-flex align-items-center justify-content-center" style={{ height: '250px' }}>
-                      {product.imageUrl ? (
-                        <img 
-                          src={product.imageUrl} 
-                          alt={product.name}
-                          className="img-fluid"
-                          style={{ maxHeight: '200px', objectFit: 'cover' }}
-                        />
-                      ) : (
-                        <i className="bi bi-box display-1 text-muted opacity-50"></i>
-                      )}
+            products.map((product) => {
+              const stockStatus =
+                product.stockQuantity <= product.lowStockThreshold
+                  ? 'danger'
+                  : product.stockQuantity <= product.lowStockThreshold * 2
+                  ? 'warning'
+                  : 'success';
+              const stockIcon =
+                stockStatus === 'danger'
+                  ? 'bi-exclamation-triangle-fill'
+                  : stockStatus === 'warning'
+                  ? 'bi-exclamation-circle-fill'
+                  : 'bi-check-circle-fill';
+
+              return (
+                <div key={product.id} className="col-md-6 col-lg-3">
+                  <div className="card border-0 shadow-sm hover-lift h-100 position-relative">
+                    <div className="position-relative">
+                      <div className="card-img-top bg-white d-flex align-items-center justify-content-center" style={{ height: '250px' }}>
+                        {product.imageUrl ? (
+                          <img 
+                            src={product.imageUrl} 
+                            alt={product.name}
+                            className="img-fluid"
+                            style={{ maxHeight: '200px', objectFit: 'cover' }}
+                          />
+                        ) : (
+                          <i className="bi bi-box display-1 text-muted opacity-50"></i>
+                        )}
+                      </div>
                     </div>
-                    {product.stockQuantity <= product.lowStockThreshold && (
-                      <div className="position-absolute top-0 end-0 m-2">
-                        <span className="badge bg-warning text-dark">Low Stock</span>
+                    <div className="card-body d-flex flex-column">
+                      <Link
+                        href={`/products/${product.id}`}
+                        className="stretched-link"
+                        aria-label={`View ${product.name}`}
+                      />
+                      <h6 className="card-title fw-bold text-truncate" title={product.name}>
+                        {product.name}
+                      </h6>
+                      <p className="card-text text-muted small flex-grow-1 text-truncate-2">
+                        {product.description}
+                      </p>
+                      <div className="mt-auto">
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <span className="h5 text-primary fw-bold mb-0">
+                            {formatCurrency(product.price)}
+                          </span>
+                          <span className={`badge bg-${stockStatus}`}>
+                            <i className={`bi ${stockIcon} me-1`}></i>
+                            {stockStatus === 'success'
+                              ? 'In Stock'
+                              : `Only ${product.stockQuantity} left`}
+                          </span>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                  <div className="card-body d-flex flex-column">
-                    <h6 className="card-title fw-bold text-truncate" title={product.name}>
-                      {product.name}
-                    </h6>
-                    <p className="card-text text-muted small flex-grow-1 text-truncate-2">
-                      {product.description}
-                    </p>
-                    <div className="mt-auto">
-                      <div className="d-flex justify-content-between align-items-center mb-2">
-                        <span className="h5 text-primary fw-bold mb-0">
-                          {formatCurrency(product.price)}
-                        </span>
-                        <small className="text-muted">
-                          Stock: {product.stockQuantity}
-                        </small>
-                      </div>
-                      <Link 
-                        href={`/products/${product.id}`} 
-                        className="btn btn-primary w-100"
-                      >
-                        <i className="bi bi-eye me-1"></i>
-                        View Details
-                      </Link>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <div className="col-12 text-center">
               <div className="py-5">
