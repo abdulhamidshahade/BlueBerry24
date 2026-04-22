@@ -6,6 +6,7 @@ using Berryfy.Application.Services.Interfaces.AuthServiceInterfaces;
 using Berryfy.Application.Services.Interfaces.ShoppingCartServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Berryfy.API.Controllers
 {
@@ -16,13 +17,17 @@ namespace Berryfy.API.Controllers
         private readonly IAuthService _authService;
         private readonly IUserService _userService;
         private readonly ICartService _cartService;
+        private readonly ILogger<AuthController> _logger;
+
         public AuthController(IAuthService authService,
                               IUserService userService,
-                              ICartService cartService)
+                              ICartService cartService,
+                              ILogger<AuthController> logger)
         {
             _authService = authService;
             _userService = userService;
             _cartService = cartService;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -427,7 +432,7 @@ namespace Berryfy.API.Controllers
         }
 
         [HttpPost]
-        [AdminAndAbove]
+        [AllowAnonymous]
         [Route("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto requestDto)
         {
@@ -443,16 +448,29 @@ namespace Berryfy.API.Controllers
 
             try
             {
-                //TODO: Token refresh functionality to be implemented
-                return Ok(new ResponseDto<object>
+                var result = await _authService.RefreshTokenAsync(requestDto.Token);
+
+                if (string.IsNullOrEmpty(result.Token))
+                {
+                    return Unauthorized(new ResponseDto<object>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 401,
+                        StatusMessage = result.ErrorMessage ?? "Invalid or expired refresh token."
+                    });
+                }
+
+                return Ok(new ResponseDto<LoginResponseDto>
                 {
                     IsSuccess = true,
                     StatusCode = 200,
-                    StatusMessage = "Token refresh functionality to be implemented."
+                    StatusMessage = "Token refreshed successfully.",
+                    Data = result
                 });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while refreshing the token.");
                 return StatusCode(500, new ResponseDto<object>
                 {
                     IsSuccess = false,

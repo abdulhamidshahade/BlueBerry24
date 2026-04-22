@@ -1,4 +1,4 @@
-﻿namespace Berryfy.API.Controllers
+﻿namespace Berryfy.Application.Dtos.AuthDtos
 {
     public class RefreshTokenRequestDto
     {
