@@ -180,11 +180,45 @@ namespace Berryfy.Application.Services.Concretes.AuthServiceConcretes
             };
 
             var token = await _tokenService.GenerateToken(user);
+            var refreshToken = await _tokenService.GenerateRefreshToken(user);
 
             return new LoginResponseDto()
             {
                 User = userDto,
-                Token = token
+                Token = token,
+                RefreshToken = refreshToken
+            };
+        }
+
+        public async Task<LoginResponseDto> RefreshTokenAsync(string refreshToken)
+        {
+            var user = _userManager.Users.FirstOrDefault(u => u.RefreshToken == refreshToken);
+
+            if (user == null || user.RefreshTokenExpiry == null || user.RefreshTokenExpiry < DateTime.UtcNow)
+            {
+                return new LoginResponseDto { Token = string.Empty, ErrorMessage = "Invalid or expired refresh token." };
+            }
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            ApplicationUserDto userDto = new()
+            {
+                Email = user.Email,
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserName = user.UserName,
+                Roles = userRoles.ToList()
+            };
+
+            var newToken = await _tokenService.GenerateToken(user);
+            var newRefreshToken = await _tokenService.GenerateRefreshToken(user);
+
+            return new LoginResponseDto()
+            {
+                User = userDto,
+                Token = newToken,
+                RefreshToken = newRefreshToken
             };
         }
 
