@@ -56,5 +56,5 @@ export interface ApiResponse<T> {
 export interface AuthLog{
     user: User,
     token: string,
-
+    refreshToken: string,
 }

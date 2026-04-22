@@ -30,7 +30,15 @@ export async function loginAction(formData: FormData) {
         httpOnly: true,
         secure,
         sameSite: 'lax',
-        maxAge: 24 * 60 * 60,
+        maxAge: 2 * 60 * 60, // matches JWT expiry (2 hours)
+      });
+
+      cookieStore.set('refresh_token', response.data.refreshToken, {
+        path: '/',
+        httpOnly: true,
+        secure,
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60, // 7 days
       });
 
       cookieStore.set('user_info', JSON.stringify(response.data.user), {
@@ -38,10 +46,8 @@ export async function loginAction(formData: FormData) {
         httpOnly: true,
         secure,
         sameSite: 'lax',
-        maxAge: 24 * 60 * 60,
+        maxAge: 7 * 24 * 60 * 60,
       });
-
-      
 
       return { success: true };
     } else {
@@ -287,6 +293,7 @@ export async function logoutAction() {
   }
 
   cookieStore.delete('auth_token');
+  cookieStore.delete('refresh_token');
   cookieStore.delete('user_info');
 
   redirect('/');
@@ -362,6 +369,61 @@ export async function updateProfileAction(formData: FormData) {
     return { error: response.statusMessage || 'Failed to update profile' };
   } catch {
     return { error: 'An unexpected error occurred' };
+  }
+}
+
+export async function refreshTokenAction(): Promise<boolean> {
+  const cookieStore = await cookies();
+  const refreshToken = cookieStore.get('refresh_token')?.value;
+
+  if (!refreshToken) return false;
+
+  try {
+    const response = await fetch(`${process.env.API_BASE_AUTH}/refresh-token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: refreshToken }),
+    });
+
+    if (!response.ok) return false;
+
+    const result = await response.json();
+
+    if (!result.isSuccess || !result.data?.token) return false;
+
+    const secure = await cookieIsSecure();
+
+    cookieStore.set('auth_token', result.data.token, {
+      path: '/',
+      httpOnly: true,
+      secure,
+      sameSite: 'lax',
+      maxAge: 2 * 60 * 60,
+    });
+
+    if (result.data.refreshToken) {
+      cookieStore.set('refresh_token', result.data.refreshToken, {
+        path: '/',
+        httpOnly: true,
+        secure,
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60,
+      });
+    }
+
+    if (result.data.user) {
+      cookieStore.set('user_info', JSON.stringify(result.data.user), {
+        path: '/',
+        httpOnly: true,
+        secure,
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60,
+      });
+    }
+
+    return true;
+  } catch {
+    return false;
   }
 }
 
