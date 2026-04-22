@@ -1,465 +1,529 @@
 # 🫐 Berryfy
 
-A modern, full-stack **e-commerce platform** built with **.NET 9** and **Next.js 15**. BlueBerry24 combines a robust, clean architecture backend with a beautiful, responsive React frontend to deliver a comprehensive online shopping experience.
+A modern, full-stack **e-commerce platform** built with **.NET 9** and **Next.js 15**.  
+Berryfy delivers a complete online shopping experience — product catalog, cart, checkout, wishlist, coupons, order management, simulated payments, and a full admin dashboard — all containerized with Docker.
 
 [![.NET 9](https://img.shields.io/badge/.NET-9.0-512BD4?style=flat&logo=dotnet)](https://dotnet.microsoft.com/)
 [![Next.js 15](https://img.shields.io/badge/Next.js-15.1.8-000000?style=flat&logo=next.js)](https://nextjs.org/)
+[![React 19](https://img.shields.io/badge/React-19.0-61DAFB?style=flat&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5.3.6-7952B3?style=flat&logo=bootstrap)](https://getbootstrap.com/)
+[![EF Core](https://img.shields.io/badge/EF_Core-9.0.4-512BD4?style=flat&logo=dotnet)](https://learn.microsoft.com/en-us/ef/core/)
 
 ---
 
-## 🏗️ Architecture Overview
+## 🌐 Live Demo
 
-BlueBerry24 follows **Clean Architecture** principles with clear separation of concerns across multiple layers:
+**[demo.berryfy.org](https://demo.berryfy.org/auth/login)** — sign in to explore the storefront or the admin dashboard.
+
+---
+
+## 🏗️ Architecture
+
+Berryfy follows a **layered architecture** with strict separation of concerns. Each layer depends only on the layer below it; the domain has no external dependencies except cross-cutting libraries.
 
 ### Backend (.NET 9)
+
 | Project | Responsibility |
 |---------|----------------|
-| **Berryfy.Domain**        | Enterprise rules, entities, value objects & validations. Core business logic with no external dependencies except cross-cutting libraries (FluentValidation, Identity, Redis). |
-| **Berryfy.Application**   | Application logic, use cases, DTOs, services, and AutoMapper profiles. Depends only on Domain layer. |
-| **Berryfy.Infrastructure**| External concerns: Entity Framework Core, SQL Server persistence, Identity stores, Redis cache, repository implementations. Depends on Domain layer. |
-| **Berryfy.API**           | RESTful API endpoints using ASP.NET Core Minimal APIs. Exposes OpenAPI/Swagger documentation. |
+| **Berryfy.Domain** | Entities, repository interfaces, domain constants, and identity models. No dependencies on infrastructure. |
+| **Berryfy.Application** | Services, DTOs, AutoMapper profiles, FluentValidation rules, and JWT token helpers. Depends only on Domain. |
+| **Berryfy.Infrastructure** | EF Core `DbContext`, repository implementations, SQL Server, Identity stores, health checks, Zoho SMTP. |
+| **Berryfy.API** | ASP.NET Core controller-based REST API. OpenAPI + Scalar docs, JWT auth, CORS, rate limiting, health endpoint, data seeding on startup. |
 
 ### Frontend (Next.js 15)
+
 | Directory | Responsibility |
 |-----------|----------------|
-| **src/app/**              | App Router pages, layouts, and API routes |
-| **src/components/**       | Reusable React components (admin, auth, product, etc.) |
-| **src/lib/services/**     | API client services for backend communication |
-| **src/lib/actions/**      | Server actions for form handling and data mutations |
-| **src/types/**            | TypeScript type definitions |
+| `src/app/` | App Router pages, layouts, and Next.js API route handlers |
+| `src/components/` | React components — admin, auth, cart, checkout, product, shared UI |
+| `src/lib/services/` | API client services that call the .NET backend |
+| `src/lib/actions/` | Next.js Server Actions for mutations and form handling |
+| `src/middleware.ts` | Edge middleware — JWT refresh, auth-guarded routes, session cookie management |
+| `src/types/` | TypeScript type definitions shared across the app |
 
 ---
 
 ## ✨ Features
 
 ### 🛒 E-Commerce Core
-- **Product Management**: Complete operations with categories, inventory tracking, and search
-- **Shopping Cart**: Session-based cart with real-time updates and persistence
-- **Order Management**: Full order lifecycle from checkout to fulfillment
-- **Wishlist System**: Save products for later with sharing capabilities
-- **Coupon System**: Flexible discount codes with various rules and restrictions
-- **Inventory Tracking**: Real-time stock management with low-stock alerts
+- Product catalog with categories, images, search, sorting, and pagination
+- Shopping cart — session-based for guests, user-linked on login
+- Full checkout flow with saved shipping/billing info
+- Wishlist — create, share, duplicate, and bulk-manage items
+- Coupon system — percentage & fixed discounts, assignable to all / specific / new users
+- Simulated payment processing with PDF receipt download
+- Real-time inventory tracking with reserve/release/confirm on checkout and low-stock alerts
 
-### 🔐 Authentication & Authorization  
-- **ASP.NET Identity**: Custom `ApplicationUser` and role-based authorization
-- **JWT Authentication**: Secure token-based authentication for API access
-- **Role Management**: Multi-level access control (User, Admin, SuperAdmin)
-- **User Profile Management**: Complete profile editing and preferences
+### 🔐 Authentication & Authorization
+- JWT access tokens (2-hour expiry) with rotating refresh tokens (7-day expiry)
+- Role-based authorization — **User**, **Admin**, **SuperAdmin**
+- Email confirmation via 6-digit OTP code (Zoho SMTP)
+- Forgot password & secure reset via emailed token
+- User profile management, change password, lock/unlock accounts
+- Transparent token refresh in Next.js middleware (no page reload required)
 
 ### 📊 Admin Dashboard
-- **Sales Analytics**: Revenue tracking, order statistics, and performance metrics
-- **Product Management**: Bulk operations, category management, and inventory control
-- **Customer Management**: User accounts, order history, and customer analytics
-- **Coupon Management**: Create, manage, and track promotional campaigns
-- **Order Tracking**: Real-time order status and fulfillment management
-- **System Settings**: Configurable site settings and preferences
+- Analytics — sales revenue, order statistics, traffic charts
+- Product & category CRUD with image management
+- Order management — update status, cancel, refund
+- Inventory — adjust stock, view change history, low-stock notifications
+- Coupon lifecycle — create, assign to all / specific / new users, disable per user
+- User management — view, lock/unlock, assign roles
+- Payment records — search, filter by status/date range, totals
+- Shop settings & admin wishlist overview
 
-### 🎨 Modern UI/UX
-- **Responsive Design**: Mobile-first Bootstrap 5 components
-- **Server-Side Rendering**: Next.js App Router with optimized performance
-- **Interactive Components**: Real-time cart updates and dynamic content
-- **Admin Interface**: Comprehensive dashboard with data visualization
-- **Toast Notifications**: User feedback for all actions
-
-### 🚀 Technical Features
-- **Clean Architecture**: Maintainable, testable, and scalable codebase
-- **Entity Framework Core**: Code-first database approach with migrations
-- **Redis Caching**: Performance optimization for frequently accessed data
-- **FluentValidation**: Comprehensive input validation and error handling
-- **AutoMapper**: Efficient object mapping between layers
-- **OpenAPI/Swagger**: Complete API documentation and testing interface
+### 🚀 Technical Highlights
+- **Controller-based REST API** with 12 resource controllers and 100+ endpoints
+- **Standardized response envelope** (`isSuccess`, `statusCode`, `statusMessage`, `data`, `errors`)
+- **Server-Side Rendering** via Next.js App Router with React Server Components
+- **Server Actions** for secure form handling and data mutations
+- **FluentValidation** — declarative, testable validation rules on every request DTO
+- **AutoMapper** — zero-boilerplate entity → DTO mapping across all layers
+- **Serilog** — structured request logging
+- **Health check** at `/health` — SQL Server connectivity verified on startup
+- **Docker Compose** — one command spins up API, frontend, and SQL Server
 
 ---
 
-## 🛠 Tech Stack
+## 🛠️ Tech Stack
 
 ### Backend
-- **.NET 9** - Latest .NET framework with performance improvements
-- **ASP.NET Core 9** - Web API framework with Minimal APIs
-- **Entity Framework Core 9** - Object-relational mapping with SQL Server
-- **FluentValidation 11** - Robust model validation
-- **AutoMapper** - Object-to-object mapping
-- **ASP.NET Identity** - Authentication and authorization
-- **JWT Bearer** - Token-based authentication
-- **Swashbuckle** - OpenAPI documentation
+
+| Package | Version |
+|---------|---------|
+| .NET / ASP.NET Core | 9.0 |
+| Entity Framework Core | 9.0.4 |
+| EF Core SQL Server | 9.0.4 |
+| ASP.NET Core Identity | 9.0.4 |
+| JWT Bearer | 9.0.4 |
+| Microsoft.AspNetCore.OpenApi | 9.0.2 |
+| Scalar.AspNetCore | 1.2.61 |
+| AutoMapper | 16.1.1 |
+| FluentValidation.AspNetCore | 11.3.1 |
+| Serilog.AspNetCore | 10.0.0 |
+| Microsoft.IdentityModel.Tokens | 8.16.0 |
+| Microsoft.Extensions.Diagnostics.HealthChecks | 9.0.7 |
+| Newtonsoft.Json | 13.0.3 |
 
 ### Frontend
-- **Next.js 15** - React framework with App Router
-- **React 19** - Latest React with concurrent features
-- **TypeScript 5** - Type-safe JavaScript development
-- **Bootstrap 5.3** - Responsive CSS framework
-- **React Bootstrap** - Bootstrap components for React
-- **Bootstrap Icons** - Comprehensive icon library
-- **date-fns** - Modern date utility library
+
+| Package | Version |
+|---------|---------|
+| Next.js | 15.1.8 |
+| React / React DOM | 19.0.0 |
+| TypeScript | ^5 |
+| Bootstrap | 5.3.6 |
+| Bootstrap Icons | 1.13.1 |
+| React Bootstrap | 2.10.10 |
+| date-fns | 4.1.0 |
+| uuid | 11.1.0 |
+| formidable | 3.5.1 |
+
+### Infrastructure
+
+| Component | Detail |
+|-----------|--------|
+| Database | SQL Server 2022 (Docker image `mcr.microsoft.com/mssql/server:2022-latest`) |
+| Email | Zoho SMTP — OTP confirmation codes, password resets, order notifications |
+| Containerization | Docker + Docker Compose 3.9 |
 
 ---
 
 ## 📁 Project Structure
 
 ```text
-Berryfy/
+BlueBerry24/
 ├── Berryfy.API/                    # ASP.NET Core Web API
-│   ├── Controllers/                    # API Controllers
-│   ├── Program.cs                      # Application entry point
-│   └── appsettings.json               # Configuration
-├── Berryfy.Application/            # Application Layer
-│   ├── Services/                       # Business logic services
-│   │   ├── Concretes/                 # Service implementations
-│   │   └── Interfaces/                # Service contracts
-│   ├── Dtos/                          # Data Transfer Objects
-│   ├── Mapping/                       # AutoMapper profiles
-│   └── Authorization/                 # Authorization policies
-├── Berryfy.Domain/                 # Domain Layer
-│   ├── Entities/                      # Domain entities
-│   │   ├── AuthEntities/              # User & Role entities
-│   │   ├── ProductEntities/           # Product & Category entities
-│   │   ├── OrderEntities/             # Order management entities
-│   │   ├── ShoppingCartEntities/      # Cart entities
-│   │   ├── CouponEntities/            # Discount entities
-│   │   ├── WishlistEntities/          # Wishlist entities
-│   │   ├── ShopEntities/              # Shop/Store entities
-│   │   └── InventoryEntities/         # Stock management entities
-│   ├── Repositories/                  # Repository interfaces
-│   └── Constants/                     # Domain constants
-├── Berryfy.Infrastructure/         # Infrastructure Layer
-│   ├── Data/                          # EF Core DbContext
-│   ├── Repositories/                  # Repository implementations
-│   └── Migrations/                    # Database migrations
-└── Berryfy.Web/                   # Next.js Frontend
-    ├── src/
-    │   ├── app/                       # App Router pages
-    │   │   ├── admin/                 # Admin dashboard pages
-    │   │   │   ├── analytics/         # Analytics & reports
-    │   │   │   ├── categories/        # Category management
-    │   │   │   ├── coupons/           # Coupon management
-    │   │   │   ├── customers/         # Customer management
-    │   │   │   ├── inventory/         # Inventory management
-    │   │   │   ├── orders/            # Order management
-    │   │   │   ├── products/          # Product management
-    │   │   │   ├── reports/           # Business reports
-    │   │   │   ├── settings/          # System settings
-    │   │   │   └── users/             # User management
-    │   │   ├── auth/                  # Authentication pages
-    │   │   ├── cart/                  # Shopping cart
-    │   │   ├── categories/            # Product categories
-    │   │   ├── checkout/              # Checkout process
-    │   │   ├── orders/                # Order history
-    │   │   ├── products/              # Product catalog
-    │   │   └── profile/               # User profile
-    │   ├── components/                # React components
-    │   │   ├── admin/                 # Admin components
-    │   │   ├── auth/                  # Authentication components
-    │   │   ├── cart/                  # Shopping cart components
-    │   │   ├── product/               # Product components
-    │   │   └── ui/                    # Common UI components
-    │   ├── lib/
-    │   │   ├── services/              # API client services
-    │   │   ├── actions/               # Server actions
-    │   │   └── utils/                 # Utility functions
-    │   └── types/                     # TypeScript definitions
-    ├── public/                        # Static assets
-    └── package.json                   # Dependencies
+│   ├── Controllers/                # 12 resource controllers
+│   ├── Program.cs                  # App entry point — DI, middleware, seeding
+│   ├── appsettings.json            # Base configuration
+│   └── Dockerfile                  # API container image
+├── Berryfy.Application/            # Application layer
+│   ├── Services/
+│   │   ├── Concretes/              # Service implementations
+│   │   └── Interfaces/             # Service contracts
+│   ├── Dtos/                       # Request / response DTOs
+│   └── Mapping/                    # AutoMapper profiles
+├── Berryfy.Domain/                 # Domain layer (no infra dependencies)
+│   ├── Entities/
+│   │   ├── AuthEntities/           # ApplicationUser, ApplicationRole
+│   │   ├── ProductEntities/        # Product, Category, ProductCategory
+│   │   ├── OrderEntities/          # Order, OrderItem, OrderTotal
+│   │   ├── ShoppingCartEntities/   # Cart, CartItem, CartCoupon
+│   │   ├── CouponEntities/         # Coupon, UserCoupon
+│   │   ├── WishlistEntities/       # Wishlist, WishlistItem
+│   │   ├── ShopEntities/           # Shop
+│   │   ├── CheckoutEntities/       # UserCheckoutInfo
+│   │   ├── InventoryEntities/      # InventoryLog
+│   │   └── PaymentEntities/        # Payment
+│   ├── Repositories/               # Repository interfaces
+│   └── Constants/                  # OrderStatus, PaymentStatus, CartStatus, roles …
+├── Berryfy.Infrastructure/         # Infrastructure layer
+│   ├── Data/                       # EF Core DbContext
+│   ├── Repositories/               # Repository implementations
+│   └── Migrations/                 # EF Core migrations (auto-applied on startup)
+├── Berryfy.Tests/                  # xUnit test project
+├── Berryfy.Web/                    # Next.js 15 frontend
+│   ├── src/
+│   │   ├── app/                    # App Router pages & API routes
+│   │   ├── components/             # React components
+│   │   ├── lib/
+│   │   │   ├── actions/            # Server Actions
+│   │   │   ├── services/           # API client services
+│   │   │   └── utils/              # Helpers & formatters
+│   │   ├── types/                  # TypeScript definitions
+│   │   └── middleware.ts           # Edge middleware (auth guard, token refresh)
+│   ├── public/                     # Static assets
+│   ├── Dockerfile                  # Frontend container image
+│   └── package.json
+├── docker-compose.yml              # Compose — API + frontend + SQL Server
+├── .env.example                    # Environment variable template
+└── README.md
 ```
 
 ---
 
-## ⚡️ Quick Start
+## 🌐 Frontend Routes
 
-### Prerequisites
-- [.NET 9 SDK](https://dotnet.microsoft.com/) (Preview Channel)
-- [Node.js 18+](https://nodejs.org/) and npm/yarn
-- SQL Server (LocalDB or full instance)
-- Redis (optional, for caching)
+### Public / Storefront
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/abdulhamidshahade/berryfy.git berryfy
-cd berryfy
-```
+| Route | Description |
+|-------|-------------|
+| `/` | Home — hero, featured products, categories, stats |
+| `/products` | Product catalog with search, filter, sort & pagination |
+| `/products/[id]` | Product detail page |
+| `/categories` | Category browser |
+| `/categories/[id]` | Products by category |
+| `/cart` | Shopping cart |
+| `/checkout` | Checkout — shipping info & summary |
+| `/checkout/order` | Order review |
+| `/payment` | Payment processing |
+| `/payment/success` | Order confirmation |
+| `/wishlist` | Public wishlist view |
 
-### 2. Backend Setup (.NET API)
+### Authentication
 
-**Install dependencies:**
-```bash
-dotnet restore
-```
+| Route | Description |
+|-------|-------------|
+| `/auth/login` | Sign in |
+| `/auth/register` | Create account |
+| `/auth/confirm-email` | 6-digit OTP verification |
+| `/auth/resend-confirmation` | Resend OTP code |
+| `/auth/forgot-password` | Request password reset |
+| `/auth/reset-password` | Reset password via emailed token |
 
-**Configure database connection:**
-```bash
-# Using user secrets (recommended for development)
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=.;Database=Berryfy;Trusted_Connection=True;MultipleActiveResultSets=true" --project Berryfy.API
+### User Account (protected)
 
-# Or edit appsettings.Development.json directly
-```
+| Route | Description |
+|-------|-------------|
+| `/profile` | Profile overview |
+| `/profile/edit` | Edit name & username |
+| `/profile/change-password` | Change password |
+| `/profile/payments` | Payment history |
+| `/profile/payments/[id]` | Payment detail & receipt |
+| `/profile/wishlist` | Manage wishlist |
+| `/profile/coupons` | My coupons |
+| `/orders` | Order history |
+| `/orders/[id]` | Order detail |
 
-**Run database migrations:**
-```bash
-dotnet ef database update --startup-project Berryfy.API --project Berryfy.Infrastructure
-```
+### Admin Dashboard (Admin / SuperAdmin only)
 
-**Start the API:**
-```bash
-dotnet run --project Berryfy.API
-```
-API will be available at `https://localhost:7105` with Swagger at `/swagger`
-
-### 3. Frontend Setup (Next.js)
-
-**Navigate to frontend directory:**
-```bash
-cd Berryfy.Web
-```
-
-**Install dependencies:**
-```bash
-npm install
-# or
-yarn install
-```
-
-**Configure environment variables:**
-```bash
-# Create .env.local file
-echo "NEXT_PUBLIC_API_URL=https://localhost:3000" > .env.local
-```
-
-**Start development server:**
-```bash
-npm run dev
-# or
-yarn dev
-```
-Frontend will be available at `http://localhost:3000`
-
-### 4. Default Admin Account
-After running the database migrations, you can create an admin account through the registration page and promote it via the database or create one programmatically.
-
-### 5. Run with Docker (optional)
-
-From the repository root:
-
-```bash
-# Copy environment template and add your secrets (do not commit .env)
-cp .env.example .env
-# Edit .env with your SA_PASSWORD, JWT secret, and Gmail credentials
-
-# Build and start all services
-docker compose up -d
-```
-
-- **API**: http://localhost:7105  
-- **Frontend**: http://localhost:30305  
-- **SQL Server**: localhost:11433 (user `sa`, password from `.env`)
-
-Secrets (passwords, JWT key, Gmail) are read from `.env`; only `.env.example` is committed.
+| Route | Description |
+|-------|-------------|
+| `/admin` | Dashboard overview |
+| `/admin/analytics` | Sales & revenue analytics |
+| `/admin/reports` | Business reports |
+| `/admin/Traffic` | Traffic overview |
+| `/admin/products` | Product list |
+| `/admin/products/create` | Create product |
+| `/admin/products/update/[id]` | Edit product |
+| `/admin/products/delete/[id]` | Delete product |
+| `/admin/categories` | Category list |
+| `/admin/categories/create` | Create category |
+| `/admin/categories/update/[id]` | Edit category |
+| `/admin/categories/delete/[id]` | Delete category |
+| `/admin/orders` | Order management |
+| `/admin/orders/[id]` | Order detail & status update |
+| `/admin/customers` | Customer list |
+| `/admin/users` | User management |
+| `/admin/role-management` | Assign & manage roles |
+| `/admin/coupons` | Coupon list |
+| `/admin/coupons/create` | Create coupon |
+| `/admin/coupons/update/[id]` | Edit coupon |
+| `/admin/coupons/delete/[id]` | Delete coupon |
+| `/admin/coupons/add-to-user` | Assign coupon to a user |
+| `/admin/coupons/add-to-all-users` | Assign to all users |
+| `/admin/coupons/add-to-specific-users` | Assign to specific users |
+| `/admin/coupons/add-to-new-users` | Assign to new users |
+| `/admin/coupons/[id]/users` | Users holding a coupon |
+| `/admin/coupons/[id]/add-user` | Add user to coupon |
+| `/admin/payments` | Payment records |
+| `/admin/payments/[id]` | Payment detail |
+| `/admin/payments/update/[id]` | Update payment status |
+| `/admin/payments/delete/[id]` | Delete payment |
+| `/admin/payments/refund/[id]` | Process refund |
+| `/admin/inventory` | Inventory overview |
+| `/admin/inventory/edit/[id]` | Adjust stock |
+| `/admin/inventory/history/[id]` | Stock change history |
+| `/admin/wishlists` | Wishlist admin overview |
+| `/admin/settings` | Shop settings |
 
 ---
 
-## 🔒 Authorization Levels
+## 🔌 API Controllers
 
-The API uses attribute-based authorization with the following levels:
+| Controller | Base Route | Description |
+|------------|-----------|-------------|
+| `AuthController` | `api/auth` | Register, login, logout, me, refresh token, email confirmation, password reset, user CRUD, lock/unlock |
+| `ProductsController` | `api/products` | Paginated list, by id, by name, create, update, delete, existence checks |
+| `CategoriesController` | `api/categories` | List, by id, by name, create, update, delete, existence checks |
+| `ShoppingCartsController` | `api/shopping-carts` | Current cart, add/update/remove items, apply/remove coupon, checkout, complete, clear |
+| `OrdersController` | `api/orders` | Create, by id, by user, by reference, by status, admin list, update status, cancel, refund, process |
+| `PaymentsController` | `api/payments` | Process, verify, refund, by id, by user, my payments, paginated, stats, search, update status |
+| `CouponsController` | `api/coupons` | CRUD, by code, assign to all/specific/new users, user coupon lists, disable per user |
+| `InventoriesController` | `api/inventories` | Stock check, reserve, release, confirm deduction, add stock, adjust, low-stock list, history, notifications |
+| `WishlistsController` | `api/wishlists` | CRUD, default wishlist, add/remove/bulk items, share, duplicate, admin stats |
+| `RoleManagementController` | `api/role-managements` | Create/rename/delete roles, assign/remove per user, bulk assign, initialize defaults, stats |
+| `ShopsController` | `api/shops` | Get shop settings, update shop settings |
+| `UserCheckoutInfoController` | `api/UserCheckoutInfo` | Get, save checkout info, save billing info, delete |
 
-- **Anonymous** - No authentication required
-- **User+** (`[UserAndAbove]`) - Requires User role or higher
-- **Admin+** (`[AdminAndAbove]`) - Requires Admin role or higher  
-- **SuperAdmin** (`[SuperAdminOnly]`) - Requires SuperAdmin role only
-- **Authenticated** (`[AllRoles]`) - Any authenticated user
+### Response Envelope
 
-## 📊 Response Format
-
-All API responses follow a standardized format:
+All endpoints return a standardized envelope:
 
 ```json
 {
   "isSuccess": true,
   "statusCode": 200,
   "statusMessage": "Operation completed successfully",
-  "data": { /* Response data */ },
-  "errors": [ /* Error messages if any */ ]
+  "data": {},
+  "errors": []
 }
 ```
 
-## 🔧 Query Parameters
+### Authorization Levels
 
-Many endpoints support query parameters for pagination and filtering:
-
-- `page` - Page number (default: 1)
-- `pageSize` - Items per page (default: 10-50 depending on endpoint)
-- `limit` - Maximum items to return
-
-Visit `/swagger` when running the API to see the complete OpenAPI documentation with request/response schemas and interactive testing interface.
-
----
-
-## 🎨 Frontend Pages
-
-### Public Pages
-- **Home** (`/`) - Landing page with featured products and categories
-- **Products** (`/products`) - Product catalog with search and filtering
-- **Product Details** (`/products/[id]`) - Individual product page
-- **Categories** (`/categories`) - Browse by category
-- **Cart** (`/cart`) - Shopping cart management
-- **Checkout** (`/checkout`) - Order placement process
-
-### User Dashboard
-- **Profile** (`/profile`) - User account management
-- **Orders** (`/orders`) - Order history and tracking
-- **Wishlist** (`/profile/wishlist`) - Saved products
-
-### Admin Dashboard
-- **Overview** (`/admin`) - Sales metrics and quick actions
-- **Products** (`/admin/products`) - Product management
-- **Categories** (`/admin/categories`) - Category management
-- **Orders** (`/admin/orders`) - Order management
-- **Customers** (`/admin/customers`) - Customer management
-- **Coupons** (`/admin/coupons`) - Discount code management
-- **Analytics** (`/admin/analytics`) - Business intelligence
-- **Inventory** (`/admin/inventory`) - Stock management
-- **Settings** (`/admin/settings`) - System configuration
+| Policy | Roles |
+|--------|-------|
+| `[AllRoles]` | Any authenticated user |
+| `[UserAndAbove]` | User, Admin, SuperAdmin |
+| `[AdminAndAbove]` | Admin, SuperAdmin |
+| `[SuperAdminOnly]` | SuperAdmin only |
 
 ---
 
-## 🔧 Configuration
+## ⚡ Quick Start
 
-### Backend Configuration
-Key settings in `appsettings.json`:
+### Prerequisites
 
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Your SQL Server connection string"
-  },
-  "Redis": {
-    "ConnectionString": "localhost:6379"
-  },
-  "Jwt": {
-    "Key": "your-secret-key",
-    "Issuer": "Berryfy",
-    "Audience": "berryfy-Users",
-    "ExpirationHours": 24
-  }
-}
-```
+- [.NET 9 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
+- [Node.js 20+](https://nodejs.org/) with npm
+- SQL Server (local or Docker)
+- Docker & Docker Compose (for the one-command setup)
 
-### Frontend Configuration
-Environment variables in `.env.local`:
+---
+
+### Option A — Docker Compose (recommended)
 
 ```bash
-NEXT_PUBLIC_API_URL=https://localhost:3000
-NEXT_PUBLIC_SITE_NAME=Berryfy
+git clone https://github.com/abdulhamidshahade/berryfy.git berryfy
+cd berryfy
+
+# Copy the environment template and fill in your secrets (never commit .env)
+cp .env.example .env
 ```
+
+Edit `.env` with your values, then:
+
+```bash
+docker compose up --build
+```
+
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:30305 |
+| API | http://localhost:7105 |
+| SQL Server | localhost:11433 |
+
+EF Core migrations and data seeding run automatically when the API starts.
+
+---
+
+### Option B — Manual Setup
+
+#### 1. Clone
+
+```bash
+git clone https://github.com/abdulhamidshahade/berryfy.git berryfy
+cd berryfy
+```
+
+#### 2. Backend
+
+```bash
+# Restore packages
+dotnet restore
+
+# Set required user secrets (or edit appsettings.Development.json)
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" \
+  "Server=.;Database=Berryfy;Trusted_Connection=True;MultipleActiveResultSets=true" \
+  --project Berryfy.API
+
+dotnet user-secrets set "ApiSettings:JwtOptions:SecretKey" "your-min-32-char-secret" \
+  --project Berryfy.API
+
+# Apply migrations (auto-applied on startup too)
+dotnet ef database update \
+  --startup-project Berryfy.API \
+  --project Berryfy.Infrastructure
+
+# Start the API
+dotnet run --project Berryfy.API
+```
+
+API is available at `https://localhost:7105`.  
+Health check: `https://localhost:7105/health`
+
+#### 3. Frontend
+
+```bash
+cd Berryfy.Web
+npm install
+```
+
+Create `Berryfy.Web/.env.local`:
+
+```bash
+API_BASE_URL=https://localhost:7105/api
+API_BASE_AUTH=https://localhost:7105/api/auth
+NEXTAUTH_URL=http://localhost:3000
+COOKIE_SECURE=false
+```
+
+```bash
+npm run dev
+```
+
+Frontend is available at `http://localhost:3000`.
+
+---
+
+## 🔧 Environment Variables
+
+### `.env` (Docker Compose — from `.env.example`)
+
+```bash
+# SQL Server SA password — must be strong (uppercase + lowercase + digits + symbols, min 8 chars)
+SA_PASSWORD=YourStrongSaPassword123!
+
+# JWT secret key — minimum 32 characters
+ApiSettings__JwtOptions__SecretKey=your-jwt-secret-key-min-32-chars-here
+
+# Zoho SMTP — for OTP codes, password resets, and notifications
+GmailSettings__Email=your-account@zohomail.com
+GmailSettings__Password=your-zoho-app-password
+
+# CORS — semicolon-separated list of allowed browser origins
+Cors__Origins=http://localhost:30305;http://frontend:30305
+
+# Cookie security (set false for plain HTTP, true when behind HTTPS)
+COOKIE_SECURE=false
+```
+
+### `.env.local` (Frontend development)
+
+```bash
+API_BASE_URL=https://localhost:7105/api
+API_BASE_AUTH=https://localhost:7105/api/auth
+NEXTAUTH_URL=http://localhost:3000
+COOKIE_SECURE=false
+```
+
+---
+
+## 🔒 Security
+
+- JWT access tokens with 2-hour expiry; refresh tokens with 7-day expiry and rotation
+- Role-based authorization enforced at the controller/action level
+- Email confirmation required before first login (6-digit OTP via Zoho SMTP)
+- CORS configured from environment — no wildcards in production
+- HTTPS enforcement and HSTS configurable via `Security:*` settings
+- Input validation on every request DTO via FluentValidation
+- Passwords hashed by ASP.NET Core Identity (PBKDF2)
+- `.env` file is git-ignored — only `.env.example` is committed
+
+---
+
+## 📊 Performance
+
+- Next.js Server-Side Rendering and React Server Components for fast initial load
+- Edge middleware handles token refresh without an extra round-trip
+- EF Core queries with `AsNoTracking()` for read operations
+- Inventory uses a reserve/confirm pattern to prevent overselling under concurrent load
+- Health check endpoint used by Docker Compose to delay dependent services until the DB is ready
 
 ---
 
 ## 🧪 Testing
 
-Unit and integration tests are planned for both backend and frontend components. When implemented, they will include:
-
-- **Backend**: xUnit tests for services, repositories, and controllers
-- **Frontend**: Jest and React Testing Library for components
-- **E2E**: Playwright tests for critical user journeys
+A `Berryfy.Tests` xUnit project is included. Tests for services, repositories, and controllers are in progress.
 
 ---
 
 ## 🚀 Deployment
 
-### Backend Deployment
-1. Publish the API:
-   ```bash
-   dotnet publish Berryfy.API -c Release -o ./publish
-   ```
-2. Deploy to your preferred hosting platform (Azure App Service, AWS, etc.)
-3. Configure production connection strings and secrets
+### Docker (production)
 
-### Frontend Deployment
-1. Build the Next.js application:
-   ```bash
-   cd Berryfy.Web
-   npm run build
-   ```
-2. Deploy to Vercel, Netlify, or your preferred hosting platform
-3. Configure environment variables for production API URL
-
-### Database Deployment
 ```bash
-# Generate migration scripts for production
-dotnet ef migrations script --project Berryfy.Infrastructure --startup-project Berryfy.API
+# On your server
+git clone https://github.com/abdulhamidshahade/berryfy.git berryfy
+cd berryfy
+cp .env.example .env   # fill in production secrets
+docker compose up -d --build
+```
+
+### Manual publish
+
+```bash
+# API
+dotnet publish Berryfy.API -c Release -o ./publish/api
+
+# Frontend
+cd Berryfy.Web
+npm run build
+npm start
+```
+
+### Database migration script (for managed SQL instances)
+
+```bash
+dotnet ef migrations script \
+  --project Berryfy.Infrastructure \
+  --startup-project Berryfy.API \
+  --output migration.sql
 ```
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these steps:
-
 1. Fork the repository
-2. Create your feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'feat: add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
-
-### Development Guidelines
-- Follow Clean Architecture principles
-- Write descriptive commit messages using conventional commits
-- Ensure code is properly formatted and linted
-- Add appropriate tests for new features
-- Update documentation as needed
-
----
-
-## 📖 Documentation
-
-- **API Documentation**: Available at `/swagger` when running the API
-- **Component Documentation**: Storybook integration planned
-- **Architecture Decision Records**: Located in `/docs/adr/` (planned)
-
----
-
-## 🛡️ Security
-
-Berryfy implements comprehensive security measures:
-
-- **Authentication**: JWT tokens with secure headers
-- **Authorization**: Role-based access control
-- **Data Protection**: ASP.NET Core Data Protection APIs
-- **Input Validation**: FluentValidation with XSS protection
-- **HTTPS Enforcement**: Secure communication only
-- **CORS Policy**: Configured for frontend domain only
-
----
-
-## 📊 Performance
-
-- **Caching**: Redis distributed cache for improved response times
-- **Database**: Optimized EF Core queries with proper indexing
-- **Frontend**: Next.js SSR and static generation for fast loading
-- **Images**: Optimized image loading and responsive images
-- **Bundle Size**: Tree shaking and code splitting for minimal bundles
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit using conventional commits: `git commit -m 'feat: add amazing feature'`
+4. Push and open a Pull Request
 
 ---
 
 ## 📄 License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the MIT License.
 
 ---
 
-## 🙏 Acknowledgments
+## 👤 Author
 
-- [ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/) - Web framework
-- [Next.js](https://nextjs.org/) - React framework
-- [Bootstrap](https://getbootstrap.com/) - CSS framework
-- [Bootstrap Icons](https://icons.getbootstrap.com/) - Icon library
-- [Entity Framework Core](https://docs.microsoft.com/en-us/ef/core/) - ORM
-- [FluentValidation](https://fluentvalidation.net/) - Validation library
-
----
-
-## 📞 Support
-
-For support and questions:
-- 📧 Email: support@berryfy.org
-
----
+**Abdulhamid Shahade**  
+📧 [shahade.abdulhamid@gmail.com](mailto:shahade.abdulhamid@gmail.com)  
+🔗 [linkedin.com/in/abdulhamidshahade](https://linkedin.com/in/abdulhamidshahade)  
+💻 [github.com/abdulhamidshahade](https://github.com/abdulhamidshahade)
