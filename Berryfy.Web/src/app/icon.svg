@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Background rounded square -->
+  <rect width="32" height="32" rx="8" fill="#1a0a3c"/>
+  <!-- Berry body -->
+  <circle cx="16" cy="19" r="10" fill="url(#berryGrad)"/>
+  <!-- Highlight -->
+  <circle cx="12.5" cy="15.5" r="3" fill="white" opacity="0.18"/>
+  <!-- Stem -->
+  <line x1="16" y1="9" x2="16" y2="6" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Calyx leaves -->
+  <path d="M16 9 C14 7 11 7.5 11 9.5 C12.5 8.5 14.5 9 16 9Z" fill="#22c55e"/>
+  <path d="M16 9 C18 7 21 7.5 21 9.5 C19.5 8.5 17.5 9 16 9Z" fill="#22c55e"/>
+  <path d="M16 9 C15 6.5 16 4.5 16 6 C16 4.5 17 6.5 16 9Z" fill="#16a34a"/>
+  <!-- Navel dot -->
+  <circle cx="16" cy="27.5" r="1.2" fill="#4c1d95" opacity="0.6"/>
+  <defs>
+    <radialGradient id="berryGrad" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="60%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#4c1d95"/>
+    </radialGradient>
+  </defs>
+</svg>
