@@ -521,7 +521,7 @@ Distributed under the MIT License.
 
 ---
 
-## 👤 Author
+## 👤 Developer
 
 **Abdulhamid Shahade**  
 📧 [shahade.abdulhamid@gmail.com](mailto:shahade.abdulhamid@gmail.com)  
