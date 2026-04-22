@@ -92,7 +92,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
         <div className="col-lg-6">
           <div className="h-100">
-            <h1 className="display-5 fw-bold mb-3">{product.name}</h1>
+            <h1 className="h2 fw-bold mb-3">{product.name}</h1>
             
             <div className="mb-3">
               <span className="text-muted">SKU: {product.sku}</span>
