@@ -46,10 +46,10 @@ export default function RootLayout({
             <div className="row">
               <div className="col-md-6">
                 <h5>Berryfy</h5>
-                <p className="text-muted">Your trusted shopping destination with server-side cart management.</p>
+                <p className="text-white-50">Your trusted shopping destination with server-side cart management.</p>
               </div>
               <div className="col-md-6 text-md-end">
-                <p className="text-muted mb-0">
+                <p className="text-white-50 mb-0">
                   &copy; 2026 Berryfy. All rights reserved.
                 </p>
               </div>
