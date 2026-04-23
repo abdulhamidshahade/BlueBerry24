@@ -11,8 +11,6 @@ services:
       - MSSQL_PID=Express
       - MSSQL_MEMORY_LIMIT_MB=4096
       - MSSQL_COLLATION=SQL_Latin1_General_CP1_CI_AS
-    ports:
-      - "11433:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
     networks:
@@ -39,17 +37,20 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:7105
-      - AllowedHosts=*
+      - AllowedHosts=${ALLOWED_HOSTS}
       - Cors__Origins=http://localhost:30305;http://frontend:30305
       - Database__RunMigrationsOnStartup=true
       - Database__RunSeedOnStartup=true
-      - SEED_SUPERADMIN_PASSWORD=${SEED_SUPERADMIN_PASSWORD:-lkjflajljlka@32lkjA32}
+      - SEED_SUPERADMIN_EMAIL=${SEED_SUPERADMIN_EMAIL}
+      - SEED_SUPERADMIN_FIRSTNAME=${SEED_SUPERADMIN_FIRSTNAME:-Admin}
+      - SEED_SUPERADMIN_LASTNAME=${SEED_SUPERADMIN_LASTNAME:-User}
+      - SEED_SUPERADMIN_PASSWORD=${SEED_SUPERADMIN_PASSWORD}
       - ConnectionStrings__MSSQLServer=Server=sqlserver,1433;Database=Berryfy;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Connection Timeout=60;Command Timeout=120;MultipleActiveResultSets=true;
       - ApiSettings__JwtOptions__SecretKey=${ApiSettings__JwtOptions__SecretKey}
       - ApiSettings__JwtOptions__Issuer=https://berryfy.org
       - ApiSettings__JwtOptions__Audience=berryfy-api
       - ApiSettings__JwtOptions__RequireHttps=false
-      - OpenApi__EnableInProduction=true
+      - OpenApi__EnableInProduction=false
       - App__BaseUrl=https://demo.berryfy.org
       - App__AppName=Berryfy
       - App__Version=1.0.0
@@ -94,7 +95,7 @@ services:
       - API_BASE_ORDER=http://backend:7105/api/Orders
       - API_BASE_INVENTORY=http://backend:7105/api/Inventories
       - USE_CLOUDFLARE=false
-      - COOKIE_SECURE=false
+      - COOKIE_SECURE=${COOKIE_SECURE:-false}
     ports:
       - "30305:30305"
     depends_on:

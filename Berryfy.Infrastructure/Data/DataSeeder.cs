@@ -90,12 +90,21 @@ namespace Berryfy.Infrastructure.Data
         {
             Console.WriteLine("Seeding users...");
 
+            var superAdminEmail = Environment.GetEnvironmentVariable("SEED_SUPERADMIN_EMAIL");
+            if (string.IsNullOrWhiteSpace(superAdminEmail))
+            {
+                Console.WriteLine("Seeder: SEED_SUPERADMIN_EMAIL is not set — skipping superadmin creation.");
+                return;
+            }
+
             var superAdminPass = Environment.GetEnvironmentVariable("SEED_SUPERADMIN_PASSWORD");
+            var firstName = Environment.GetEnvironmentVariable("SEED_SUPERADMIN_FIRSTNAME") ?? "Admin";
+            var lastName = Environment.GetEnvironmentVariable("SEED_SUPERADMIN_LASTNAME") ?? "User";
 
             await CreateUserAsync(
-                email: "abdulhamidshahade@berryfy.org",
-                firstName: "Abdulhamid",
-                lastName: "Shahade",
+                email: superAdminEmail,
+                firstName: firstName,
+                lastName: lastName,
                 role: RoleConstants.SuperAdmin,
                 password: superAdminPass
             );
