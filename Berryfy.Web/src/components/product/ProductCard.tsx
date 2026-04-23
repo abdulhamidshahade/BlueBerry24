@@ -5,12 +5,15 @@ import AddToCartForm from "../cart/AddToCartForm";
 interface ProductCardProps {
   product: ProductDto;
   showAdminActions?: boolean;
+  /** When true with showAdminActions, Edit is disabled (read-only catalog). */
+  catalogMutationsDisabled?: boolean;
   onDelete?: (id: number) => void;
 }
 
 export default function ProductCard({
   product,
   showAdminActions = false,
+  catalogMutationsDisabled = false,
 }: ProductCardProps) {
   const displayName = product.name.replace(/\s*\([^)]*\)\s*/g, " ").trim();
 
@@ -99,12 +102,23 @@ export default function ProductCard({
           <div className="d-flex gap-2 position-relative" style={{ zIndex: 1 }}>
             {showAdminActions ? (
               <>
-                <a
-                  href={`/admin/products/update/${product.id}`}
-                  className="btn btn-outline-warning btn-sm flex-fill"
-                >
-                  <i className="bi bi-pencil-square me-1"></i>Edit
-                </a>
+                {catalogMutationsDisabled ? (
+                  <button
+                    type="button"
+                    disabled
+                    className="btn btn-outline-warning btn-sm flex-fill"
+                    title="Editing products is disabled"
+                  >
+                    <i className="bi bi-pencil-square me-1"></i>Edit
+                  </button>
+                ) : (
+                  <a
+                    href={`/admin/products/update/${product.id}`}
+                    className="btn btn-outline-warning btn-sm flex-fill"
+                  >
+                    <i className="bi bi-pencil-square me-1"></i>Edit
+                  </a>
+                )}
                 <a
                   href={`/admin/products/delete/${product.id}`}
                   className="btn btn-outline-danger btn-sm flex-fill"

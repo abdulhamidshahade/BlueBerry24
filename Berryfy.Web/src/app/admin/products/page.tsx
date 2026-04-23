@@ -4,6 +4,7 @@ import { getPaginatedProducts } from '../../../lib/actions/product-actions';
 import ProductCard from '../../../components/product/ProductCard';
 import Pagination from '../../../components/shared/Pagination';
 import { ProductFilterDto } from '../../../types/pagination';
+import { ADMIN_CATALOG_MUTATIONS_DISABLED } from '../../../lib/config/admin-catalog';
 
 export const dynamic = 'force-dynamic';
 interface SearchParams {
@@ -80,9 +81,15 @@ async function ProductsList({ filter }: { filter: ProductFilterDto }) {
         </div>
         <h3 className="text-muted">No products found</h3>
         <p className="text-muted mb-4">Start by creating your first product.</p>
-        <Link href="/admin/products/create" className="btn btn-primary">
-          <i className="bi bi-plus-circle me-2"></i>Create First Product
-        </Link>
+        {ADMIN_CATALOG_MUTATIONS_DISABLED ? (
+          <button type="button" disabled className="btn btn-primary" title="Creating products is disabled">
+            <i className="bi bi-plus-circle me-2"></i>Create First Product
+          </button>
+        ) : (
+          <Link href="/admin/products/create" className="btn btn-primary">
+            <i className="bi bi-plus-circle me-2"></i>Create First Product
+          </Link>
+        )}
       </div>
     );
   }
@@ -95,6 +102,7 @@ async function ProductsList({ filter }: { filter: ProductFilterDto }) {
             key={product.id} 
             product={product} 
             showAdminActions={true}
+            catalogMutationsDisabled={ADMIN_CATALOG_MUTATIONS_DISABLED}
           />
         ))}
       </div>
@@ -188,12 +196,20 @@ export default async function AdminProductsPage({
             )}
           </p>
         </div>
-        <Link 
-          href="/admin/products/create" 
-          className="btn btn-primary"
-        >
-          <i className="bi bi-plus-circle me-2"></i>Add New Product
-        </Link>
+        {ADMIN_CATALOG_MUTATIONS_DISABLED ? (
+          <button
+            type="button"
+            disabled
+            className="btn btn-primary"
+            title="Adding products is disabled"
+          >
+            <i className="bi bi-plus-circle me-2"></i>Add New Product
+          </button>
+        ) : (
+          <Link href="/admin/products/create" className="btn btn-primary">
+            <i className="bi bi-plus-circle me-2"></i>Add New Product
+          </Link>
+        )}
       </div>
 
       {success && <SuccessAlert message={success} />}
