@@ -46,7 +46,7 @@ services:
       - SEED_SUPERADMIN_PASSWORD=${SEED_SUPERADMIN_PASSWORD:-lkjflajljlka@32lkjA32}
       - ConnectionStrings__MSSQLServer=Server=sqlserver,1433;Database=Berryfy;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Connection Timeout=60;Command Timeout=120;MultipleActiveResultSets=true;
       - ApiSettings__JwtOptions__SecretKey=${ApiSettings__JwtOptions__SecretKey}
-      - ApiSettings__JwtOptions__Issuer=https://berryfy.com
+      - ApiSettings__JwtOptions__Issuer=https://berryfy.org
       - ApiSettings__JwtOptions__Audience=berryfy-api
       - ApiSettings__JwtOptions__RequireHttps=false
       - OpenApi__EnableInProduction=true
