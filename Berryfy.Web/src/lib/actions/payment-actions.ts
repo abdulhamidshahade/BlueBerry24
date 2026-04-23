@@ -11,11 +11,6 @@ const paymentService: IPaymentService = new PaymentService();
 
 export async function processPayment(formData: FormData) {
   try {
-    console.log('ProcessPayment Action - Raw FormData entries:');
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
-
     const orderId = formData.get("orderId") ? parseInt(formData.get("orderId") as string) : undefined;
     const method = parseInt(formData.get("method") as string) as PaymentMethod;
     const provider = formData.get("provider") as string;
@@ -60,21 +55,6 @@ export async function processPayment(formData: FormData) {
     if (!emailRegex.test(payerEmail)) {
       throw new Error(`Invalid email format: ${payerEmail}`);
     }
-
-    console.log('ProcessPayment Action - Validated data:', {
-      orderId,
-      method,
-      provider,
-      amount,
-      currency,
-      payerEmail,
-      payerName,
-      billingAddress1,
-      billingCity,
-      billingState,
-      billingPostalCode,
-      billingCountry
-    });
 
     const paymentData: CreatePayment = {
       orderId,
@@ -312,56 +292,3 @@ export async function getTotalAmountByDateRange(startDate: string, endDate: stri
     throw new Error("Failed to fetch total amount");
   }
 }
-
-export async function validatePaymentData(formData: FormData) {
-  try {
-    console.log('=== PAYMENT DATA VALIDATION TEST ===');
-    console.log('Raw FormData entries:');
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}: ${value} (type: ${typeof value})`);
-    }
-
-    const orderId = formData.get("orderId") ? parseInt(formData.get("orderId") as string) : undefined;
-    const method = parseInt(formData.get("method") as string) as PaymentMethod;
-    const provider = formData.get("provider") as string;
-    const amount = parseFloat(formData.get("amount") as string);
-    const currency = (formData.get("currency") as string) || "USD";
-    
-    console.log('\nParsed values:');
-    console.log(`orderId: ${orderId} (${typeof orderId})`);
-    console.log(`method: ${method} (${typeof method}) - Valid: ${!isNaN(method) && method >= 0 && method <= 8}`);
-    console.log(`provider: "${provider}" (${typeof provider}) - Valid: ${!!(provider && provider.trim())}`);
-    console.log(`amount: ${amount} (${typeof amount}) - Valid: ${!isNaN(amount) && amount > 0}`);
-    console.log(`currency: "${currency}" (${typeof currency})`);
-
-    const paymentData: CreatePayment = {
-      orderId,
-      method,
-      provider,
-      amount,
-      currency,
-      payerEmail: formData.get("payerEmail") as string,
-      payerName: formData.get("payerName") as string,
-      billingAddress1: formData.get("billingAddress1") as string,
-      billingAddress2: formData.get("billingAddress2") as string || undefined,
-      billingCity: formData.get("billingCity") as string,
-      billingState: formData.get("billingState") as string,
-      billingPostalCode: formData.get("billingPostalCode") as string,
-      billingCountry: formData.get("billingCountry") as string,
-      cardLast4: formData.get("cardLast4") as string || undefined,
-      cardBrand: formData.get("cardBrand") as string || undefined
-    };
-
-    console.log('\nFinal payment data object:');
-    console.log(JSON.stringify(paymentData, null, 2));
-    
-    return { success: true, data: paymentData, message: "Validation successful" };
-  } catch (error) {
-    console.error('Validation error:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : "Validation failed",
-      message: "Validation failed"
-    };
-  }
-} 

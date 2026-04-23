@@ -54,11 +54,27 @@ async function uploadImageFile(file: File, currentImageUrl?: string): Promise<st
     }
   }
 
+  const ALLOWED_EXTENSIONS: Record<string, string> = {
+    'image/jpeg': '.jpg',
+    'image/png': '.png',
+    'image/gif': '.gif',
+    'image/webp': '.webp',
+  };
+
+  const mimeType = file.type.toLowerCase();
+  if (!ALLOWED_EXTENSIONS[mimeType]) {
+    throw new Error(`File type not allowed. Accepted: JPEG, PNG, GIF, WebP.`);
+  }
+
+  const MAX_SIZE = 10 * 1024 * 1024;
+  if (file.size > MAX_SIZE) {
+    throw new Error('Image must be smaller than 10 MB.');
+  }
+
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
-  
-  const fileExtension = file.name.substring(file.name.lastIndexOf('.'));
 
+  const fileExtension = ALLOWED_EXTENSIONS[mimeType];
   const fileName = `${Date.now()}_category_${uuidv4()}${fileExtension}`;
   const uploadDir = path.join(process.cwd(), 'public/uploads/category');
 

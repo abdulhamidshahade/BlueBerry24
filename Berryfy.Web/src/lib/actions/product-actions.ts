@@ -60,11 +60,27 @@ async function uploadImageFile(
     }
   }
 
+  const ALLOWED_EXTENSIONS: Record<string, string> = {
+    "image/jpeg": ".jpg",
+    "image/png": ".png",
+    "image/gif": ".gif",
+    "image/webp": ".webp",
+  };
+
+  const mimeType = file.type.toLowerCase();
+  if (!ALLOWED_EXTENSIONS[mimeType]) {
+    throw new Error(`File type not allowed. Accepted: JPEG, PNG, GIF, WebP.`);
+  }
+
+  const MAX_SIZE = 10 * 1024 * 1024;
+  if (file.size > MAX_SIZE) {
+    throw new Error("Image must be smaller than 10 MB.");
+  }
+
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  const fileExtension = file.name.substring(file.name.lastIndexOf("."));
-
+  const fileExtension = ALLOWED_EXTENSIONS[mimeType];
   const fileName = `${Date.now()}_product_${uuidv4()}${fileExtension}`;
   const uploadDir = path.join(process.cwd(), "public/uploads/product");
 
@@ -99,13 +115,17 @@ export async function createProduct(formData: FormData): Promise<void> {
     const errors: Record<string, string> = {};
 
     if (!imageFile || imageFile.size === 0) {
-      errors.imageFile = "Category image is required";
+      errors.imageFile = "Product image is required";
     } else {
       if (!imageFile.type.startsWith("image/")) {
         errors.imageFile = "Please select a valid image file";
       } else if (imageFile.size > 10 * 1024 * 1024) {
         errors.imageFile = "Image size must be less than 10MB";
       }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      throw new Error(Object.values(errors)[0]);
     }
 
     const imageUrl = await uploadImageFile(imageFile);
@@ -151,6 +171,15 @@ export async function updateProduct(
       : [];
 
     const imageFile = formData.get("imageFile") as File;
+
+    if (imageFile && imageFile.size > 0) {
+      if (!imageFile.type.startsWith("image/")) {
+        throw new Error("Please select a valid image file");
+      }
+      if (imageFile.size > 10 * 1024 * 1024) {
+        throw new Error("Image size must be less than 10MB");
+      }
+    }
 
     const imageUrl = await uploadImageFile(imageFile, currentImageUrl);
 
