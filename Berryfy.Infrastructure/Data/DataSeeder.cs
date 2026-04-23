@@ -93,7 +93,7 @@ namespace Berryfy.Infrastructure.Data
             var superAdminPass = Environment.GetEnvironmentVariable("SEED_SUPERADMIN_PASSWORD");
 
             await CreateUserAsync(
-                email: "shahade.abdulhamid@gmail.com",
+                email: "abdulhamidshahade@berryfy.org",
                 firstName: "Abdulhamid",
                 lastName: "Shahade",
                 role: RoleConstants.SuperAdmin,

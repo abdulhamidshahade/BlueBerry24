@@ -7,7 +7,7 @@ interface LoginFormProps {
   redirectTo?: string;
 }
 
-const SUPER_ADMIN_EMAIL = 'shahade.abdulhamid@gmail.com';
+const SUPER_ADMIN_EMAIL = 'abdulhamidshahade@berryfy.org';
 const SUPER_ADMIN_PASSWORD = 'lkjflajljlka@32lkjA32';
 
 export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
