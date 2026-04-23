@@ -1,0 +1,1 @@
+export const ADMIN_CATALOG_MUTATIONS_DISABLED = true;
