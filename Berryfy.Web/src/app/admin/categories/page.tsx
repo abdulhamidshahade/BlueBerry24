@@ -3,6 +3,7 @@ import { CategoryService } from '../../../lib/services/category/service';
 import { ICategoryService } from "../../../lib/services/category/interface";
 import { CategoryDto } from "../../../types/category";
 import CategoryActionButtons from '../../../components/category/CategoryActionButtons';
+import { ADMIN_CATALOG_MUTATIONS_DISABLED } from '../../../lib/config/admin-catalog';
 
 const categoryService: ICategoryService = new CategoryService();
 
@@ -40,13 +41,22 @@ export default async function AdminCategoriesPage({ searchParams }: Props) {
                 Create, edit, and manage product categories
               </p>
             </div>
-            <Link
-              href="/admin/categories/create"
-              className="btn btn-primary"
-            >
-              <i className="bi bi-plus-circle me-2"></i>
-              Add New Category
-            </Link>
+            {ADMIN_CATALOG_MUTATIONS_DISABLED ? (
+              <button
+                type="button"
+                disabled
+                className="btn btn-primary"
+                title="Adding categories is disabled"
+              >
+                <i className="bi bi-plus-circle me-2"></i>
+                Add New Category
+              </button>
+            ) : (
+              <Link href="/admin/categories/create" className="btn btn-primary">
+                <i className="bi bi-plus-circle me-2"></i>
+                Add New Category
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -120,13 +130,22 @@ export default async function AdminCategoriesPage({ searchParams }: Props) {
                   <i className="bi bi-folder-x display-1 text-muted mb-3"></i>
                   <h5 className="text-muted">No Categories Found</h5>
                   <p className="text-muted mb-4">Get started by creating your first category.</p>
-                  <Link
-                    href="/admin/categories/create"
-                    className="btn btn-primary"
-                  >
-                    <i className="bi bi-plus-circle me-2"></i>
-                    Create First Category
-                  </Link>
+                  {ADMIN_CATALOG_MUTATIONS_DISABLED ? (
+                    <button
+                      type="button"
+                      disabled
+                      className="btn btn-primary"
+                      title="Creating categories is disabled"
+                    >
+                      <i className="bi bi-plus-circle me-2"></i>
+                      Create First Category
+                    </button>
+                  ) : (
+                    <Link href="/admin/categories/create" className="btn btn-primary">
+                      <i className="bi bi-plus-circle me-2"></i>
+                      Create First Category
+                    </Link>
+                  )}
                 </div>
               ) : !hasError ? (
                 <div className="table-responsive">
@@ -169,7 +188,10 @@ export default async function AdminCategoriesPage({ searchParams }: Props) {
                             </span>
                           </td>
                           <td>
-                            <CategoryActionButtons categoryId={category.id} />
+                            <CategoryActionButtons
+                              categoryId={category.id}
+                              editDisabled={ADMIN_CATALOG_MUTATIONS_DISABLED}
+                            />
                           </td>
                         </tr>
                       ))}
