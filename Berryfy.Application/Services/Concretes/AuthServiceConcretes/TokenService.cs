@@ -61,10 +61,16 @@ namespace Berryfy.Application.Services.Concretes.AuthServiceConcretes
         public async Task<string> GenerateRefreshToken(ApplicationUser user)
         {
             var refreshToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
-            user.RefreshToken = refreshToken;
+            user.RefreshToken = HashToken(refreshToken);
             user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
             await _userManager.UpdateAsync(user);
             return refreshToken;
+        }
+
+        public static string HashToken(string token)
+        {
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(token));
+            return Convert.ToBase64String(bytes);
         }
     }
 }

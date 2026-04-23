@@ -192,7 +192,8 @@ namespace Berryfy.Application.Services.Concretes.AuthServiceConcretes
 
         public async Task<LoginResponseDto> RefreshTokenAsync(string refreshToken)
         {
-            var user = _userManager.Users.FirstOrDefault(u => u.RefreshToken == refreshToken);
+            var hashedToken = TokenService.HashToken(refreshToken);
+            var user = _userManager.Users.FirstOrDefault(u => u.RefreshToken == hashedToken);
 
             if (user == null || user.RefreshTokenExpiry == null || user.RefreshTokenExpiry < DateTime.UtcNow)
             {
