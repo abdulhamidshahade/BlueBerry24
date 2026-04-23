@@ -37,7 +37,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:7105
-      - AllowedHosts=${ALLOWED_HOSTS:-*};localhost
+      - AllowedHosts=${ALLOWED_HOSTS}
       - Cors__Origins=http://localhost:30305;http://frontend:30305
       - Database__RunMigrationsOnStartup=true
       - Database__RunSeedOnStartup=true
