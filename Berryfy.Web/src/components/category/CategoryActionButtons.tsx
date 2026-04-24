@@ -2,7 +2,6 @@ import Link from 'next/link';
 
 interface Props {
   categoryId: number;
-  /** When true, Edit is disabled (read-only catalog). */
   editDisabled?: boolean;
 }
 
