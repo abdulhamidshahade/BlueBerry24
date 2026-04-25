@@ -19,7 +19,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
-using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
