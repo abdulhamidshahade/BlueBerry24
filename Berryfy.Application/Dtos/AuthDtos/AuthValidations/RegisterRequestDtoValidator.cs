@@ -1,9 +1,4 @@
-﻿using Berryfy.Application.Services.Concretes.AuthServiceConcretes;
-using Berryfy.Domain.Entities.AuthEntities;
-using FluentValidation;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Query.Internal;
-using System.Security.Cryptography.X509Certificates;
+﻿using FluentValidation;
 
 namespace Berryfy.Application.Dtos.AuthDtos.AuthValidations
 {
