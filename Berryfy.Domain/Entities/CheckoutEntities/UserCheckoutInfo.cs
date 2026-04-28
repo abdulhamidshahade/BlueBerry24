@@ -1,5 +1,3 @@
-using System;
-
 namespace Berryfy.Domain.Entities.CheckoutEntities
 {
     public class UserCheckoutInfo
