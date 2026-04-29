@@ -3,13 +3,6 @@ using Berryfy.Domain.Entities.AuthEntities;
 using Berryfy.Domain.Entities.Base;
 using Berryfy.Domain.Entities.PaymentEntities;
 using Berryfy.Domain.Entities.ShoppingCartEntities;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Berryfy.Domain.Entities.OrderEntities
 {
     public class Order : IAuditableEntity
