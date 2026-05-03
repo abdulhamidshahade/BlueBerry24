@@ -126,17 +126,13 @@ export async function registerAction(formData: FormData) {
 
     const response = await AuthService.register(userData);
 
-    //TODO: make here validations for register functionality
-    // if (response.isSuccess) {
-    //   return { success: true };
-    // } else {
-    //   return {
-    //     error: response.statusMessage || 'Registration failed',
-    //   };
-    // }
+    if (response.isSuccess) {
+      return { success: true };
+    }
 
-    return true;
-
+    return {
+      error: response.statusMessage || response.errors?.[0] || 'Registration failed.',
+    };
   } catch (error) {
     console.error('Registration error:', error);
     return {

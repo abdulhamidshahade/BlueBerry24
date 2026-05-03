@@ -9,23 +9,23 @@ namespace Berryfy.Application.Dtos.AuthDtos.AuthValidations
             RuleFor(fn => fn.FirstName)
                 .NotNull().WithMessage("First name is required.")
                 .NotEmpty().WithMessage("First name is required.")
-                .Matches(@"^[a-zA-Z\s'-]+$").WithMessage("First name must contain only letters.")
+                .Matches(@"^[\p{L}\s'-]+$").WithMessage("First name must contain only letters.")
                 .MinimumLength(2).WithMessage("First name must be at least 2 characters long.")
                 .MaximumLength(50).WithMessage("First name must be at most 50 characters long.");
 
             RuleFor(fn => fn.LastName)
                 .NotNull().WithMessage("Last name is required.")
                 .NotEmpty().WithMessage("Last name is required.")
-                .Matches(@"^[a-zA-Z\s'-]+$").WithMessage("Last name must contain only letters.")
+                .Matches(@"^[\p{L}\s'-]+$").WithMessage("Last name must contain only letters.")
                 .MinimumLength(2).WithMessage("Last name must be at least 2 characters long.")
                 .MaximumLength(50).WithMessage("Last name must be at most 50 characters long.");
 
             RuleFor(fn => fn.UserName)
-                .NotNull().WithMessage("Last name is required.")
-                .NotEmpty().WithMessage("Last name is required.")
-                .Matches(@"^[a-zA-Z0-9\s._'-]+$").WithMessage("Last name must contain only letters.")
-                .MinimumLength(3).WithMessage("Last name must be at least 3 characters long.")
-                .MaximumLength(20).WithMessage("Last name must be at most 20 characters long.");
+                .NotNull().WithMessage("Username is required.")
+                .NotEmpty().WithMessage("Username is required.")
+                .Matches(@"^[\p{L}0-9\s._'-]+$").WithMessage("Username may include letters, numbers, spaces, periods, underscores, apostrophes, and hyphens.")
+                .MinimumLength(3).WithMessage("Username must be at least 3 characters long.")
+                .MaximumLength(20).WithMessage("Username must be at most 20 characters long.");
 
             RuleFor(fn => fn.Email)
                 .NotNull().WithMessage("Email is required.")
@@ -35,11 +35,11 @@ namespace Berryfy.Application.Dtos.AuthDtos.AuthValidations
             RuleFor(fn => fn.Password)
                 .NotNull().WithMessage("Password is required.")
                 .NotEmpty().WithMessage("Password is required.")
-                .MinimumLength(2).WithMessage("Password must be at least 2 characters long.")
+                .MinimumLength(6).WithMessage("Password must be at least 6 characters long.")
                 .MaximumLength(50).WithMessage("Password must be at most 50 characters long.")
-                .Must(pass => ContainsUpperCase(pass)).WithMessage("Password should contains at least one uppercase letter.")
-                .Must(pass => ContainsDigits(pass)).WithMessage("Password should contains at least one digit.")
-                .Must(pass => ContainsSpecial(pass)).WithMessage("Password should contains at least one special character.");
+                .Must(pass => ContainsUpperCase(pass)).WithMessage("Password should contain at least one uppercase letter.")
+                .Must(pass => ContainsDigits(pass)).WithMessage("Password should contain at least one digit.")
+                .Must(pass => ContainsSpecial(pass)).WithMessage("Password should contain at least one special character.");
         }
 
         private bool ContainsUpperCase(string password)

@@ -35,6 +35,17 @@ namespace Berryfy.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto requestDto)
         {
+            if (requestDto == null || !ModelState.IsValid)
+            {
+                return BadRequest(new ResponseDto<RegisterResponseDto>
+                {
+                    IsSuccess = false,
+                    StatusCode = 400,
+                    StatusMessage = "Invalid registration data.",
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList()
+                });
+            }
+
             var registerResult = await _authService.Register(requestDto);
 
             switch (registerResult)

@@ -58,15 +58,16 @@ export default function RegisterForm({ redirectTo }: RegisterFormProps) {
 
     startTransition(async () => {
       const result = await registerAction(formData);
-      if (result) {
+      if (result?.success) {
         let url = '/auth/confirm-email?email=' + encodeURIComponent(email);
         if (redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')) {
           url += '&redirectTo=' + encodeURIComponent(redirectTo);
         }
         window.location.href = url;
-      } else {
-        setError('Registration failed. Please try again.');
+        return;
       }
+
+      setError(result?.error || 'Registration failed. Please try again.');
     });
   }
 
